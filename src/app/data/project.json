@@ -1,0 +1,90 @@
+[
+  {
+    "slug": "smart-project",
+    "title": "SMART Project",
+    "src": "/assets/img/factbg.webp",
+    "fullName": "Sustainable Microenterprise and Resilient Transformation",
+    "category": "Economic Development",
+    "description": "Supported by the World Bank and PKSF, the SMART project (2025–2028) strengthens microenterprises in agribusiness, manufacturing, and service sectors. The project promotes climate-resilient technologies and sustainable green growth, particularly in environmentally vulnerable areas."
+  },
+  {
+    "slug": "integrated-agricultural-farm",
+    "title": "Integrated Agricultural Farm",
+    "src": "/assets/img/agri/agri1.webp",
+    "fullName": "Agriculture, Fisheries and Livestock Development Program",
+    "category": "Agriculture",
+    "description": "This program promotes modern agricultural practices such as USG block demonstration, AWD irrigation techniques, vermicompost production, and improved crop varieties. It also supports livestock rearing, fish culture, and beef fattening to increase rural income."
+  },
+  {
+    "slug": "cdsp",
+    "title": "CDSP",
+    "src": "/assets/img/fisheries/fisheries1.webp",
+    "fullName": "Char Development and Settlement Project",
+    "category": "Coastal Development",
+    "description": "The CDSP initiative focuses on improving the livelihoods of coastal char communities through infrastructure development, land settlement support, and climate resilience activities for vulnerable households."
+  },
+  {
+    "slug": "programme-for-adolescents",
+    "title": "Programme for Adolescents",
+    "src": "/assets/img/fisheries/fisheries2.webp",
+    "fullName": "Koisor (Adolescent) and Adolescent Girl Club Programme",
+    "category": "Youth Development",
+    "description": "Implemented with support from PKSF, this program builds awareness, leadership, and life skills among adolescents, particularly girls. It promotes education, health awareness, and community participation to empower young people."
+  },
+  {
+    "slug": "bdrwash-project",
+    "title": "BDRWASH Project",
+    "src": "/assets/img/microfinance/micro1.webp",
+    "fullName": "Bangladesh Rural Water, Sanitation and Hygiene for Human Capital Development",
+    "category": "Health & Sanitation",
+    "description": "Funded by the World Bank, AIIB, and PKSF (2021–2025), the BDRWASH project increases access to safe drinking water, sanitary latrines, and hygiene practices to help achieve SDG Goal 6 in rural communities."
+  },
+  {
+    "slug": "lift-project",
+    "title": "LIFT",
+    "src": "/assets/img/microfinance/micro3.webp",
+    "fullName": "Learning and Innovation Fund to Test New Ideas",
+    "category": "Innovation",
+    "description": "The LIFT program supports testing and scaling of innovative development solutions. It enables organizations to experiment with new approaches to poverty reduction, livelihood improvement, and sustainable community development."
+  },
+  {
+    "slug": "elderly-people-programme",
+    "title": "Elderly People Programme",
+    "src": "/assets/img/scolarship/hh.jpg.jpg",
+    "fullName": "Elderly People Livelihood Development Program",
+    "category": "Social Protection",
+    "description": "This program organizes elderly citizens into community groups and provides livelihood support, health services, and social protection. Elderly centers are established to promote dignity and wellbeing among older community members."
+  },
+  {
+    "slug": "enrich-program",
+    "title": "ENRICH",
+    "src": "/assets/img/microfinance/micro2.webp",
+    "fullName": "Enhancing Resources and Increasing Capacities of Poor Households",
+    "category": "Poverty Reduction",
+    "description": "The ENRICH program aims to reduce poverty by strengthening the economic, social, and health capacities of poor households through integrated community development and asset-building activities."
+  },
+  {
+    "slug": "raise-project",
+    "title": "RAISE Project",
+    "src": "/assets/img/raise/raise1.webp",
+    "fullName": "Recovery and Advancement of Informal Sector Employment",
+    "category": "Employment",
+    "description": "Implemented with support from PKSF (2022–2026), the RAISE project improves employability and productivity of informal sector workers. It provides financial assistance and skill development for low-income youth and micro-entrepreneurs."
+  },
+  {
+    "slug": "integrated-agriculture-unit",
+    "title": "Integrated Agriculture Unit",
+    "src": "/assets/img/agri/agri2.webp",
+    "fullName": "SSUS Integrated Agriculture and Livestock Program",
+    "category": "Agriculture",
+    "description": "This initiative promotes diversified agriculture, livestock rearing, and fish farming to enhance rural livelihoods, improve food security, and increase household income in underserved communities."
+  },
+  {
+    "slug": "sustainable-enterprise-project",
+    "title": "Sustainable Enterprise Project",
+    "src": "/assets/img/actionAid/action.webp",
+    "fullName": "Microenterprise Development Initiative",
+    "category": "Economic Development",
+    "description": "This project supports the growth of small and microenterprises through access to finance, business training, and market linkages to create sustainable employment opportunities."
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "category": "Health",
+    "title": "Diagnostic Center",
+    "image": "/assets/img/diagonastic/diagonastic1.webp"
+  },
+  {
+    "id": 2,
+    "category": "Education",
+    "title": "Scholarship Program",
+    "image": "/assets/img/scolarship/hh.jpg.jpg"
+  },
+  {
+    "id": 3,
+    "category": "Disaster Relief",
+    "title": "Flood Support",
+    "image": "/assets/img/Livestock/Livestock food 1.webp"
+  },
+  {
+    "id": 4,
+    "category": "Cultural",
+    "title": "Bangabandhu Anniversary",
+    "image": "/assets/img/gallery/4.webp"
+  },
+  {
+    "id": 5,
+    "category": "Health",
+    "title": "Clinic Services",
+    "image": "/assets/img/health/health2.webp"
+  },
+  {
+    "id": 6,
+    "category": "Award",
+    "title": "Citi Award",
+    "image": "/assets/img/awardsandrecognitions/Citi Award.webp"
+  },
+  {
+    "id": 7,
+    "category": "Award",
+    "title": "Dairy Icon Award",
+    "image": "/assets/img/awardsandrecognitions/Dairy Icon award.webp"
+  },
+  {
+    "id": 8,
+    "category": "Award",
+    "title": "Fish Award",
+    "image": "/assets/img/awardsandrecognitions/Fish Award.webp"
+  }
+]

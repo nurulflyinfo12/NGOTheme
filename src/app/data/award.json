@@ -1,0 +1,20 @@
+[
+ {
+    "id": 1,
+    "category": "Award",
+    "title": "Citi Award",
+    "image": "/assets/img/awardsandrecognitions/Citi Award.webp"
+  },
+  {
+    "id": 2,
+    "category": "Award",
+    "title": "Dairy Icon Award",
+    "image": "/assets/img/awardsandrecognitions/Dairy Icon award.webp"
+  },
+  {
+    "id": 3,
+    "category": "Award",
+    "title": "Fish Award",
+    "image": "/assets/img/awardsandrecognitions/Fish Award.webp"
+  }
+]
