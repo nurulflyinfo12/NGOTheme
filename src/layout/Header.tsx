@@ -430,6 +430,10 @@ const Nav = () => {
             <Link href="/publication">Publication</Link>
           </li>
 
+          <li className={isActive("/careers") ? "active" : ""}>
+            <Link href="/careers">Careers</Link>
+          </li>
+
           <li className={isActive("/contact") ? "active" : ""}>
             <Link href="/contact">Contact</Link>
           </li>

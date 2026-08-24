@@ -27,6 +27,58 @@ const PublicationsPage = () => {
     setSelectedPdf("");
   };
 
+  const JobCircular = [
+    {
+      id: 1,
+      title: "শিক্ষানবিশ শাখা ব্যবসা",
+      description: "শিক্ষানবিশ শাখা ব্যবসা",
+      fileId: "14Y1Z6ADQNYPHx7qTTjR-TY5dGNtppYW0",
+      date: "2026",
+      type: "Job Circular",
+    },
+    {
+      id: 2,
+      title: "শাখা ব্যবস্থাপক - Sagarika Samaj",
+      description: "শাখা ব্যবস্থাপক - Sagarika Samaj",
+      fileId: "1Ol-VizxlKKmkmuLyf7WeJyws35JXCY2m",
+      date: "2026",
+      type: "Job Circular",
+    },
+    {
+      id: 3,
+      title: "ক্রেডিট অফিসার (অভিজ্ঞ)",
+      description: "ক্রেডিট অফিসার (অভিজ্ঞ)- Published: 19 Aug 2026",
+      fileId: "1X3wgAOW4ch2MONErio6kSKxZ3cZapqEJ",
+      date: "2026",
+      type: "Job Circular",
+    },
+    {
+      id: 4,
+      title: "ক্রেডিট অফিসার - অভিজ্ঞ",
+      description: "ক্রেডিট অফিসার (অভিজ্ঞ)- Application Deadline : 06 Sep 2026",
+      fileId: "1aQcPuBk73gZlnNkna2hqTI6Vs0yJXqST",
+      date: "2026",
+      type: "Job Circular",
+    },
+    {
+      id: 5,
+      title: "এলাকা ব্যবস্থাপক - Sagarika Samaj",
+      description: "এলাকা ব্যবস্থাপক - Sagarika Samaj - Published: 19 Aug 2026",
+      fileId: "1gThdIAW9-WwwQcaVh8tBGn8iCMy7xhLV",
+      date: "2026",
+      type: "Job Circular",
+    },
+    {
+      id: 6,
+      title: "নিয়োগ বিজ্ঞপ্তি",
+      description: "নিয়োগ বিজ্ঞপ্তি",
+      fileId: "1tyDLiua1LRDt3QiKqIt1Jbs5d6etF7di",
+      date: "2026",
+      type: "Job Circular",
+    },
+
+  ];
+
   const annualReports = [
     {
       id: 1,
@@ -54,6 +106,7 @@ const PublicationsPage = () => {
     },
 
   ];
+
 
   const brochures = [
     {
@@ -151,8 +204,7 @@ const PublicationsPage = () => {
   return (
     <DanboxLayout header={1}>
       <PageBanner pageName="Publications" pageTitle="Annual Reports & Publications" />
-
-      {/* ANNUAL REPORTS */}
+      {/* Annual Repoets  */}
       <section className="py-10! bg-white dark:bg-[#0f172a]!">
         <div className="container mx-auto px-6! lg:max-w-7xl">
           <h2 className="text-4xl font-black! text-center mb-12! text-gray-900! dark:text-white!">
@@ -188,6 +240,7 @@ const PublicationsPage = () => {
                       href={getDownloadUrl(pub.fileId)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="dark:text-white!"
                     >
                       Download
                     </a>
@@ -234,6 +287,7 @@ const PublicationsPage = () => {
                       href={getDownloadUrl(item.fileId)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="dark:text-white!"
                     >
                       Download
                     </a>
@@ -280,6 +334,7 @@ const PublicationsPage = () => {
                       href={getDownloadUrl(item.fileId)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="dark:text-white!"
                     >
                       Download
                     </a>
@@ -326,6 +381,7 @@ const PublicationsPage = () => {
                       href={getDownloadUrl(item.fileId)}
                       target="_blank"
                       rel="noopener noreferrer"
+                      className="dark:text-white!"
                     >
                       Download
                     </a>

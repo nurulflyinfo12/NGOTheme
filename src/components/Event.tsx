@@ -19,47 +19,47 @@ export const Event1 = () => {
     link: string;
     description: string;
   }[] = [
-    {
-      img: "/assets/img/microfinance/micro2.webp",
-      date: "20 Mar 2026",
-      time: "10:00 AM",
-      location: "SSUS Head Office, Charbata, Noakhali",
-      title: "Microfinance Awareness Workshop",
-      link: "event-details",
-      description:
-        "An informative session on microfinance programs empowering coastal families in Bangladesh.",
-    },
-    {
-      img: "/assets/img/factbg.webp",
-      date: "25 Mar 2026",
-      time: "11:00 AM",
-      location: "Community Hall, Subarnachar",
-      title: "Disaster Preparedness Training",
-      link: "event-details",
-      description:
-        "Training session for local communities on cyclone and flood preparedness and response.",
-    },
-    {
-      img: "/assets/img/factbg.webp",
-      date: "30 Mar 2026",
-      time: "09:30 AM",
-      location: "Lakshmipur School Grounds",
-      title: "Clean Water & Sanitation Campaign",
-      link: "event-details",
-      description:
-        "Launching awareness and practical support for safe drinking water and sanitation in coastal villages.",
-    },
-    {
-      img: "/assets/img/factbg.webp",
-      date: "05 Apr 2026",
-      time: "10:00 AM",
-      location: "SSUS Training Center, Noakhali",
-      title: "Women Empowerment & Vocational Training",
-      link: "event-details",
-      description:
-        "A program to educate and train women in skills development, legal awareness, and small business management.",
-    },
-  ];
+      {
+        img: "/assets/img/microfinance/micro2.webp",
+        date: "20 Mar 2026",
+        time: "10:00 AM",
+        location: "SSUS Head Office, Charbata, Noakhali",
+        title: "Microfinance Awareness Workshop",
+        link: "event-details",
+        description:
+          "An informative session on microfinance programs empowering coastal families in Bangladesh.",
+      },
+      {
+        img: "/assets/img/factbg.webp",
+        date: "25 Mar 2026",
+        time: "11:00 AM",
+        location: "Community Hall, Subarnachar",
+        title: "Disaster Preparedness Training",
+        link: "event-details",
+        description:
+          "Training session for local communities on cyclone and flood preparedness and response.",
+      },
+      {
+        img: "/assets/img/factbg.webp",
+        date: "30 Mar 2026",
+        time: "09:30 AM",
+        location: "Lakshmipur School Grounds",
+        title: "Clean Water & Sanitation Campaign",
+        link: "event-details",
+        description:
+          "Launching awareness and practical support for safe drinking water and sanitation in coastal villages.",
+      },
+      {
+        img: "/assets/img/factbg.webp",
+        date: "05 Apr 2026",
+        time: "10:00 AM",
+        location: "SSUS Training Center, Noakhali",
+        title: "Women Empowerment & Vocational Training",
+        link: "event-details",
+        description:
+          "A program to educate and train women in skills development, legal awareness, and small business management.",
+      },
+    ];
 
   // Animation classes for each card position
   const cardAnimations = [
@@ -117,7 +117,7 @@ export const Event1 = () => {
           </p>
         </div>
 
-        <div className="container-fluid mx-auto px-4! sm:px-6! lg:px-8! xl:px-36!">
+        <div className="container-fluid mx-auto px-4! sm:px-6! lg:px-8! xl:px-60!">
           {/* 2-Column Grid - Responsive */}
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8">
             {eventsData.map((event, i) => (
@@ -140,11 +140,11 @@ export const Event1 = () => {
                     className="object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
                   />
                   {/* Date Badge */}
-                  <div className="absolute top-3 left-3 bg-white/95 dark:bg-slate-900/95! backdrop-blur-sm text-center px-3 py-1.5 rounded-xl shadow-md border border-slate-100 dark:border-slate-800!">
-                    <div className="text-[10px] text-[#f86048] font-bold tracking-wider uppercase">
+                  <div className="absolute top-3 left-3 bg-white/95 dark:bg-slate-900/95! backdrop-blur-sm text-center px-1.5! py-1.5! rounded-[10px]! shadow-md border border-slate-100 dark:border-slate-800!">
+                    <div className="text-[10px] text-[#f86048] font-bold tracking-wider! uppercase leading-none!">
                       {event.date.split(" ")[1]}
                     </div>
-                    <div className="text-lg font-black text-slate-900 dark:text-white! leading-none mt-0!">
+                    <div className="text-lg font-black text-slate-900 dark:text-white! leading-none!">
                       {event.date.split(" ")[0]}
                     </div>
                   </div>
@@ -342,27 +342,27 @@ export const Event2 = () => {
     description: string;
     delay: string;
   }[] = [
-    {
-      img: "/assets/img/event/02.webp",
-      date: "13 Nov 2024",
-      time: "10:00 PM",
-      location: "66 Broklyant, New York India",
-      title: "How to build a loyal community offline",
-      description:
-        "Nullam faucibus eleifend mi eu varius. Integer vel tincidunt massa, quis semper odio. Mauris et mollis quam. Nullam fringilla erat id ante commodo sodales.",
-      delay: ".3s",
-    },
-    {
-      img: "/assets/img/event/08.webp",
-      date: "13 Nov 2024",
-      time: "10:00 PM",
-      location: "66 Broklyant, New York India",
-      title: "Start a campaign to reach your creative",
-      description:
-        "Nullam faucibus eleifend mi eu varius. Integer vel tincidunt massa, quis semper odio. Mauris et mollis quam. Nullam fringilla erat id ante commodo sodales.",
-      delay: ".5s",
-    },
-  ];
+      {
+        img: "/assets/img/event/02.webp",
+        date: "13 Nov 2024",
+        time: "10:00 PM",
+        location: "66 Broklyant, New York India",
+        title: "How to build a loyal community offline",
+        description:
+          "Nullam faucibus eleifend mi eu varius. Integer vel tincidunt massa, quis semper odio. Mauris et mollis quam. Nullam fringilla erat id ante commodo sodales.",
+        delay: ".3s",
+      },
+      {
+        img: "/assets/img/event/08.webp",
+        date: "13 Nov 2024",
+        time: "10:00 PM",
+        location: "66 Broklyant, New York India",
+        title: "Start a campaign to reach your creative",
+        description:
+          "Nullam faucibus eleifend mi eu varius. Integer vel tincidunt massa, quis semper odio. Mauris et mollis quam. Nullam fringilla erat id ante commodo sodales.",
+        delay: ".5s",
+      },
+    ];
   return (
     <section className="event-section fix section-padding">
       <div className="container">
@@ -435,105 +435,105 @@ export const Event3 = () => {
     time: string;
     author: string;
   }[] = [
-    {
-      bgImage: "/assets/img/event/01.webp",
-      date: "11",
-      month: "July",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/04.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-2",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/05.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-3",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/06.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-4",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/07.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-5",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/01.webp",
-      date: "11",
-      month: "July",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/04.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-2",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/05.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-3",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/06.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-4",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-    {
-      bgImage: "/assets/img/event/07.webp",
-      date: "11",
-      month: "July",
-      colorClass: "color-5",
-      category: "School",
-      title: "Need To Playing For This Worlds",
-      time: "13:00 - 18:00",
-      author: "Shikhon Islam",
-    },
-  ];
+      {
+        bgImage: "/assets/img/event/01.webp",
+        date: "11",
+        month: "July",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/04.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-2",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/05.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-3",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/06.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-4",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/07.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-5",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/01.webp",
+        date: "11",
+        month: "July",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/04.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-2",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/05.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-3",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/06.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-4",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+      {
+        bgImage: "/assets/img/event/07.webp",
+        date: "11",
+        month: "July",
+        colorClass: "color-5",
+        category: "School",
+        title: "Need To Playing For This Worlds",
+        time: "13:00 - 18:00",
+        author: "Shikhon Islam",
+      },
+    ];
 
   return (
     <section className="event-section">
@@ -653,12 +653,12 @@ export const EventPage = () => {
     label: string;
     delay: string;
   }[] = [
-    { key: "categories", label: "All Categories", delay: ".3s" },
-    { key: "water", label: "Water Day", delay: ".5s" },
-    { key: "festival", label: "Festival", delay: ".7s" },
-    { key: "proevent", label: "ProEvent", delay: ".7s" },
-    { key: "trending", label: "Trending", delay: ".7s" },
-  ];
+      { key: "categories", label: "All Categories", delay: ".3s" },
+      { key: "water", label: "Water Day", delay: ".5s" },
+      { key: "festival", label: "Festival", delay: ".7s" },
+      { key: "proevent", label: "ProEvent", delay: ".7s" },
+      { key: "trending", label: "Trending", delay: ".7s" },
+    ];
 
   const eventData: Record<
     string,
