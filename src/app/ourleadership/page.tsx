@@ -14,6 +14,7 @@ interface TeamMember {
 }
 
 interface CommitteeMember {
+  empId: number;
   image: string;
   name: string;
   designation: string;
@@ -44,26 +45,264 @@ const teamMembers: TeamMember[] = [
 
 const committeeMembers: CommitteeMember[] = [
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 1",
-    designation: "President",
+    "empId": 514,
+    "image": "/assets/img/directors/saifull.webp",
+    "name": "Mohammad Saiful Islam (Head Office)",
+    "designation": "Executive Director"
   },
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 2",
-    designation: "Vice President",
+    "empId": 503,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Shamsul Hoque (Head Office)",
+    "designation": "Deputy Director(Microfinance)"
   },
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 3",
-    designation: "General Secretary",
+    "empId": 980,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Hannan Molla (Head Office)",
+    "designation": "Coordinator(Admin)"
   },
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 4",
-    designation: "General Secretary",
+    "empId": 1293,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Zulfiker Ali (Head Office)",
+    "designation": "Coordinator(Program)"
   },
-];
+  {
+    "empId": 1306,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Alauddin (Head Office)",
+    "designation": "Credit Coordinatio (Micro-Enterprise)"
+  },
+  {
+    "empId": 1440,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Abu Muhammad Hannan (Head Office)",
+    "designation": "Manager (Audit)"
+  },
+  {
+    "empId": 1010,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sultan Mahmud Rana (Head Office)",
+    "designation": "Manager (Micro-Enterprise)"
+  },
+  {
+    "empId": 589,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Rezaul Islam (Head Office)",
+    "designation": "Manager (Monitoring and Documentation)"
+  },
+  {
+    "empId": 673,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "MD Zahirul Islam (Head Office)",
+    "designation": "Manager (Micro-Enterprise)"
+  },
+  {
+    "empId": 1097,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Shahidul Alam (Head Office)",
+    "designation": "Fisheries officer"
+  },
+  {
+    "empId": 1098,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sibabrata Bhowmik (Head Office)",
+    "designation": "Agriculture officer"
+  },
+  {
+    "empId": 1259,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Anisur Rahman (Head Office)",
+    "designation": "Livestock officer"
+  },
+  {
+    "empId": 792,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Mazammal Hoque (Head Office)",
+    "designation": "Accounts Officer"
+  },
+  {
+    "empId": 833,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Jahedul Alam (Head Office)",
+    "designation": "IT Manager"
+  },
+  {
+    "empId": 508,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Raktima Chakraborty (Head Office)",
+    "designation": "Accountant"
+  },
+  {
+    "empId": 528,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "ABM Zakariya (Head Office)",
+    "designation": "Accountant"
+  },
+  {
+    "empId": 983,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Hari Kanta Das (Head Office)",
+    "designation": "Accounts Officer, RAISE"
+  },
+  {
+    "empId": 512,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Mosleh Uddin (Head Office)",
+    "designation": "Assistant Administative Officer"
+  },
+  {
+    "empId": 1294,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sunanda Bose (Head Office)",
+    "designation": "Assistant Manager HR"
+  },
+  {
+    "empId": 1755,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Ranjan Kumar Mahanta (Head Office)",
+    "designation": "Assistant Manager (Monitoring and Documentation)"
+  },
+  {
+    "empId": 1754,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Rajib Mahmud (Head Office)",
+    "designation": "Assistant Manager (Training & Social Activity)"
+  },
+  {
+    "empId": 953,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Nazrul Islam (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1254,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Muhammad Maksudur Rahman (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1263,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Fakhrul Islam (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1342,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Azharul Islam (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 662,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md.Kamal Uddin (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1490,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Safayet Hossain (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1491,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Robiul Hossain (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 739,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Rahamat Ullah (Head Office)",
+    "designation": "Accountant"
+  },
+  {
+    "empId": 639,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md Abu Bokkor Siddiq (Head Office)",
+    "designation": "Area Accountant"
+  },
+  {
+    "empId": 1069,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Joydeb Chandra Majumder (Head Office)",
+    "designation": "Accounts & Finance Officer, SMART"
+  },
+  {
+    "empId": 1295,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Kazi Mohammad Mosaref Hossain (Head Office)",
+    "designation": "Personal Secretary"
+  },
+  {
+    "empId": 1296,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Kanij Farhana Nipu (Head Office)",
+    "designation": "Documentation and Publication Officer"
+  },
+  {
+    "empId": 1093,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Abul Khayer (Head Office)",
+    "designation": "Logistic Officer"
+  },
+  {
+    "empId": 1432,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Nazmul Islam Mishu (Head Office)",
+    "designation": "Photographer"
+  },
+  {
+    "empId": 1441,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Nurul Karim Patwary (Head Office)",
+    "designation": "Assistant Accountant"
+  },
+  {
+    "empId": 1443,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Saidul Islam (Head Office)",
+    "designation": "Assistant Livestock Officer"
+  },
+  {
+    "empId": 1554,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md Rashedul Islam (Head Office)",
+    "designation": "Assistant Fisheries Officer"
+  },
+  {
+    "empId": 1442,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sree Sushanta Kumar Ray (Head Office)",
+    "designation": "Assistant Agriculture Officer"
+  },
+  {
+    "empId": 504,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Jamal Uddin (Head Office)",
+    "designation": "Admin Assistant"
+  },
+  {
+    "empId": 307,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "MD Kefayet Ullah (Head Office)",
+    "designation": "Case Management Officer"
+  },
+  {
+    "empId": 308,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Riyed Hossain (Head Office)",
+    "designation": "Officer(Life Skill and Enterprise Development)"
+  },
+  {
+    "empId": 309,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Shamsunnahar (Head Office)",
+    "designation": "District Facilitator"
+  }
+]
 
 const PRIMARY = "#f86048";
 
@@ -141,7 +380,7 @@ export default function OurLeadershipPage() {
                 className="max-w-sm text-slate-500 dark:text-slate-400! text-sm! leading-relaxed! italic! border-l-2! pl-6!"
                 style={{ borderColor: PRIMARY }}
               >
-                SSUS has a 7 member executive body. It is very much strong and active. The Executive Body meets by monthly and discusses the organizational performance and gives the guideline for implementation of the various projects.
+                SSUS has a strong and active 7-member executive body that meets monthly to review organizational performance and guide project implementation.
               </motion.p>
             </div>
 
@@ -166,15 +405,13 @@ export default function OurLeadershipPage() {
                 <motion.div
                   key={index}
                   variants={{
-                    hidden: {
-                      opacity: 0,
-                      y: 60,
-                      scale: 0.92,
-                    },
+                    hidden: { opacity: 0 },
                     visible: {
                       opacity: 1,
-                      y: 0,
-                      scale: 1,
+                      transition: {
+                        staggerChildren: 0.03,
+                        delayChildren: 0.05,
+                      },
                     },
                   }}
                   transition={{
@@ -250,7 +487,11 @@ export default function OurLeadershipPage() {
                       initial={{ opacity: 0, y: 8 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.2, delay: 0.3 + index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{
+                        duration: 0.2,
+                        delay: Math.min(0.15 + index * 0.02, 0.45), 
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                      }}
                       className="text-[10px] sm:text-xs font-semibold uppercase tracking-[1.5px]! sm:tracking-[2px]! mb-1 sm:mb-2!"
                       style={{ color: PRIMARY_COLOR }}
                     >
@@ -260,7 +501,11 @@ export default function OurLeadershipPage() {
                       initial={{ opacity: 0, y: 8 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.2, delay: 0.35 + index * 0.04, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{
+                        duration: 0.2,
+                        delay: Math.min(0.2 + index * 0.02, 0.5),
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                      }}
                       className="text-sm sm:text-base md:text-lg font-bold text-slate-900 dark:text-white! leading-tight! group-hover:text-[#e86958]! transition-colors duration-300"
                     >
                       {member.name}
