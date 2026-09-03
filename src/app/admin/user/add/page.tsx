@@ -2,114 +2,178 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { UserPlus, Save, AlertCircle } from "lucide-react";
-import Swal from "sweetalert2";
+import { UserPlus, Save, User as UserIcon, Mail, Shield, Lock } from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import StatusSelect from "@/components/Admin/StatusSelect";
+import { TextField } from "@/components/Admin/TextField";
+import { useUsers, ApiUser } from "@/hooks/useUsers";
+import { useRoles, ApiRole } from "@/hooks/useRoles";
 
 export interface UserFormData {
-  name: string;
+  userId?: string;
+  userName: string;
+  userFullName: string;
   email: string;
-  role: "Admin" | "Editor" | "Subscriber";
-  status: "Active" | "Inactive";
+  password?: string;
+  confirmPassword?: string;
+  roleId: string;
+  roleName?: string;
+  isAdmin: boolean;
+  isActive: boolean;
+  isLockedOut: boolean;
 }
 
 export default function AddEditUserPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const userId = searchParams.get("id");
-  const isEditMode = Boolean(userId);
+  const userIdParam = searchParams.get("id");
+  const isEditMode = Boolean(userIdParam);
+
+  const { submitting, createUser, updateUser } = useUsers();
+  const { roles, fetchRoles } = useRoles();
 
   const [formData, setFormData] = useState<UserFormData>({
-    name: "",
+    userName: "",
+    userFullName: "",
     email: "",
-    role: "Subscriber",
-    status: "Active",
+    password: "",
+    confirmPassword: "",
+    roleId: "",
+    isAdmin: false,
+    isActive: true,
+    isLockedOut: false,
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof UserFormData, string>>>({});
-  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof UserFormData, string>>
+  >({});
 
-  // Load existing user data if editing
+  // Populate roles dropdown on component load
+  useEffect(() => {
+    fetchRoles();
+  }, [fetchRoles]);
+
+  // Load user data when editing an existing user
   useEffect(() => {
     if (isEditMode) {
       const rawData = localStorage.getItem("tempUserData");
       if (rawData) {
         try {
-          const user = JSON.parse(rawData);
+          const user: ApiUser = JSON.parse(rawData);
           setFormData({
-            name: user.name || "",
-            email: user.email || "",
-            role: user.role || "Subscriber",
-            status: user.status === "Active" ? "Active" : "Inactive",
+            userId: user.UserId || userIdParam || "0",
+            userName: user.UserName || "",
+            userFullName: user.UserFullName || user.EmployeeName || "",
+            email: user.Email || "",
+            roleId: user.RoleID || "",
+            roleName: user.RoleName || "",
+            isAdmin: user.IsAdmin ?? false,
+            isActive: user.IsActive ?? true,
+            isLockedOut: user.IsLockedOut ?? false,
           });
         } catch (err) {
           console.error("Error parsing user data:", err);
         }
       }
     }
-  }, [isEditMode, userId]);
+  }, [isEditMode, userIdParam]);
 
   const validate = () => {
     const newErrors: Partial<Record<keyof UserFormData, string>> = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
+
+    if (!formData.userFullName.trim())
+      newErrors.userFullName = "Full Name is required";
     if (!formData.email.trim()) newErrors.email = "Email is required";
+    if (!formData.roleId) newErrors.roleId = "Role selection is required";
+
+    if (!isEditMode) {
+      if (!formData.password) newErrors.password = "Password is required";
+      if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = "Passwords do not match";
+      }
+    }
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (name: keyof UserFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) {
-      setErrors((prev) => ({ ...prev, [name]: "" }));
-    }
+  const handleChange = (field: keyof UserFormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    setSubmitting(true);
-    try {
-      console.log("Payload:", formData);
+    const currentUserStr = localStorage.getItem("user");
+    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
+    const companyIdValue = currentUser?.CompanyID || "0";
 
-      localStorage.removeItem("tempUserData");
+    const selectedRole = roles.find(
+      (r: ApiRole) => String(r.RoleID) === formData.roleId
+    );
 
-      Swal.fire({
-        icon: "success",
-        title: isEditMode ? "Updated!" : "Created!",
-        text: `User ${isEditMode ? "updated" : "created"} successfully.`,
-        timer: 1500,
-        showConfirmButton: false,
+    let success = false;
+
+    if (isEditMode) {
+      success = await updateUser({
+        UserId: formData.userId || userIdParam || "0",
+        UserFullName: formData.userFullName,
+        RoleID: formData.roleId,
+        Email: formData.email,
+        IsAdmin: formData.isAdmin,
+        IsActive: formData.isActive,
+        IsLockedOut: formData.isLockedOut,
       });
+    } else {
+      const createPayload: ApiUser = {
+        UserId: "0",
+        CompanyID: companyIdValue,
+        UserName: formData.userName || formData.email,
+        UserFullName: formData.userFullName,
+        EmployeeID: "0",
+        EmployeeName: formData.userFullName,
+        Password: formData.password || "",
+        ConfirmPassword: formData.confirmPassword || "",
+        OldPassword: "",
+        AccessLevel: "User",
+        Email: formData.email,
+        RoleID: formData.roleId,
+        RoleName: selectedRole ? selectedRole.RoleName : "",
+        IsAdmin: formData.isAdmin,
+        IsHead: false,
+        ChangePassword: false,
+        IsActive: formData.isActive,
+        IsLockedOut: formData.isLockedOut,
+        AccessToken: "",
+      };
 
+      success = await createUser(createPayload);
+    }
+
+    if (success) {
+      localStorage.removeItem("tempUserData");
       router.push("/admin/user");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleClear = () => {
     setFormData({
-      name: "",
+      userId: isEditMode ? formData.userId : undefined,
+      userName: "",
+      userFullName: "",
       email: "",
-      role: "Subscriber",
-      status: "Active",
+      password: "",
+      confirmPassword: "",
+      roleId: "",
+      isAdmin: false,
+      isActive: true,
+      isLockedOut: false,
     });
     setErrors({});
   };
-
-  const inputClass = (field: keyof UserFormData) => `
-    w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition-all text-black
-    ${
-      errors[field]
-        ? "border-red-500 focus:ring-4 focus:ring-red-500/10"
-        : "border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-    }
-  `;
 
   return (
     <div className="min-h-screen">
@@ -117,7 +181,7 @@ export default function AddEditUserPage() {
         title={isEditMode ? "Edit User" : "Add New User"}
         description={
           isEditMode
-            ? "Update the user details below."
+            ? "Update user profile and assigned roles."
             : "Fill in the details to create a new user."
         }
         onBack={() => {
@@ -135,69 +199,100 @@ export default function AddEditUserPage() {
             : "Create User"
         }
         submitIcon={
-          isEditMode ? <Save className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />
+          isEditMode ? (
+            <Save className="h-4 w-4" />
+          ) : (
+            <UserPlus className="h-4 w-4" />
+          )
         }
         onSubmit={handleSubmit}
       >
-        {/* Name */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">
-            Name <span className="text-red-500">*</span>
+        <TextField
+          label="Full Name"
+          icon={UserIcon}
+          placeholder="e.g. John Doe"
+          value={formData.userFullName}
+          onChange={(e) => handleChange("userFullName", e.target.value)}
+          error={errors.userFullName}
+          required
+        />
+
+        <TextField
+          label="Email Address"
+          icon={Mail}
+          type="email"
+          placeholder="john@example.com"
+          value={formData.email}
+          onChange={(e) => handleChange("email", e.target.value)}
+          error={errors.email}
+          required
+        />
+
+        {/* Dynamic Role Dropdown from useRoles */}
+        <div className="space-y-1.5">
+          <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
+            Role <span className="text-red-500">*</span>
           </label>
-          <input
-            value={formData.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            className={inputClass("name")}
-          />
-          {errors.name && (
-            <p className="text-xs text-red-600 flex items-center gap-1 ml-1">
-              <AlertCircle size={12} /> {errors.name}
+          <div className="relative">
+            <select
+              value={formData.roleId}
+              onChange={(e) => handleChange("roleId", e.target.value)}
+              className={`w-full py-3 px-4 pl-10 text-sm sm:text-base border-2 rounded-2xl text-slate-800 outline-none bg-white/70 focus:bg-white transition-all shadow-sm appearance-none ${
+                errors.roleId
+                  ? "border-red-500 focus:ring-4 focus:ring-red-500/10"
+                  : "border-slate-200/80 focus:border-[#e86958]"
+              }`}
+            >
+              <option value="">Select Role</option>
+              {roles.map((role: ApiRole) => (
+                <option key={role.RoleID} value={String(role.RoleID)}>
+                  {role.RoleName}
+                </option>
+              ))}
+            </select>
+            <Shield className="absolute left-3 top-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
+          </div>
+          {errors.roleId && (
+            <p className="text-xs text-red-600 flex items-center gap-1 ml-1 mt-1">
+              {errors.roleId}
             </p>
           )}
         </div>
 
-        {/* Email */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">
-            Email <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="email"
-            value={formData.email}
-            onChange={(e) => handleChange("email", e.target.value)}
-            className={inputClass("email")}
-          />
-          {errors.email && (
-            <p className="text-xs text-red-600 flex items-center gap-1 ml-1">
-              <AlertCircle size={12} /> {errors.email}
-            </p>
-          )}
-        </div>
+        <StatusSelect
+          label="Status"
+          required
+          value={formData.isActive ? "Active" : "Inactive"}
+          onChange={(val) =>
+            setFormData((prev) => ({ ...prev, isActive: val === "Active" }))
+          }
+        />
 
-        {/* Role */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">Role</label>
-          <select
-            value={formData.role}
-            onChange={(e) => handleChange("role", e.target.value)}
-            className={inputClass("role")}
-          >
-            <option value="Admin">Admin</option>
-            <option value="Editor">Editor</option>
-            <option value="Subscriber">Subscriber</option>
-          </select>
-        </div>
+        {!isEditMode && (
+          <>
+            <TextField
+              label="Password"
+              icon={Lock}
+              type="password"
+              placeholder="••••••••"
+              value={formData.password}
+              onChange={(e) => handleChange("password", e.target.value)}
+              error={errors.password}
+              required
+            />
 
-        {/* Status */}
-        <div className="space-y-2">
-          <StatusSelect
-            label="Status"
-            required
-            value={formData.status}
-            onChange={(val) => setFormData((prev) => ({ ...prev, status: val }))}
-            error={errors.status}
-          />
-        </div>
+            <TextField
+              label="Confirm Password"
+              icon={Lock}
+              type="password"
+              placeholder="••••••••"
+              value={formData.confirmPassword}
+              onChange={(e) => handleChange("confirmPassword", e.target.value)}
+              error={errors.confirmPassword}
+              required
+            />
+          </>
+        )}
       </FormCard>
     </div>
   );

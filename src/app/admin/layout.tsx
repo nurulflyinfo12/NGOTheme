@@ -8,7 +8,7 @@ import {
   Settings,
   LogOut,
   Bell,
-  User,
+  User as UserIcon,
   Menu,
   X,
   FileText,
@@ -20,18 +20,38 @@ import {
   Shield,
   Users,
   ChevronRight,
+  FolderKanban,
+  Target,
+  UserCheck,
+  Trophy,
+  MapPin,
+  Briefcase,
 } from "lucide-react";
+
+interface UserProfile {
+  UserFullName?: string;
+  UserName?: string;
+  RoleName?: string;
+  IsAdmin?: boolean;
+}
 
 const navItems = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Role Management", href: "/admin/role", icon: Shield },
   { name: "Users", href: "/admin/user", icon: Users },
   { name: "Category", href: "/admin/category", icon: Layers },
-  { name: "All Programs", href: "/admin/allprograms", icon: BookOpen },
   { name: "Banner", href: "/admin/herobanner", icon: Layout },
+  { name: "Projects", href: "/admin/projects", icon: FolderKanban },
+  { name: "Key Initiatives", href: "/admin/key-initiatives", icon: Target },
+  { name: "Leadership Team", href: "/admin/leadership-team", icon: UserCheck },
+  { name: "Awards", href: "/admin/awards", icon: Trophy },
+  { name: "Our Branch", href: "/admin/branch", icon: MapPin },
+  { name: "Our Staff", href: "/admin/staff", icon: Users },
   { name: "Photo Gallery", href: "/admin/photogallery", icon: Images },
   { name: "Video Gallery", href: "/admin/videogallery", icon: Film },
-  { name: "Blogs", href: "/admin/blogs", icon: FileText },
+  { name: "Publication", href: "/admin/publication", icon: BookOpen },
+  { name: "Careers", href: "/admin/careers", icon: Briefcase },
+  // { name: "Blogs", href: "/admin/blogs", icon: FileText },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 
@@ -45,6 +65,7 @@ export default function AdminLayout({
   const [authorized, setAuthorized] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
+  const [user, setUser] = useState<UserProfile | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -53,11 +74,30 @@ export default function AdminLayout({
       router.replace("/login");
       return;
     }
+
+    // Load logged in user details from localStorage
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user profile:", e);
+      }
+    }
+
     setAuthorized(true);
   }, [router]);
 
   const handleLogout = () => {
+    // Clear cookies
     document.cookie = "admin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+    document.cookie = "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
+
+    // Clear local storage
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("user");
+    localStorage.removeItem("permittedScreens");
+
     router.replace("/login");
   };
 
@@ -65,7 +105,7 @@ export default function AdminLayout({
 
   const SidebarContent = () => (
     <div className="flex h-full flex-col bg-white">
-      {/* BRAND LOGO SECTION - Refined */}
+      {/* BRAND LOGO SECTION */}
       <div className="flex h-20 items-center px-6">
         <Link href="/admin/dashboard" className="flex items-center gap-3 group">
           <div className="relative h-9 w-20 overflow-hidden transition-transform group-hover:scale-105">
@@ -113,7 +153,9 @@ export default function AdminLayout({
                     }
                   />
                   <span
-                    className={`text-sm font-semibold ${isActive ? "text-[#e86958]" : "text-slate-700"}`}
+                    className={`text-sm font-semibold ${
+                      isActive ? "text-[#e86958]" : "text-slate-700"
+                    }`}
                   >
                     {item.name}
                   </span>
@@ -152,7 +194,9 @@ export default function AdminLayout({
 
       {/* Sidebar Mobile */}
       <div
-        className={`fixed inset-0 z-50 lg:hidden ${sidebarOpen ? "block" : "hidden"}`}
+        className={`fixed inset-0 z-50 lg:hidden ${
+          sidebarOpen ? "block" : "hidden"
+        }`}
       >
         <div
           className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
@@ -185,16 +229,17 @@ export default function AdminLayout({
               <span className="absolute top-2 right-2 h-2 w-2 rounded-full bg-[#e86958] ring-2 ring-white"></span>
             </button>
 
+            {/* Profile Info dynamically populated */}
             <div className="flex items-center gap-3 group cursor-pointer border border-slate-100 rounded-full py-1 pl-1 pr-4 hover:bg-slate-50 transition-colors">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-slate-900 text-white shadow-sm">
-                <User size={16} />
+                <UserIcon size={16} />
               </div>
               <div className="flex flex-col">
                 <span className="text-xs font-bold text-slate-900 leading-tight">
-                  Admin User
+                  {user?.UserFullName || user?.UserName || "Admin User"}
                 </span>
                 <span className="text-[10px] text-slate-400 font-medium">
-                  Super Admin
+                  {user?.RoleName || (user?.IsAdmin ? "Super Admin" : "Administrator")}
                 </span>
               </div>
             </div>
@@ -203,9 +248,7 @@ export default function AdminLayout({
 
         {/* Content */}
         <main className="flex-1 overflow-y-auto p-6 lg:p-10">
-          <div className="animate-in fade-in duration-700">
-            {children}
-          </div>
+          <div className="animate-in fade-in duration-700">{children}</div>
         </main>
       </div>
 

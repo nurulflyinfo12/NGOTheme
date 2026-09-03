@@ -2,12 +2,21 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, Mail, ArrowRight, Loader2, ShieldCheck } from "lucide-react";
+import {
+  Lock,
+  User,
+  ArrowRight,
+  Loader2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
+import { api } from "@/utility/api";
+import { TextField } from "@/components/Admin/TextField";
 
 export default function AdminLogin() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
@@ -19,173 +28,178 @@ export default function AdminLogin() {
     setIsLoading(true);
     setError("");
 
-    setTimeout(() => {
-      if (email === "admin@test.com" && password === "123456") {
-        document.cookie = "admin=true; path=/; SameSite=Lax";
+    try {
+      const response = await api.post("/Login", {
+        UserName: username,
+        Password: password,
+      });
+
+      if (response?.User?.AccessToken) {
+        const token = response.User.AccessToken;
+
+        document.cookie = `admin=true; path=/; SameSite=Lax`;
+        document.cookie = `accessToken=${token}; path=/; SameSite=Lax`;
+
+        localStorage.setItem("accessToken", token);
+        localStorage.setItem("user", JSON.stringify(response.User));
+
+        if (response.PermittedScreen) {
+          localStorage.setItem(
+            "permittedScreens",
+            JSON.stringify(response.PermittedScreen),
+          );
+        }
+
         router.push("/admin/dashboard");
       } else {
-        setError("Invalid credentials. Access denied.");
-        setIsLoading(false);
+        setError(response?.CurrentMessage || "Invalid username or password.");
       }
-    }, 800);
+    } catch (err: any) {
+      setError(
+        err.message || "Failed to connect to the server. Please try again.",
+      );
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
-    <div className="min-h-screen w-full bg-white">
-      <div className=" flex flex-col lg:flex-row">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8 }}
-          className="w-full lg:w-1/2 bg-[#f86048] relative flex flex-col justify-center items-center "
-        >
-          <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-20">
-            <div className="absolute w-[300px] sm:w-[400px] lg:w-[500px] h-[300px] sm:h-[400px] lg:h-[500px] rounded-full blur-[120px] -translate-x-1/4 -translate-y-1/4 top-0 left-0 bg-white/30" />
-            <div className="absolute w-[250px] sm:w-[300px] lg:w-[400px] h-[250px] sm:h-[300px] lg:h-[400px] bg-black rounded-full blur-[100px] translate-x-1/4 translate-y-1/4 bottom-0 right-0" />
-          </div>
+    <div className="min-h-screen w-full bg-slate-900 flex overflow-x-hidden selection:bg-[#f86048] selection:text-white">
+      {/* Left Banner Section - Completely Hidden on Small Devices (< lg) */}
+      <motion.div
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.8 }}
+        className="hidden lg:flex lg:w-1/2 bg-[#f86048] relative flex-col justify-between p-12 shrink-0 overflow-hidden"
+      >
+        {/* Decorative Radial Background Lights */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-25">
+          <div className="absolute w-[500px] h-[500px] rounded-full blur-[120px] -translate-x-1/4 -translate-y-1/4 top-0 left-0 bg-white/40" />
+          <div className="absolute w-[400px] h-[400px] bg-black rounded-full blur-[100px] translate-x-1/4 translate-y-1/4 bottom-0 right-0" />
+        </div>
 
-          <div className="relative z-10 text-center">
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.2, type: "spring" }}
-              className="mb-6 sm:mb-8 inline-flex bg-white p-2 rounded-[2rem] shadow-2xl"
-            >
-              <Image
-                src="/assets/img/logo/Sagorika.webp"
-                alt="Logo"
-                width={80}
-                height={80}
-                className="w-14 h-14 sm:w-16 sm:h-16 lg:w-20 lg:h-20 object-contain"
-                priority
-              />
-            </motion.div>
-
-            <motion.div
-              initial={{ y: 20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              transition={{ delay: 0.4 }}
-            >
-              <p className="text-white text-xl sm:text-2xl lg:text-3xl font-light">
-                Welcome To
-              </p>
-              <h2 className="text-lg sm:text-xl lg:text-2xl font-black text-white leading-tight uppercase tracking-tight">
-                Sagarika Samaj <br /> Unnayan Sangstha
-              </h2>
-
-              <div className="h-1 w-10 sm:w-12 bg-white/40 mx-auto mt-4 sm:mt-6 rounded-full" />
-
-              <p className="mt-4 sm:mt-6 text-white/70 font-medium tracking-widest text-[10px] sm:text-xs uppercase">
-                Management Portal
-              </p>
-            </motion.div>
-          </div>
-        </motion.div>
-
-        <div className="w-full lg:w-1/2 flex flex-col items-center bg-slate-50 relative overflow-y-auto lg:overflow-hidden">
+        {/* Center Branding & Logo */}
+        <div className="relative z-10 text-center max-w-lg mx-auto">
           <motion.div
-            initial={{ scale: 0.95, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ duration: 0.4 }}
-            className="w-full max-w-md mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-12 flex flex-col min-h-screen"
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.2, type: "spring" }}
+            className="inline-flex bg-white p-4 rounded-[2.5rem] shadow-2xl mb-8 border-4 border-white/20 backdrop-blur-md"
           >
-            <div className="flex-1 flex flex-col justify-center">
-              <div className="mb-8 sm:mb-10">
-                <p className="text-slate-400 text-center font-bold text-[10px] sm:text-xs uppercase tracking-widest">
-                  Enter Administrative Credentials
-                </p>
-              </div>
+            <Image
+              src="/assets/img/logo/Sagorika.webp"
+              alt="Sagarika Logo"
+              width={90}
+              height={90}
+              className="w-20 h-20 object-contain drop-shadow-md"
+              priority
+            />
+          </motion.div>
 
-              <form onSubmit={handleLogin} className="space-y-4 sm:space-y-5">
-                <AnimatePresence mode="wait">
-                  {error && (
-                    <motion.div
-                      initial={{ x: -10, opacity: 0 }}
-                      animate={{ x: 0, opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="bg-red-50 text-red-600 px-4 py-3 rounded-2xl text-xs font-bold flex items-center gap-2 border border-red-100"
-                    >
-                      <ShieldCheck size={16} />
-                      {error}
-                    </motion.div>
-                  )}
-                </AnimatePresence>
+          <motion.div
+            initial={{ y: 20, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 0.3 }}
+          >
+            <p className="text-white/90 text-2xl font-light tracking-wide">
+              Welcome To
+            </p>
+            <h2 className="text-3xl font-black text-white leading-tight uppercase tracking-tight mt-1 drop-shadow-sm">
+              Sagarika Samaj <br /> Unnayan Sangstha
+            </h2>
 
-                <div className="relative group">
-                  <Mail
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#f86048]"
-                    size={18}
-                  />
-                  <input
-                    type="email"
-                    required
-                    autoComplete="email"
-                    placeholder="Email Address"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 sm:py-4 text-sm sm:text-base border-2 border-slate-100 rounded-2xl text-black focus:border-[#f86048] outline-none bg-white"
-                  />
-                </div>
+            <div className="h-1.5 w-16 bg-white/40 mx-auto mt-6 rounded-full" />
 
-                <div className="relative group">
-                  <Lock
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-[#f86048]"
-                    size={18}
-                  />
-                  <input
-                    type="password"
-                    required
-                    autoComplete="current-password"
-                    placeholder="Password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    className="w-full pl-12 pr-4 py-3 sm:py-4 text-sm sm:text-base border-2 border-slate-100 rounded-2xl text-black focus:border-[#f86048] outline-none bg-white"
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full py-3 sm:py-4 text-sm sm:text-base hover:bg-[#f86048] text-black rounded-2xl font-black flex items-center justify-center gap-3 transition-all active:scale-[0.98] disabled:opacity-70 group mt-2"
-                >
-                  {isLoading ? (
-                    <Loader2 className="animate-spin" size={20} />
-                  ) : (
-                    <>
-                      SIGN IN
-                      <ArrowRight
-                        size={18}
-                        className="group-hover:translate-x-1 transition-transform"
-                      />
-                    </>
-                  )}
-                </button>
-              </form>
-
-              <div className="mt-6 sm:mt-8 p-3 sm:p-4 bg-orange-50 border border-orange-100 rounded-2xl">
-                <p className="text-[10px] font-black text-[#f86048] uppercase tracking-widest mb-1">
-                  Development Access
-                </p>
-                <div className="flex justify-between items-center gap-2 flex-wrap">
-                  <code className="text-xs font-mono text-slate-600 bg-white px-2 py-1 rounded border border-orange-100">
-                    admin@test.com
-                  </code>
-                  <code className="text-xs font-mono text-slate-600 bg-white px-2 py-1 rounded border border-orange-100">
-                    123456
-                  </code>
-                </div>
-              </div>
-            </div>
-
-            <footer className="mt-auto pt-6 sm:pt-10 flex flex-col sm:flex-row items-center justify-between gap-2 sm:gap-0 opacity-30 grayscale text-center sm:text-left">
-              <span className="text-[10px] font-black uppercase tracking-widest">
-                Security Verified
-              </span>
-              <div className="hidden sm:block h-[1px] flex-1 mx-4 bg-slate-400" />
-              <span className="text-[10px] font-black">2026</span>
-            </footer>
+            <p className="mt-6 text-white/80 font-bold tracking-[0.25em] text-xs uppercase">
+              Management Portal
+            </p>
           </motion.div>
         </div>
+      </motion.div>
+
+      {/* Right Side Login Form - Fullscreen on Mobile/Tablet */}
+      <div className="w-full lg:w-1/2 flex flex-col justify-between items-center bg-slate-50 min-h-screen px-6 sm:px-12 lg:px-16 py-10 relative overflow-hidden">
+        {/* Subtle Ambient Background Gradients on Right Side */}
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#f86048]/5 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-200/50 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="w-full max-w-sm sm:max-w-md my-auto flex flex-col justify-center relative z-10">
+          {/* Header Title */}
+          <div className="mb-8 text-center">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-orange-100/80 text-[#f86048] text-[10px] font-black uppercase tracking-widest mb-3 border border-orange-200/50">
+              Administrative Access
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Sign In
+            </h1>
+            <p className="text-slate-400 font-medium text-xs mt-1.5">
+              Enter your credentials to manage 
+            </p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-5">
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  initial={{ x: -10, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  className="bg-rose-50 text-rose-600 p-4 rounded-2xl text-xs font-bold flex items-center gap-3 border border-rose-200 shadow-sm"
+                >
+                  <ShieldCheck className="shrink-0 text-rose-500" size={18} />
+                  <span className="leading-snug">{error}</span>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Reusable Universal TextField - Username */}
+            <TextField
+              icon={User}
+              placeholder="Username"
+              autoComplete="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+
+            {/* Reusable Universal TextField - Password */}
+            <TextField
+              icon={Lock}
+              type="password"
+              placeholder="Password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            {/* Submit Action Button */}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full py-4 text-sm sm:text-base !bg-[#f86048] !hover:bg-[#e24e37] active:scale-[0.98] text-white rounded-2xl font-black flex items-center justify-center gap-2.5 transition-all disabled:opacity-70 shadow-lg shadow-[#f86048]/25 group mt-2"
+            >
+              {isLoading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                <>
+                  SIGN IN
+                  <ArrowRight
+                    size={18}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+
+        {/* Form Footer */}
+        <footer className="w-full max-w-sm sm:max-w-md pt-8 flex items-center justify-between text-slate-400 text-[10px] font-bold uppercase tracking-widest relative z-10">
+          <span>Security Enforced</span>
+          <div className="h-[1px] flex-1 mx-4 bg-slate-200" />
+          <span>SUSS 2026</span>
+        </footer>
       </div>
     </div>
   );
