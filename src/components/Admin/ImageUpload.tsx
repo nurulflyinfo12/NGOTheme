@@ -195,7 +195,7 @@ const ImageUpload: React.FC<FileUploadProps> = ({
         </p>
         <span className="text-xs text-slate-400 my-1">or</span>
 
-        <label className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold text-[#f86048] bg-white border-2 border-[#f86048] rounded-xl !hover:bg-[#f86048] hover:text-white transition-all shadow-sm cursor-pointer">
+        <label className="inline-flex items-center gap-2 px-4 py-2 text-sm font-bold !text-[#f86048] bg-white border-2 border-[#f86048] rounded-xl !hover:bg-[#f86048] hover:text-white transition-all shadow-sm cursor-pointer">
           <UploadCloud size={16} />
           {isUploading
             ? "Uploading..."
@@ -211,7 +211,6 @@ const ImageUpload: React.FC<FileUploadProps> = ({
         </label>
       </div>
 
-      {/* Uploaded Files List */}
       {photos.length > 0 && (
         <div className="space-y-3 pt-2">
           <p className="text-xs font-bold text-[#f86048] uppercase tracking-wider px-1">
@@ -228,7 +227,6 @@ const ImageUpload: React.FC<FileUploadProps> = ({
                   key={index}
                   className="flex items-center gap-4 p-3 bg-white border-2 border-slate-100 rounded-2xl shadow-sm"
                 >
-                  {/* File Thumbnail or Icon Badge */}
                   <div className="w-16 h-16 shrink-0 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 flex items-center justify-center">
                     {fileIsPdf ? (
                       <div className="flex flex-col items-center justify-center text-red-500">
@@ -250,7 +248,6 @@ const ImageUpload: React.FC<FileUploadProps> = ({
                     )}
                   </div>
 
-                  {/* PDF Details & Download Link */}
                   {fileIsPdf ? (
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-slate-800 truncate">
@@ -283,7 +280,6 @@ const ImageUpload: React.FC<FileUploadProps> = ({
                     )
                   )}
 
-                  {/* Remove Button */}
                   <button
                     type="button"
                     onClick={() => handleRemoveFile(index)}

@@ -16,6 +16,7 @@ export interface StaffFormData {
   photo: string;
   position: string;
   email: string;
+  isLead: boolean;
   isActive: boolean;
 }
 
@@ -33,6 +34,7 @@ export default function AddEditStaffPage() {
     photo: "",
     position: "",
     email: "",
+    isLead: false,
     isActive: true,
   });
 
@@ -53,6 +55,7 @@ export default function AddEditStaffPage() {
             position: item.Position || "",
             email: item.Email || "",
             photo: item.Photo || "",
+            isLead: Boolean(item.IsLead ?? false),
             isActive: item.IsActive ?? true,
           });
         } catch (e) {
@@ -68,6 +71,7 @@ export default function AddEditStaffPage() {
               position: item.Position || "",
               email: item.Email || "",
               photo: item.Photo || "",
+              isLead: Boolean(item.IsLead ?? false),
               isActive: item.IsActive ?? true,
             });
           }
@@ -85,6 +89,7 @@ export default function AddEditStaffPage() {
       photo: "",
       position: "",
       email: "",
+      isLead: false,
       isActive: true,
     });
     setErrors({});
@@ -92,9 +97,9 @@ export default function AddEditStaffPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof StaffFormData, string>> = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.position.trim()) newErrors.position = "Position is required";
-    if (!formData.type.trim()) newErrors.type = "Type is required";
+    if (!formData.name.trim()) newErrors.name = "Name is Required";
+    if (!formData.position.trim()) newErrors.position = "Position is Required";
+    if (!formData.type.trim()) newErrors.type = "Type is Required";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -117,6 +122,7 @@ export default function AddEditStaffPage() {
       Photo: formData.photo || "nai",
       Position: formData.position,
       Email: formData.email,
+      IsLead: Boolean(formData.isLead),
       IsActive: formData.isActive,
       SetDate: new Date().toISOString(),
     };
@@ -138,14 +144,14 @@ export default function AddEditStaffPage() {
         router.push("/admin/staff");
       }}
       backButtonLabel="Back to List"
-      onClear={handleClear} // Added onClear prop here!
+      onClear={handleClear}
       clearButtonLabel="Clear"
       submitLabel={
         submitting
           ? "Submitting..."
           : isEditMode
-          ? "Save Changes"
-          : "Create Staff"
+            ? "Save Changes"
+            : "Create Staff"
       }
       submitIcon={
         isEditMode ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />
@@ -153,33 +159,30 @@ export default function AddEditStaffPage() {
       onSubmit={handleSubmit}
     >
       <TextField
-        label="Name"
+        label="Name*"
         icon={User}
         placeholder="e.g. Nurul"
         value={formData.name}
         onChange={(e) => handleChange("name", e.target.value)}
         error={errors.name}
-        required
       />
 
       <TextField
-        label="Staff Type"
+        label="Staff Type*"
         icon={BadgeCheck}
         placeholder="e.g. Permanent, Part-Time"
         value={formData.type}
         onChange={(e) => handleChange("type", e.target.value)}
         error={errors.type}
-        required
       />
 
       <TextField
-        label="Position"
+        label="Position*"
         icon={Briefcase}
         placeholder="e.g. Engineer"
         value={formData.position}
         onChange={(e) => handleChange("position", e.target.value)}
         error={errors.position}
-        required
       />
 
       <TextField
@@ -192,15 +195,30 @@ export default function AddEditStaffPage() {
         error={errors.email}
       />
 
+      {/* Simple Is Lead Checkbox */}
+      <div className="flex items-center gap-2 pt-2 sm:col-span-2">
+        <input
+          type="checkbox"
+          id="isLead"
+          checked={formData.isLead}
+          onChange={(e) => handleChange("isLead", e.target.checked)}
+          className="h-4 w-4 rounded border-gray-300 text-[#f86048] focus:ring-[#f86048] cursor-pointer"
+        />
+        <label
+          htmlFor="isLead"
+          className="text-sm font-semibold text-slate-700 cursor-pointer select-none"
+        >
+         Designate as Team/Project Lead
+        </label>
+      </div>
+
       <div className="space-y-1.5 sm:col-span-2">
         <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
           Photo
         </label>
         <ImageUpload
           initialImages={formData.photo ? [{ image: formData.photo }] : []}
-          onImagesChange={(imgs) =>
-            handleChange("photo", imgs[0]?.image || "")
-          }
+          onImagesChange={(imgs) => handleChange("photo", imgs[0]?.image || "")}
           allowMultiple={false}
           showCaption={false}
         />

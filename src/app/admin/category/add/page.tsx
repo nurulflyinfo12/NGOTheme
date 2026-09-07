@@ -55,7 +55,7 @@ export default function AddEditCategoryPage() {
             slug: cat.CategorySlug || "",
             description: cat.Description || cat.description || "",
             bannerImage: cat.BannerImage || "",
-            isActive: cat.IsActive ?? (cat.status === "Active"),
+            isActive: cat.IsActive ?? cat.status === "Active",
           });
         } catch (err) {
           console.error("Error parsing category data:", err);
@@ -67,7 +67,7 @@ export default function AddEditCategoryPage() {
   const validate = () => {
     const newErrors: Partial<Record<keyof CategoryFormData, string>> = {};
 
-    if (!formData.name.trim()) newErrors.name = "Category name is required";
+    if (!formData.name.trim()) newErrors.name = "Category name is Required. ";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -91,7 +91,8 @@ export default function AddEditCategoryPage() {
       CategoryCode: formData.categoryCode || "",
       CategoryName: formData.name,
       CategoryNameNative: formData.nameNative || "",
-      CategorySlug: formData.slug || formData.name.toLowerCase().replace(/\s+/g, "-"),
+      CategorySlug:
+        formData.slug || formData.name.toLowerCase().replace(/\s+/g, "-"),
       Description: formData.description,
       BannerImage: formData.bannerImage,
       IsActive: formData.isActive,
@@ -147,8 +148,8 @@ export default function AddEditCategoryPage() {
           submitting
             ? "Submitting..."
             : isEditMode
-            ? "Save Changes"
-            : "Create Category"
+              ? "Save Changes"
+              : "Create Category"
         }
         submitIcon={
           isEditMode ? (
@@ -160,19 +161,17 @@ export default function AddEditCategoryPage() {
         onSubmit={handleSubmit}
       >
         <TextField
-          label="Category Name"
+          label="Category Name*"
           icon={Tag}
           placeholder="e.g. Technology"
           value={formData.name}
           onChange={(e) => handleChange("name", e.target.value)}
           error={errors.name}
-          required
         />
 
         <div className="space-y-[#f86048]">
           <StatusSelect
             label="Status"
-            required
             value={formData.isActive ? "Active" : "Inactive"}
             onChange={(val) =>
               setFormData((prev) => ({
@@ -195,8 +194,6 @@ export default function AddEditCategoryPage() {
             placeholder="Category description..."
           />
         </div>
-
-       
       </FormCard>
     </div>
   );

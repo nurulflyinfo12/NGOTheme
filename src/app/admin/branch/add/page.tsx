@@ -133,10 +133,9 @@ export default function AddEditBranchPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof BranchFormData, string>> = {};
-    if (!formData.branchName.trim())
-      newErrors.branchName = "Branch name is required";
-    if (!formData.district.trim()) newErrors.district = "District is required";
-    if (!formData.phone.trim()) newErrors.phone = "Phone is required";
+    if (!formData.branchName.trim()) newErrors.branchName = "Branch name is Required.";
+    if (!formData.district.trim()) newErrors.district = "District is Required.";
+    if (!formData.phone.trim()) newErrors.phone = "Phone is Required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -198,8 +197,8 @@ export default function AddEditBranchPage() {
         submitting
           ? "Submitting..."
           : isEditMode
-          ? "Save Changes"
-          : "Create Branch"
+            ? "Save Changes"
+            : "Create Branch"
       }
       submitIcon={
         isEditMode ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />
@@ -207,23 +206,21 @@ export default function AddEditBranchPage() {
       onSubmit={handleSubmit}
     >
       <TextField
-        label="Branch Name"
+        label="Branch Name*"
         icon={Building}
         placeholder="e.g. Dhaka Central"
         value={formData.branchName}
         onChange={(e) => handleChange("branchName", e.target.value)}
         error={errors.branchName}
-        required
       />
 
       <TextField
-        label="District"
+        label="District*"
         icon={MapPin}
         placeholder="e.g. Dhaka"
         value={formData.district}
         onChange={(e) => handleChange("district", e.target.value)}
         error={errors.district}
-        required
       />
 
       <TextField
@@ -272,13 +269,12 @@ export default function AddEditBranchPage() {
       />
 
       <TextField
-        label="Phone"
+        label="Phone*"
         icon={PhoneIcon}
         placeholder="e.g. +8801700000000"
         value={formData.phone}
         onChange={(e) => handleChange("phone", e.target.value)}
         error={errors.phone}
-        required
       />
 
       <TextField

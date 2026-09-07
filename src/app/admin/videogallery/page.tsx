@@ -1,105 +1,87 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Swal from "sweetalert2";
 import DataTable, { Column } from "@/components/Admin/DataTable";
 import { StatusCell, ImageCell } from "@/components/Admin/TableCells";
-
-interface Video {
-  id: string;
-  title: string;
-  videoUrl: string;
-  thumbnail: string | null;
-  platform: "YouTube" | "Vimeo" | "Custom";
-  status: "Active" | "Inactive";
-}
-
-const dummyVideos: Video[] = [
-  {
-    id: "1",
-    title: "PLC Training Intro",
-    videoUrl: "https://youtube.com/watch?v=abc123",
-    thumbnail: null,
-    platform: "YouTube",
-    status: "Active",
-  },
-  {
-    id: "2",
-    title: "Robotics Demo",
-    videoUrl: "https://vimeo.com/123456",
-    thumbnail: null,
-    platform: "Vimeo",
-    status: "Inactive",
-  },
-];
+import { useVideoGallery, ApiVideoGallery } from "@/hooks/useVideoGallery";
 
 export default function AllVideos() {
   const router = useRouter();
-  const [videos, setVideos] = useState<Video[]>(dummyVideos);
+  const { videos, fetchVideos } = useVideoGallery();
   const [statusFilter, setStatusFilter] = useState("All");
 
-  const filteredVideos = useMemo(
-    () =>
-      videos.filter(
-        (v) => statusFilter === "All" || v.status === statusFilter
-      ),
-    [videos, statusFilter]
-  );
+  useEffect(() => {
+    fetchVideos();
+  }, [fetchVideos]);
 
-  const handleDelete = async (video: Video) => {
-    const result = await Swal.fire({
-      title: "Delete Video?",
-      text: `Delete "${video.title}"?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#e86958",
-      confirmButtonText: "Yes",
+  const filteredVideos = useMemo(() => {
+    return videos.filter((v) => {
+      const statusText = v.Status ? "Active" : "Inactive";
+      return statusFilter === "All" || statusText === statusFilter;
     });
+  }, [videos, statusFilter]);
 
-    if (result.isConfirmed) {
-      setVideos((prev) => prev.filter((v) => v.id !== video.id));
-      Swal.fire("Deleted!", "", "success");
-    }
-  };
-
-  const columns: Column<Video>[] = [
-    { key: "title", header: "Title", className: "font-medium text-black" },
+  const columns: Column<ApiVideoGallery>[] = [
     {
-      key: "thumbnail",
+      key: "VideoHeadline",
+      header: "Title",
+      className: "font-medium text-black",
+      render: (v) => (
+        <div className="flex flex-col">
+          <span className="font-bold text-slate-800">{v.VideoHeadline}</span>
+          {v.PublishedTime && (
+            <span className="text-[10px] text-slate-400">
+              Published: {v.PublishedTime}
+            </span>
+          )}
+        </div>
+      ),
+    },
+    {
+      key: "VideoImage",
       header: "Thumbnail",
       render: (v) =>
-        v.thumbnail ? <ImageCell src={v.thumbnail} alt={v.title} /> : null,
+        v.VideoImage ? (
+          <ImageCell src={v.VideoImage} alt={v.VideoHeadline} />
+        ) : (
+          <span className="text-slate-400 text-xs">No Thumbnail</span>
+        ),
     },
-    { key: "platform", header: "Platform" },
     {
-      key: "videoUrl",
-      header: "Video",
+      key: "VideoLink",
+      header: "Video Link",
       render: (v) => (
         <a
-          href={v.videoUrl}
+          href={v.VideoLink}
           target="_blank"
-          className="text-blue-600 text-xs underline"
+          rel="noopener noreferrer"
+          className="text-blue-600 text-xs font-semibold underline truncate max-w-[200px] block"
         >
-          View
+          View Video
         </a>
       ),
     },
     {
-      key: "status",
+      key: "Status",
       header: "Status",
-      render: (v) => <StatusCell status={v.status} showIcon={false} />,
+      render: (v) => (
+        <StatusCell
+          status={v.Status ? "Active" : "Inactive"}
+          showIcon={false}
+        />
+      ),
     },
   ];
 
   return (
-    <div className="">
-      <DataTable<Video>
+    <div>
+      <DataTable<ApiVideoGallery>
         title="Video Gallery"
         description="Manage video contents"
         data={filteredVideos}
         columns={columns}
-        searchKeys={["title", "platform"]}
+        searchKeys={["VideoHeadline", "VideoLink"]}
         filters={[
           {
             key: "status",
@@ -117,10 +99,9 @@ export default function AllVideos() {
         onAdd={() => router.push("/admin/videogallery/add")}
         onEdit={(v) => {
           localStorage.setItem("tempVideoData", JSON.stringify(v));
-          router.push(`/admin/videogallery/add?id=${v.id}`);
+          router.push(`/admin/videogallery/add?id=${v.VideoID}`);
         }}
-        onDelete={handleDelete}
-        getRowId={(v) => v.id}
+        getRowId={(v) => v.VideoID || String(Math.random())}
         showActions
       />
     </div>

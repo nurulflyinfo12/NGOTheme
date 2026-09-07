@@ -20,15 +20,11 @@ export default function AllProjects() {
       key: "Photo",
       header: "Photo",
       render: (p) => (
-        <ImageCell
-          src={api.getFileUrl(p.Photo || "")}
-          alt={p.Title}
-        />
+        <ImageCell src={api.getFileUrl(p.Photo || "")} alt={p.Title} />
       ),
     },
     { key: "Title", header: "Title", className: "font-medium text-black" },
     { key: "Subtitle", header: "Subtitle", render: (p) => p.Subtitle || "-" },
-    { key: "CategoryName", header: "Category", render: (p) => p.CategoryName || "-" },
     { key: "Location", header: "Location", render: (p) => p.Location || "N/A" },
     { key: "Time", header: "Time", render: (p) => p.Time || "-" },
   ];

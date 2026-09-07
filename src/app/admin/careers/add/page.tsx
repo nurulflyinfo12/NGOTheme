@@ -90,10 +90,11 @@ export default function AddEditCareerPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof CareerFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Job Title is required";
-    if (!formData.category.trim()) newErrors.category = "Category is required";
+    if (!formData.title.trim()) newErrors.title = "Job Title is Required. ";
+    if (!formData.category.trim())
+      newErrors.category = "Category is Required. ";
     if (!formData.fileUpload.trim())
-      newErrors.fileUpload = "Circular file is required";
+      newErrors.fileUpload = "Circular file is Required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -146,8 +147,8 @@ export default function AddEditCareerPage() {
         submitting
           ? "Submitting..."
           : isEditMode
-          ? "Save Changes"
-          : "Create Career"
+            ? "Save Changes"
+            : "Create Career"
       }
       submitIcon={
         isEditMode ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />
@@ -155,13 +156,12 @@ export default function AddEditCareerPage() {
       onSubmit={handleSubmit}
     >
       <TextField
-        label="Job Title"
+        label="Job Title*"
         icon={Briefcase}
         placeholder="e.g. Project Manager"
         value={formData.title}
         onChange={(e) => handleChange("title", e.target.value)}
         error={errors.title}
-        required
       />
 
       <TextField
@@ -175,19 +175,19 @@ export default function AddEditCareerPage() {
 
       <div className="sm:col-span-2">
         <TextField
-          label="Category"
+          label="Category*"
           icon={Layers}
           placeholder="e.g. Management, IT, Field Operations"
           value={formData.category}
           onChange={(e) => handleChange("category", e.target.value)}
           error={errors.category}
-          required
         />
       </div>
 
       <div className="space-y-1.5 sm:col-span-2">
         <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
-          Circular / Application File (PDF or Image) <span className="text-red-500">*</span>
+          Circular / Application File (PDF or Image){" "}
+          <span className="text-red-500">*</span>
         </label>
         <ImageUpload
           label="Drag & Drop Circular PDF or Image"

@@ -2,7 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { UserPlus, Save, User as UserIcon, Mail, Shield, Lock } from "lucide-react";
+import {
+  UserPlus,
+  Save,
+  User as UserIcon,
+  Mail,
+  Shield,
+  Lock,
+} from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import StatusSelect from "@/components/Admin/StatusSelect";
@@ -82,13 +89,12 @@ export default function AddEditUserPage() {
   const validate = () => {
     const newErrors: Partial<Record<keyof UserFormData, string>> = {};
 
-    if (!formData.userFullName.trim())
-      newErrors.userFullName = "Full Name is required";
-    if (!formData.email.trim()) newErrors.email = "Email is required";
-    if (!formData.roleId) newErrors.roleId = "Role selection is required";
+    if (!formData.userFullName.trim()) newErrors.userFullName = "Full Name is Required";
+    if (!formData.email.trim()) newErrors.email = "Email is Required";
+    if (!formData.roleId) newErrors.roleId = "Role selection is Required";
 
     if (!isEditMode) {
-      if (!formData.password) newErrors.password = "Password is required";
+      if (!formData.password) newErrors.password = "Password is Required";
       if (formData.password !== formData.confirmPassword) {
         newErrors.confirmPassword = "Passwords do not match";
       }
@@ -112,7 +118,7 @@ export default function AddEditUserPage() {
     const companyIdValue = currentUser?.CompanyID || "0";
 
     const selectedRole = roles.find(
-      (r: ApiRole) => String(r.RoleID) === formData.roleId
+      (r: ApiRole) => String(r.RoleID) === formData.roleId,
     );
 
     let success = false;
@@ -195,8 +201,8 @@ export default function AddEditUserPage() {
           submitting
             ? "Submitting..."
             : isEditMode
-            ? "Save Changes"
-            : "Create User"
+              ? "Save Changes"
+              : "Create User"
         }
         submitIcon={
           isEditMode ? (
@@ -208,24 +214,22 @@ export default function AddEditUserPage() {
         onSubmit={handleSubmit}
       >
         <TextField
-          label="Full Name"
+          label="Full Name*"
           icon={UserIcon}
           placeholder="e.g. John Doe"
           value={formData.userFullName}
           onChange={(e) => handleChange("userFullName", e.target.value)}
           error={errors.userFullName}
-          required
         />
 
         <TextField
-          label="Email Address"
+          label="Email Address*"
           icon={Mail}
           type="email"
           placeholder="john@example.com"
           value={formData.email}
           onChange={(e) => handleChange("email", e.target.value)}
           error={errors.email}
-          required
         />
 
         {/* Dynamic Role Dropdown from useRoles */}
@@ -261,7 +265,6 @@ export default function AddEditUserPage() {
 
         <StatusSelect
           label="Status"
-          required
           value={formData.isActive ? "Active" : "Inactive"}
           onChange={(val) =>
             setFormData((prev) => ({ ...prev, isActive: val === "Active" }))
@@ -271,14 +274,13 @@ export default function AddEditUserPage() {
         {!isEditMode && (
           <>
             <TextField
-              label="Password"
+              label="Password*"
               icon={Lock}
               type="password"
               placeholder="••••••••"
               value={formData.password}
               onChange={(e) => handleChange("password", e.target.value)}
               error={errors.password}
-              required
             />
 
             <TextField
@@ -289,7 +291,6 @@ export default function AddEditUserPage() {
               value={formData.confirmPassword}
               onChange={(e) => handleChange("confirmPassword", e.target.value)}
               error={errors.confirmPassword}
-              required
             />
           </>
         )}

@@ -12,6 +12,7 @@ export interface ApiStaff {
   Photo: string;
   Position: string;
   Email: string;
+  IsLead?: boolean;
   IsActive: boolean;
   SetDate?: string;
 }
@@ -41,7 +42,26 @@ export function useStaff() {
     }
   }, []);
 
-  // 2. Get Staff By ID: GET /api/Staff/GetStaffById?staffId={id}
+  // 2. Get Active Staff Only: GET /api/Staff/GetActiveStaff
+  const fetchActiveStaff = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await api.get<ApiStaff[]>("/Staff/GetActiveStaff");
+      const list = Array.isArray(data) ? data : [];
+      setStaffList(list);
+      return list;
+    } catch (err: any) {
+      const msg = err.message || "Failed to load active staff records.";
+      setError(msg);
+      Swal.fire({ icon: "error", title: "Error", text: msg });
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 3. Get Staff By ID: GET /api/Staff/GetStaffById?staffId={id}
   const fetchStaffById = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
@@ -60,26 +80,38 @@ export function useStaff() {
     }
   }, []);
 
-  // 3. Save or Update Staff: POST /api/Staff/SaveUpdateStaff
+  // 4. Save or Update Staff: POST /api/Staff/SaveUpdateStaff
   const saveOrUpdateStaff = async (payload: Partial<ApiStaff>) => {
     setSubmitting(true);
     setError("");
     try {
-      await api.post("/Staff/SaveUpdateStaff", {
+      const res: any = await api.post("/Staff/SaveUpdateStaff", {
         ...payload,
+        IsLead: payload.IsLead ?? false,
         SetDate: payload.SetDate || new Date().toISOString(),
       });
+
+      // Handle custom backend error messages
+      if (res?.MessageType === 3 || (res?.MessageType && res.MessageType !== 1)) {
+        const msg = res?.CurrentMessage || "Failed to save staff record.";
+        setError(msg);
+        Swal.fire({ icon: "error", title: "Save Failed", text: msg });
+        return false;
+      }
 
       Swal.fire({
         icon: "success",
         title: "Saved!",
-        text: "Staff record saved successfully.",
+        text: res?.CurrentMessage || "Staff record saved successfully.",
         timer: 1500,
         showConfirmButton: false,
       });
       return true;
     } catch (err: any) {
-      const msg = err.message || "Failed to save staff record.";
+      const msg =
+        err?.response?.data?.CurrentMessage ||
+        err?.message ||
+        "Failed to save staff record.";
       setError(msg);
       Swal.fire({ icon: "error", title: "Save Failed", text: msg });
       return false;
@@ -88,10 +120,10 @@ export function useStaff() {
     }
   };
 
-  // 4. Delete Staff: POST /api/Staff/DeleteStaff?staffId={id}
+  // 5. Delete Staff: POST /api/Staff/DeleteStaff?staffId={id}
   const deleteStaff = async (staffMember: ApiStaff) => {
     const staffId = staffMember.StaffID || staffMember.ID || "";
-    
+
     if (!staffId) {
       Swal.fire({ icon: "error", title: "Error", text: "Invalid Staff ID." });
       return false;
@@ -137,6 +169,7 @@ export function useStaff() {
     submitting,
     error,
     fetchStaff,
+    fetchActiveStaff,
     fetchStaffById,
     saveOrUpdateStaff,
     deleteStaff,

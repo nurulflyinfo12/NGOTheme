@@ -86,8 +86,8 @@ export default function AddEditAwardPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof AwardFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.photo.trim()) newErrors.photo = "Photo is required";
+    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
+    if (!formData.photo.trim()) newErrors.photo = "Photo is Required. ";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -141,8 +141,8 @@ export default function AddEditAwardPage() {
         submitting
           ? "Submitting..."
           : isEditMode
-          ? "Save Changes"
-          : "Create Award"
+            ? "Save Changes"
+            : "Create Award"
       }
       submitIcon={
         isEditMode ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />
@@ -151,13 +151,12 @@ export default function AddEditAwardPage() {
     >
       <div className="sm:col-span-2">
         <TextField
-          label="Title"
+          label="Title*"
           icon={AwardIcon}
           placeholder="e.g. Best NGO Award 2025"
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
           error={errors.title}
-          required
         />
       </div>
 
@@ -180,9 +179,7 @@ export default function AddEditAwardPage() {
           allowedTypes="image"
           allowMultiple={false}
           showCaption={false}
-          initialImages={
-            formData.photo ? [{ image: formData.photo }] : []
-          }
+          initialImages={formData.photo ? [{ image: formData.photo }] : []}
           onImagesChange={(files) =>
             handleChange("photo", files[0]?.image || "")
           }

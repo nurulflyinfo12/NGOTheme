@@ -25,7 +25,8 @@ export default function AddEditPublicationPage() {
   const idParam = searchParams.get("id");
   const isEditMode = Boolean(idParam);
 
-  const { submitting, fetchPublicationById, saveOrUpdatePublication } = usePublication();
+  const { submitting, fetchPublicationById, saveOrUpdatePublication } =
+    usePublication();
 
   const [formData, setFormData] = useState<PublicationFormData>({
     title: "",
@@ -87,9 +88,11 @@ export default function AddEditPublicationPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof PublicationFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.category.trim()) newErrors.category = "Category is required";
-    if (!formData.fileUpload.trim()) newErrors.fileUpload = "Publication file is required";
+    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
+    if (!formData.category.trim())
+      newErrors.category = "Category is Required. ";
+    if (!formData.fileUpload.trim())
+      newErrors.fileUpload = "Publication file is Required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -146,23 +149,26 @@ export default function AddEditPublicationPage() {
           submitting
             ? "Submitting..."
             : isEditMode
-            ? "Save Changes"
-            : "Create Publication"
+              ? "Save Changes"
+              : "Create Publication"
         }
         submitIcon={
-          isEditMode ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />
+          isEditMode ? (
+            <Save className="h-4 w-4" />
+          ) : (
+            <Plus className="h-4 w-4" />
+          )
         }
         onSubmit={handleSubmit}
       >
         {/* Title */}
         <TextField
-          label="Title"
+          label="Title*"
           icon={BookOpen}
           placeholder="e.g. Annual Report 2025"
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
           error={errors.title}
-          required
         />
 
         {/* Subtitle */}
@@ -177,20 +183,18 @@ export default function AddEditPublicationPage() {
 
         {/* Category */}
         <TextField
-          label="Category"
+          label="Category*"
           icon={Tag}
           placeholder="e.g. Reports, Newsletters, Research"
           value={formData.category}
           onChange={(e) => handleChange("category", e.target.value)}
           error={errors.category}
-          required
         />
 
         {/* Status Select */}
         <div className="space-y-2">
           <StatusSelect
             label="Status"
-            required
             value={formData.isActive ? "Active" : "Inactive"}
             onChange={(val) => handleChange("isActive", val === "Active")}
           />
@@ -199,20 +203,27 @@ export default function AddEditPublicationPage() {
         {/* PDF / File Upload Component */}
         <div className="space-y-1.5 sm:col-span-2">
           <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1 flex items-center justify-between">
-            <span>Publication File (PDF or Image) <span className="text-red-500">*</span></span>
+            <span>
+              Publication File (PDF or Image){" "}
+              <span className="text-red-500">*</span>
+            </span>
           </label>
           <ImageUpload
             label="Drag & drop PDF document or file"
             allowedTypes="all"
             allowMultiple={false}
             showCaption={false}
-            initialImages={formData.fileUpload ? [{ image: formData.fileUpload }] : []}
+            initialImages={
+              formData.fileUpload ? [{ image: formData.fileUpload }] : []
+            }
             onImagesChange={(files) =>
               handleChange("fileUpload", files[0]?.image || "")
             }
           />
           {errors.fileUpload && (
-            <p className="text-xs text-red-600 mt-1 px-1">{errors.fileUpload}</p>
+            <p className="text-xs text-red-600 mt-1 px-1">
+              {errors.fileUpload}
+            </p>
           )}
         </div>
       </FormCard>

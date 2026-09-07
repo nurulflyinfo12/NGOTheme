@@ -55,9 +55,10 @@ export default function AddEditBlogPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof BlogFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.category.trim()) newErrors.category = "Category is required";
-    if (!formData.image.trim()) newErrors.image = "Image is required";
+    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
+    if (!formData.category.trim())
+      newErrors.category = "Category is Required. ";
+    if (!formData.image.trim()) newErrors.image = "Image is ";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -206,7 +207,6 @@ export default function AddEditBlogPage() {
         <div className="space-y-2">
           <StatusSelect
             label="Status"
-            required
             value={formData.status}
             onChange={(val) =>
               setFormData((prev) => ({ ...prev, status: val }))

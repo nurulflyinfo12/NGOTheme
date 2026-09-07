@@ -43,9 +43,9 @@ export default function AddEditLeadershipPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof LeadershipFormData, string>> = {};
-    if (!formData.name.trim()) newErrors.name = "Name is required";
-    if (!formData.position.trim()) newErrors.position = "Position is required";
-    if (!formData.photo.trim()) newErrors.photo = "Photo is required";
+    if (!formData.name.trim()) newErrors.name = "Name is ";
+    if (!formData.position.trim()) newErrors.position = "Position is ";
+    if (!formData.photo.trim()) newErrors.photo = "Photo is Required. ";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };

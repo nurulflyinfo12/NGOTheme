@@ -50,7 +50,7 @@ export function useProjects() {
     setError("");
     try {
       const res = await api.get<ApiProject | ApiProject[]>(
-        `/Project/GetProjectById?projectId=${encodeURIComponent(id)}`
+        `/Project/GetProjectById?projectId=${encodeURIComponent(id)}`,
       );
       const item = Array.isArray(res) ? res[0] : res;
       return item || null;
@@ -64,27 +64,54 @@ export function useProjects() {
   }, []);
 
   // 3. Save or Update Project: POST /api/Project/SaveUpdateProject
+  // Save or Update Project: POST /api/Project/SaveUpdateProject
   const saveOrUpdateProject = async (payload: ApiProject) => {
     setSubmitting(true);
     setError("");
     try {
-      await api.post("/Project/SaveUpdateProject", {
+      const res: any = await api.post("/Project/SaveUpdateProject", {
         ...payload,
         SetDate: payload.SetDate || new Date().toISOString(),
       });
 
+      // Check if the backend returned an explicit error response structure
+      const isErrorType = res?.MessageType === 3;
+      const errorMessage = res?.CurrentMessage || res?.message;
+
+      if (isErrorType || (res?.MessageType && res.MessageType !== 1)) {
+        const msg =
+          errorMessage || "Failed to save project due to a server error.";
+        setError(msg);
+        Swal.fire({
+          icon: "error",
+          title: "Save Failed",
+          text: msg,
+          confirmButtonColor: "#e86958",
+        });
+        return false;
+      }
+
+      // Success response handling
       Swal.fire({
         icon: "success",
         title: "Saved!",
-        text: "Project saved successfully.",
+        text: res?.CurrentMessage || "Project saved successfully.",
         timer: 1500,
         showConfirmButton: false,
       });
       return true;
     } catch (err: any) {
-      const msg = err.message || "Failed to save project.";
+      const msg =
+        err?.response?.data?.CurrentMessage ||
+        err?.message ||
+        "Failed to save project.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Save Failed", text: msg });
+      Swal.fire({
+        icon: "error",
+        title: "Save Failed",
+        text: msg,
+        confirmButtonColor: "#e86958",
+      });
       return false;
     } finally {
       setSubmitting(false);
@@ -114,7 +141,7 @@ export function useProjects() {
       try {
         await api.post(
           `/Project/DeleteProject?projectId=${encodeURIComponent(projectId)}`,
-          {}
+          {},
         );
         Swal.fire({
           title: "Deleted!",

@@ -74,7 +74,7 @@ export default function AddEditRolePage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof RoleFormData, string>> = {};
-    if (!formData.RoleName.trim()) newErrors.RoleName = "Role name is required";
+    if (!formData.RoleName.trim()) newErrors.RoleName = "Role name is Required. ";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -143,13 +143,12 @@ export default function AddEditRolePage() {
         onSubmit={handleSubmit}
       >
         <TextField
-          label="Role Name"
+          label="Role Name*"
           icon={Shield}
           placeholder="e.g. Content Manager"
           value={formData.RoleName}
           onChange={(e) => handleChange("RoleName", e.target.value)}
           error={errors.RoleName}
-          required
         />
 
         <div className="space-y-1.5">
@@ -168,7 +167,6 @@ export default function AddEditRolePage() {
         <div className="space-y-2">
           <StatusSelect
             label="Status"
-            required
             value={formData.IsActive ? "Active" : "Inactive"}
             onChange={(val) =>
               setFormData((prev) => ({

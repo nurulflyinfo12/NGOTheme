@@ -17,6 +17,7 @@ import FormCard from "@/components/Admin/FormCard";
 import ImageUpload from "@/components/Admin/ImageUpload";
 import QuillEditor from "@/components/Admin/QuillEditor";
 import { TextField } from "@/components/Admin/TextField";
+import { DropdownSelect } from "@/components/Admin/DropdownSelect";
 import { useProjects, ApiProject } from "@/hooks/useProjects";
 import { useCategories } from "@/hooks/useCategories";
 
@@ -127,12 +128,13 @@ export default function AddEditProjectPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof ProjectFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.subtitle.trim()) newErrors.subtitle = "Subtitle is required";
+    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
+    if (!formData.subtitle.trim())
+      newErrors.subtitle = "SubTitle is Required. ";
     if (!formData.categoryId.trim())
-      newErrors.categoryId = "Category selection is required";
-    if (!formData.photo.trim()) newErrors.photo = "Photo is required";
-    if (!formData.time.trim()) newErrors.time = "Time is required";
+      newErrors.categoryId = "Category selection is Required";
+    if (!formData.photo.trim()) newErrors.photo = "Photo is Required. ";
+    if (!formData.time.trim()) newErrors.time = "Time is ";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -186,6 +188,11 @@ export default function AddEditProjectPage() {
     }
   };
 
+  const categoryOptions = categories.map((cat) => ({
+    label: cat.CategoryName || "",
+    value: cat.CategoryID || "",
+  }));
+
   return (
     <FormCard
       title={isEditMode ? "Edit Project" : "Add New Project"}
@@ -210,80 +217,77 @@ export default function AddEditProjectPage() {
       onSubmit={handleSubmit}
     >
       <TextField
-        label="Title"
+        label="Title*"
         icon={Heading}
-        placeholder="e.g. Clean Water Project"
         value={formData.title}
         onChange={(e) => handleChange("title", e.target.value)}
         error={errors.title}
-        required
       />
 
       <TextField
-        label="Subtitle"
+        label="Subtitle*"
         icon={Type}
-        placeholder="e.g. Safe water for rural communities"
         value={formData.subtitle}
         onChange={(e) => handleChange("subtitle", e.target.value)}
         error={errors.subtitle}
-        required
       />
 
-      {/* Category Dropdown connected to useCategories */}
-      <div className="space-y-1.5">
-        <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
-          Category <span className="text-red-500">*</span>
-        </label>
-        <div className="relative">
-          <select
-            value={formData.categoryId}
-            onChange={(e) => handleCategorySelect(e.target.value)}
-            className={`w-full py-3 px-4 pl-10 text-sm sm:text-base border-2 rounded-2xl text-slate-800 outline-none bg-white/70 focus:bg-white transition-all shadow-sm appearance-none ${
-              errors.categoryId
-                ? "border-red-500 focus:ring-4 focus:ring-red-500/10"
-                : "border-slate-200/80 focus:border-[#e86958]"
-            }`}
-          >
-            <option value="">Select Category</option>
-            {categories.map((cat) => (
-              <option key={cat.CategoryID} value={cat.CategoryID}>
-                {cat.CategoryName}
-              </option>
-            ))}
-          </select>
-          <Layers className="absolute left-3 top-3.5 h-4 w-4 text-slate-400 pointer-events-none" />
-        </div>
-        {errors.categoryId && (
-          <p className="text-xs text-red-600 flex items-center gap-1 ml-1 mt-1">
-            <AlertCircle size={12} /> {errors.categoryId}
-          </p>
-        )}
-      </div>
+      <DropdownSelect
+        label="Category*"
+        icon={Layers}
+        placeholder="Select Category"
+        options={categoryOptions}
+        value={formData.categoryId}
+        onChange={(e) => handleCategorySelect(e.target.value)}
+        error={errors.categoryId}
+      />
 
       <TextField
         label="Location"
         icon={MapPin}
-        placeholder="e.g. Dhaka, Bangladesh"
         value={formData.location}
         onChange={(e) => handleChange("location", e.target.value)}
         error={errors.location}
       />
 
-      <div className="sm:col-span-2">
-        <TextField
-          label="Time / Schedule"
-          icon={Clock}
-          placeholder="e.g. 2026-05-10 10:00 AM"
-          value={formData.time}
-          onChange={(e) => handleChange("time", e.target.value)}
-          error={errors.time}
-          required
-        />
+      {/* Datetime Picker Field */}
+      {/* Time Picker Field */}
+      <div className="sm:col-span-2 space-y-1.5">
+        <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
+          Time / Schedule
+        </label>
+        <div className="relative group w-full">
+          <Clock
+            className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors pointer-events-none z-10 ${
+              errors.time
+                ? "text-red-400 group-focus-within:text-red-500"
+                : "text-slate-400 group-focus-within:text-[#f86048]"
+            }`}
+            size={18}
+          />
+          <input
+            type="time"
+            value={formData.time}
+            onChange={(e) => handleChange("time", e.target.value)}
+            className={`w-full py-3 text-black sm:py-3.5 pl-11 pr-4 text-sm sm:text-base border-2 rounded-2xl outline-none bg-white/70 focus:bg-white transition-all shadow-sm ${
+              formData.time ? "text-slate-900 font-medium" : "text-slate-400"
+            } ${
+              errors.time
+                ? "border-red-300 focus:border-red-500 text-red-900"
+                : "border-slate-200/80 focus:border-[#f86048]"
+            }`}
+          />
+        </div>
+        {errors.time && (
+          <span className="text-xs font-medium text-red-500 px-1 animate-in fade-in slide-in-from-top-1">
+            {errors.time}
+          </span>
+        )}
       </div>
 
       <div className="space-y-1.5 sm:col-span-2">
         <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
-          Details
+          Details*
         </label>
         <QuillEditor
           value={formData.details}

@@ -2,19 +2,26 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { UserPlus, Save, AlertCircle } from "lucide-react";
-import Swal from "sweetalert2";
+import {
+  Save,
+  Plus,
+  AlertCircle,
+  Heading,
+  FileText,
+  Quote as QuoteIcon,
+} from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import ImageUpload from "@/components/Admin/ImageUpload";
-import StatusSelect from "@/components/Admin/StatusSelect";
+import { TextField } from "@/components/Admin/TextField";
+import { useHeroSection, ApiHeroSection } from "@/hooks/useHeroSection";
 
 export interface HeroBannerFormData {
-  title: string;
-  subtitle: string;
-  link: string;
-  image: string;
-  status: "Active" | "Inactive";
+  heroSectionId?: string;
+  heroTitle: string;
+  heroDetails: string;
+  quote: string;
+  imageUrls: string[];
 }
 
 export default function AddEditHeroBannerPage() {
@@ -23,18 +30,19 @@ export default function AddEditHeroBannerPage() {
   const bannerId = searchParams.get("id");
   const isEditMode = Boolean(bannerId);
 
+  const { submitting, saveOrUpdateHeroSection } = useHeroSection();
+
   const [formData, setFormData] = useState<HeroBannerFormData>({
-    title: "",
-    subtitle: "",
-    link: "",
-    image: "",
-    status: "Active",
+    heroTitle: "",
+    heroDetails: "",
+    quote: "",
+    imageUrls: [],
   });
 
-  const [errors, setErrors] = useState<Partial<Record<keyof HeroBannerFormData, string>>>({});
-  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof HeroBannerFormData, string>>
+  >({});
 
-  // Load dummy data for edit mode
   useEffect(() => {
     if (isEditMode) {
       const rawData = localStorage.getItem("tempHeroBannerData");
@@ -42,11 +50,11 @@ export default function AddEditHeroBannerPage() {
         try {
           const banner = JSON.parse(rawData);
           setFormData({
-            title: banner.title || "",
-            subtitle: banner.subtitle || "",
-            link: banner.link || "",
-            image: banner.image || "",
-            status: banner.status === "Active" ? "Active" : "Inactive",
+            heroSectionId: banner.HeroSectionID || bannerId || undefined,
+            heroTitle: banner.HeroTitle || "",
+            heroDetails: banner.HeroDetails || "",
+            quote: banner.Quote || "",
+            imageUrls: Array.isArray(banner.ImageUrls) ? banner.ImageUrls : [],
           });
         } catch (err) {
           console.error("Error parsing banner data:", err);
@@ -57,63 +65,52 @@ export default function AddEditHeroBannerPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof HeroBannerFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.image.trim()) newErrors.image = "Banner image is required";
+    if (!formData.heroTitle.trim()) newErrors.heroTitle = "Title is Required. ";
+    if (formData.imageUrls.length === 0 || !formData.imageUrls[0]) {
+      newErrors.imageUrls = "Banner image is Required.";
+    }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (name: keyof HeroBannerFormData, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  const handleChange = (field: keyof HeroBannerFormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    setSubmitting(true);
+    const payload: ApiHeroSection = {
+      ...(formData.heroSectionId
+        ? { HeroSectionID: formData.heroSectionId }
+        : {}),
+      HeroTitle: formData.heroTitle,
+      HeroDetails: formData.heroDetails,
+      Quote: formData.quote,
+      SetDate: new Date().toISOString(),
+      ImageUrls: formData.imageUrls,
+    };
 
-    try {
-      console.log("Payload:", formData);
+    const success = await saveOrUpdateHeroSection(payload);
 
+    if (success) {
       localStorage.removeItem("tempHeroBannerData");
-
-      Swal.fire({
-        icon: "success",
-        title: isEditMode ? "Updated!" : "Created!",
-        text: `Hero Banner ${isEditMode ? "updated" : "created"} successfully.`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
-
       router.push("/admin/herobanner");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleClear = () => {
     setFormData({
-      title: "",
-      subtitle: "",
-      link: "",
-      image: "",
-      status: "Active",
+      heroSectionId: isEditMode ? formData.heroSectionId : undefined,
+      heroTitle: "",
+      heroDetails: "",
+      quote: "",
+      imageUrls: [],
     });
     setErrors({});
   };
-
-  const inputClass = (field: keyof HeroBannerFormData) => `
-    w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition-all text-black
-    ${
-      errors[field]
-        ? "border-red-500 focus:ring-4 focus:ring-red-500/10"
-        : "border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white"
-    }
-  `;
 
   return (
     <div className="min-h-screen">
@@ -131,75 +128,81 @@ export default function AddEditHeroBannerPage() {
         backButtonLabel="Back to List"
         onClear={handleClear}
         clearButtonLabel="Clear"
-        submitLabel={submitting ? "Submitting..." : isEditMode ? "Save Changes" : "Create Banner"}
-        submitIcon={isEditMode ? <Save className="h-4 w-4" /> : <UserPlus className="h-4 w-4" />}
+        submitLabel={
+          submitting
+            ? "Submitting..."
+            : isEditMode
+              ? "Save Changes"
+              : "Create Banner"
+        }
+        submitIcon={
+          isEditMode ? (
+            <Save className="h-4 w-4" />
+          ) : (
+            <Plus className="h-4 w-4" />
+          )
+        }
         onSubmit={handleSubmit}
       >
         {/* Title */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">
-            Title <span className="text-red-500">*</span>
+        <TextField
+          label="Title*"
+          icon={Heading}
+          value={formData.heroTitle}
+          onChange={(e) => handleChange("heroTitle", e.target.value)}
+          error={errors.heroTitle}
+        />
+
+        {/* Quote */}
+        <TextField
+          label="Quote"
+          icon={QuoteIcon}
+          value={formData.quote}
+          onChange={(e) => handleChange("quote", e.target.value)}
+          error={errors.quote}
+        />
+
+        {/* Details */}
+        <div className="space-y-1.5 sm:col-span-2">
+          <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
+            Details
           </label>
-          <input
-            value={formData.title}
-            onChange={(e) => handleChange("title", e.target.value)}
-            className={inputClass("title")}
-          />
-          {errors.title && (
-            <p className="text-xs text-red-600 flex items-center gap-1 ml-1">
-              <AlertCircle size={12} /> {errors.title}
-            </p>
-          )}
+          <div className="relative group w-full">
+            <textarea
+              rows={4}
+              value={formData.heroDetails}
+              onChange={(e) => handleChange("heroDetails", e.target.value)}
+              placeholder="Enter hero section description details..."
+              className="w-full p-4 text-sm border-2 rounded-2xl outline-none bg-white/70 focus:bg-white transition-all shadow-sm border-slate-200/80 focus:border-[#f86048]"
+            />
+          </div>
         </div>
 
-        {/* Subtitle */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">Subtitle</label>
-          <input
-            value={formData.subtitle}
-            onChange={(e) => handleChange("subtitle", e.target.value)}
-            className={inputClass("subtitle")}
-          />
-        </div>
-
-        {/* Link */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">Link</label>
-          <input
-            value={formData.link}
-            onChange={(e) => handleChange("link", e.target.value)}
-            placeholder="/some-page"
-            className={inputClass("link")}
-          />
-        </div>
-
-        {/* Status */}
-        <div className="space-y-2">
-          <StatusSelect
-            label="Status"
-            required
-            value={formData.status}
-            onChange={(val) => setFormData((prev) => ({ ...prev, status: val }))}
-            error={errors.status}
-          />
-        </div>
-
-        {/* Image */}
-        <div className="space-y-2 sm:col-span-2">
-          <label className="text-sm font-semibold ml-1">
+        {/* Banner Images */}
+        <div className="space-y-1.5 sm:col-span-2">
+          <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
             Banner Image <span className="text-red-500">*</span>
           </label>
           <ImageUpload
-            initialImages={formData.image ? [{ image: formData.image }] : []}
-            onImagesChange={(imgs) =>
-              setFormData((prev) => ({ ...prev, image: imgs[0]?.image || "" }))
-            }
+            label="Drag & Drop Banner Image"
+            allowedTypes="image"
             allowMultiple={false}
             showCaption={false}
+            initialImages={
+              formData.imageUrls.length > 0
+                ? [{ image: formData.imageUrls[0] }]
+                : []
+            }
+            onImagesChange={(files) =>
+              handleChange(
+                "imageUrls",
+                files.map((f) => f.image).filter(Boolean),
+              )
+            }
           />
-          {errors.image && (
-            <p className="text-xs text-red-600 flex items-center gap-1 ml-1">
-              <AlertCircle size={12} /> {errors.image}
+          {errors.imageUrls && (
+            <p className="text-xs text-red-600 flex items-center gap-1 ml-1 mt-1">
+              <AlertCircle size={12} /> {errors.imageUrls}
             </p>
           )}
         </div>

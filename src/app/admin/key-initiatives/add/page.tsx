@@ -87,8 +87,8 @@ export default function AddEditKeyInitiativePage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof KeyInitiativeFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.photo.trim()) newErrors.photo = "Photo is required";
+    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
+    if (!formData.photo.trim()) newErrors.photo = "Photo is Required. ";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -150,13 +150,12 @@ export default function AddEditKeyInitiativePage() {
     >
       <div className="sm:col-span-2">
         <TextField
-          label="Title"
+          label="Title*"
           icon={Layers}
           placeholder="e.g. Education for All"
           value={formData.title}
           onChange={(e) => handleChange("title", e.target.value)}
           error={errors.title}
-          required
         />
       </div>
 
