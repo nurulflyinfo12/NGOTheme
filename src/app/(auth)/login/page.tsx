@@ -1,11 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Lock, User, ArrowRight, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Swal from "sweetalert2";
-import { api } from "@/utility/api";
+import { api, clearAuthData } from "@/utility/api";
 import { TextField } from "@/components/Admin/TextField";
 
 export default function AdminLogin() {
@@ -13,9 +13,11 @@ export default function AdminLogin() {
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
-  /**
-   * Show error alert
-   */
+  // Clear any existing session when landing on the login screen
+  useEffect(() => {
+    clearAuthData();
+  }, []);
+
   const showErrorAlert = (title: string, text: string) => {
     Swal.fire({
       icon: "error",
@@ -29,41 +31,13 @@ export default function AdminLogin() {
     });
   };
 
-  /**
-   * Clear all previous authentication data
-   *
-   * This is important when a user logs out and another user
-   * logs in. It prevents the previous access token from
-   * remaining anywhere in the browser.
-   */
-  const clearPreviousAuth = () => {
-    // Clear localStorage
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("AccessToken");
-    localStorage.removeItem("user");
-    localStorage.removeItem("permittedScreens");
-
-    // Clear cookies
-    document.cookie =
-      "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
-
-    document.cookie =
-      "admin=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; SameSite=Lax";
-  };
-
-  /**
-   * Save the newly generated authentication data
-   */
   const saveAuthData = (token: string, user?: any, permittedScreens?: any) => {
-    // Store ONLY the new token
     localStorage.setItem("accessToken", token);
 
-    // Store user information
     if (user) {
       localStorage.setItem("user", JSON.stringify(user));
     }
 
-    // Store permitted screens
     if (permittedScreens) {
       localStorage.setItem(
         "permittedScreens",
@@ -71,18 +45,13 @@ export default function AdminLogin() {
       );
     }
 
-    // Store token in cookie for middleware/server-side authentication
     document.cookie = `accessToken=${encodeURIComponent(
       token,
     )}; path=/; max-age=86400; SameSite=Lax`;
 
-    // Admin authentication flag
     document.cookie = "admin=true; path=/; max-age=86400; SameSite=Lax";
   };
 
-  /**
-   * Login handler
-   */
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -97,22 +66,13 @@ export default function AdminLogin() {
     setIsLoading(true);
 
     try {
-      /**
-       * Login request
-       */
       const response = await api.post("/Login", {
         UserName: username.trim(),
         Password: password,
       });
 
-      /**
-       * API may return the token in either location
-       */
       const token = response?.User?.AccessToken || response?.AccessToken;
 
-      /**
-       * No token means authentication failed
-       */
       if (!token || typeof token !== "string" || !token.trim()) {
         const message =
           response?.CurrentMessage ||
@@ -123,25 +83,10 @@ export default function AdminLogin() {
         return;
       }
 
-      /**
-       * IMPORTANT
-       *
-       * Remove the previous user's authentication data BEFORE
-       * saving the newly generated token.
-       */
-      clearPreviousAuth();
-
-      /**
-       * Save the NEW token and related user data
-       */
+      // Purge prior auth data first, then store new token
+      clearAuthData();
       saveAuthData(token.trim(), response?.User, response?.PermittedScreen);
 
-      /**
-       * Optional verification.
-       *
-       * This ensures the value stored in localStorage is
-       * exactly the newly generated token.
-       */
       const savedToken = localStorage.getItem("accessToken");
 
       if (savedToken !== token.trim()) {
@@ -150,12 +95,6 @@ export default function AdminLogin() {
         );
       }
 
-      /**
-       * Redirect only AFTER the new token has been stored.
-       *
-       * Using a full page navigation also ensures that the
-       * next page starts with fresh authentication state.
-       */
       window.location.href = "/admin/dashboard";
     } catch (err: any) {
       const errorMessage =
@@ -172,7 +111,6 @@ export default function AdminLogin() {
 
   return (
     <div className="min-h-screen w-full bg-slate-900 flex overflow-x-hidden selection:bg-[#f86048] selection:text-white">
-      {/* Left Banner Section */}
       <motion.div
         initial={{ opacity: 0, x: -20 }}
         animate={{ opacity: 1, x: 0 }}
@@ -181,7 +119,6 @@ export default function AdminLogin() {
       >
         <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-25">
           <div className="absolute w-[500px] h-[500px] rounded-full blur-[120px] -translate-x-1/4 -translate-y-1/4 top-0 left-0 bg-white/40" />
-
           <div className="absolute w-[400px] h-[400px] bg-black rounded-full blur-[100px] translate-x-1/4 translate-y-1/4 bottom-0 right-0" />
         </div>
 
@@ -229,10 +166,8 @@ export default function AdminLogin() {
         </div>
       </motion.div>
 
-      {/* Right Side Login Form */}
       <div className="w-full lg:w-1/2 flex flex-col justify-between items-center bg-slate-50 min-h-screen px-6 sm:px-12 lg:px-16 py-10 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-96 h-96 bg-[#f86048]/5 rounded-full blur-3xl pointer-events-none" />
-
         <div className="absolute bottom-0 left-0 w-96 h-96 bg-slate-200/50 rounded-full blur-3xl pointer-events-none" />
 
         <div className="w-full max-w-sm sm:max-w-md my-auto flex flex-col justify-center relative z-10">
@@ -271,7 +206,7 @@ export default function AdminLogin() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-4 text-sm sm:text-base !bg-[#f86048] !hover:bg-[#e24e37] active:scale-[0.98] text-white rounded-2xl font-black flex items-center justify-center gap-2.5 transition-all disabled:opacity-70 shadow-lg shadow-[#f86048]/25 group mt-2"
+              className="w-full py-2 text-sm sm:text-base !bg-[#f86048] !hover:bg-[#e24e37] active:scale-[0.98] text-white !rounded-2xl font-black flex items-center justify-center gap-2.5 transition-all disabled:opacity-70 shadow-lg shadow-[#f86048]/25 group mt-2"
             >
               {isLoading ? (
                 <Loader2 className="animate-spin" size={20} />
@@ -290,9 +225,7 @@ export default function AdminLogin() {
 
         <footer className="w-full max-w-sm sm:max-w-md pt-8 flex items-center justify-between text-slate-400 text-[10px] font-bold uppercase tracking-widest relative z-10">
           <span>Security Enforced</span>
-
           <div className="h-[1px] flex-1 mx-4 bg-slate-200" />
-
           <span>SUSS 2026</span>
         </footer>
       </div>

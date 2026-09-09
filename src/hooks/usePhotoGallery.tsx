@@ -58,19 +58,13 @@ export function usePhotoGallery() {
     [fetchGalleries]
   );
 
-  // 3. Save or Update Photo Gallery
+  // 3. Save or Update Photo Gallery (Single POST Endpoint: /api/News/CreatePhotoGallery)
   const saveOrUpdateGallery = async (payload: ApiPhotoGallery) => {
     setSubmitting(true);
     setError("");
     try {
       const isEdit = Boolean(payload.PhotoGalleryID);
-      const endpoint = isEdit
-        ? `/News/UpdatePhotoGallery?photoGalleryID=${encodeURIComponent(
-            payload.PhotoGalleryID!
-          )}`
-        : "/News/CreatePhotoGallery";
-
-      const res: any = await api.post(endpoint, payload);
+      const res: any = await api.post("/News/CreatePhotoGallery", payload);
 
       if (res?.MessageType === 3 || (res?.MessageType && res.MessageType !== 1)) {
         const msg = res?.CurrentMessage || "Failed to save photo gallery.";

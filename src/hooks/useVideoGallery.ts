@@ -54,19 +54,13 @@ export function useVideoGallery() {
     [fetchVideos]
   );
 
-  // 3. Save or Update Video Gallery Item
+  // 3. Save or Update Video Gallery Item (Single Endpoint: POST /api/News/CreateVideoGallery)
   const saveOrUpdateVideo = async (payload: ApiVideoGallery) => {
     setSubmitting(true);
     setError("");
     try {
       const isEdit = Boolean(payload.VideoID);
-      const endpoint = isEdit
-        ? `/News/UpdateVideoGallery?videoGalleryID=${encodeURIComponent(
-            payload.VideoID!
-          )}`
-        : "/News/CreateVideoGallery";
-
-      const res: any = await api.post(endpoint, payload);
+      const res: any = await api.post("/News/CreateVideoGallery", payload);
 
       if (res?.MessageType === 3 || (res?.MessageType && res.MessageType !== 1)) {
         const msg = res?.CurrentMessage || "Failed to save video item.";

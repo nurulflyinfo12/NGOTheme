@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Save, Plus, AlertCircle, Heading, Link as LinkIcon } from "lucide-react";
+import {
+  Save,
+  Plus,
+  AlertCircle,
+  Heading,
+  Link as LinkIcon,
+} from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import ImageUpload from "@/components/Admin/ImageUpload";
@@ -99,7 +105,8 @@ export default function AddEditVideoPage() {
   const validate = () => {
     const newErrors: Partial<Record<keyof VideoFormData, string>> = {};
     if (!formData.headline.trim()) newErrors.headline = "Headline is required";
-    if (!formData.videoLink.trim()) newErrors.videoLink = "Video Link is required";
+    if (!formData.videoLink.trim())
+      newErrors.videoLink = "Video Link is required";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -172,11 +179,15 @@ export default function AddEditVideoPage() {
           submitting
             ? "Saving..."
             : isEditMode
-            ? "Save Changes"
-            : "Create Video"
+              ? "Save Changes"
+              : "Create Video"
         }
         submitIcon={
-          isEditMode ? <Save className="h-4 w-4" /> : <Plus className="h-4 w-4" />
+          isEditMode ? (
+            <Save className="h-4 w-4" />
+          ) : (
+            <Plus className="h-4 w-4" />
+          )
         }
         onSubmit={handleSubmit}
       >
@@ -209,9 +220,7 @@ export default function AddEditVideoPage() {
         <StatusSelect
           label="Status"
           value={formData.status}
-          onChange={(val) =>
-            setFormData((prev) => ({ ...prev, status: val }))
-          }
+          onChange={(val) => setFormData((prev) => ({ ...prev, status: val }))}
           error={errors.status}
         />
 
