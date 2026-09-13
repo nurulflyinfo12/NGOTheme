@@ -1,5 +1,3 @@
-// utility/api.ts
-
 const BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "https://localhost:44302/api";
 
@@ -33,7 +31,7 @@ export function logout(): void {
     typeof window !== "undefined" &&
     !window.location.pathname.includes("/login")
   ) {
-    window.location.href = "/admin/login";
+    window.location.href = "/login";
   }
 }
 
@@ -119,12 +117,13 @@ export async function apiFetch<T = any>(
 
     const data = await response.json();
 
+    // FIXED: Only trigger logout if the message explicitly mentions token/authentication issues
+    const message = (data?.CurrentMessage || data?.message || "").toLowerCase();
     if (
-      data &&
-      typeof data === "object" &&
-      (data.CurrentMessage?.toLowerCase().includes("token expired") ||
-        data.message?.toLowerCase().includes("token expired") ||
-        data.MessageType === 3)
+      message.includes("token expired") ||
+      message.includes("invalid token") ||
+      message.includes("unauthorized") ||
+      message.includes("session expired")
     ) {
       logout();
       throw new Error("Your session has expired. Please log in again.");

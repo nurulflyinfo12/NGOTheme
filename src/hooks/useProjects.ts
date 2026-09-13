@@ -11,12 +11,19 @@ export interface ApiProject {
   Subtitle?: string;
   Photo: string;
   CategoryID: string;
+  Category?: string;
   CategoryName?: string;
+  CategorySlug?: string;
+  SubCategoryId?: string;
+  SubcategoryName?: string;
+  SubCategorySlug?: string;
   Details: string;
   Location?: string;
   Time?: string;
+  Date?: string;
   IsActive: boolean;
   SetDate?: string;
+  UserID?: string;
 }
 
 export function useProjects() {
@@ -25,7 +32,6 @@ export function useProjects() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch All Projects: GET /api/Project/GetAllProject
   const fetchProjects = useCallback(async () => {
     setLoading(true);
     setError("");
@@ -37,34 +43,49 @@ export function useProjects() {
     } catch (err: any) {
       const msg = err.message || "Failed to load projects.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 2. Fetch Single Project by ID: GET /api/Project/GetProjectById?projectId={id}
   const fetchProjectById = useCallback(async (id: string) => {
+    if (!id || id === "undefined") return null;
     setLoading(true);
     setError("");
     try {
       const res = await api.get<ApiProject | ApiProject[]>(
-        `/Project/GetProjectById?projectId=${encodeURIComponent(id)}`,
+        `/Public/GetProjectById?projectId=${encodeURIComponent(id)}`
       );
       const item = Array.isArray(res) ? res[0] : res;
       return item || null;
     } catch (err: any) {
-      const msg = err.message || "Failed to fetch project details.";
-      setError(msg);
+      setError(err.message || "Failed to fetch project details.");
       return null;
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 3. Save or Update Project: POST /api/Project/SaveUpdateProject
-  // Save or Update Project: POST /api/Project/SaveUpdateProject
+  const fetchProjectsByCategorySlug = useCallback(async (slug: string) => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await api.get<ApiProject[]>(
+        `/Public/GetProjectsByCategorySlug?categorySlug=${encodeURIComponent(slug)}`
+      );
+      const list = Array.isArray(data) ? data : [];
+      setProjects(list);
+      return list;
+    } catch (err: any) {
+      const msg = err.message || "Failed to load projects for this category.";
+      setError(msg);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   const saveOrUpdateProject = async (payload: ApiProject) => {
     setSubmitting(true);
     setError("");
@@ -74,13 +95,11 @@ export function useProjects() {
         SetDate: payload.SetDate || new Date().toISOString(),
       });
 
-      // Check if the backend returned an explicit error response structure
       const isErrorType = res?.MessageType === 3;
       const errorMessage = res?.CurrentMessage || res?.message;
 
       if (isErrorType || (res?.MessageType && res.MessageType !== 1)) {
-        const msg =
-          errorMessage || "Failed to save project due to a server error.";
+        const msg = errorMessage || "Failed to save project due to a server error.";
         setError(msg);
         Swal.fire({
           icon: "error",
@@ -91,7 +110,6 @@ export function useProjects() {
         return false;
       }
 
-      // Success response handling
       Swal.fire({
         icon: "success",
         title: "Saved!",
@@ -118,7 +136,6 @@ export function useProjects() {
     }
   };
 
-  // 4. Delete Project: POST /api/Project/DeleteProject?projectId={id}
   const deleteProject = async (project: ApiProject) => {
     const projectId = project.ProjectID || "";
 
@@ -141,7 +158,7 @@ export function useProjects() {
       try {
         await api.post(
           `/Project/DeleteProject?projectId=${encodeURIComponent(projectId)}`,
-          {},
+          {}
         );
         Swal.fire({
           title: "Deleted!",
@@ -171,6 +188,7 @@ export function useProjects() {
     error,
     fetchProjects,
     fetchProjectById,
+    fetchProjectsByCategorySlug,
     saveOrUpdateProject,
     deleteProject,
   };

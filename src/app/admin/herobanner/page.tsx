@@ -1,14 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import DataTable, { Column } from "@/components/Admin/DataTable";
 import { ImageCell } from "@/components/Admin/TableCells";
-import { useHeroSection, ApiHeroSection } from "@/hooks/useHeroSection";
+import {
+  useHeroSection,
+  ApiHeroSection,
+  parseImageUrls,
+} from "@/hooks/useHeroSection";
 
 export default function AllHeroBanners() {
   const router = useRouter();
-  const { heroSections, loading, fetchHeroSections, deleteHeroSection } =
+  const { heroSections, fetchHeroSections, deleteHeroSection } =
     useHeroSection();
 
   useEffect(() => {
@@ -38,11 +42,19 @@ export default function AllHeroBanners() {
     },
     {
       key: "ImageUrls",
-      header: "Image",
-      render: (b) =>
-        b.ImageUrls && b.ImageUrls.length > 0 ? (
-          <ImageCell src={b.ImageUrls[0]} alt={b.HeroTitle} />
-        ) : null,
+      header: "Images",
+      render: (b) => {
+        const images = parseImageUrls(b.ImageUrls);
+        if (images.length === 0) return <span className="text-gray-400">No Images</span>;
+
+        return (
+          <div className="flex items-center gap-2 flex-wrap max-w-xs">
+            {images.map((imgUrl, idx) => (
+              <ImageCell key={idx} src={imgUrl} alt={`${b.HeroTitle} ${idx + 1}`} />
+            ))}
+          </div>
+        );
+      },
     },
   ];
 

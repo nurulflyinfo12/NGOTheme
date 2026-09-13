@@ -7,14 +7,17 @@ import {
   Plus,
   AlertCircle,
   Heading,
-  FileText,
   Quote as QuoteIcon,
 } from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import ImageUpload from "@/components/Admin/ImageUpload";
 import { TextField } from "@/components/Admin/TextField";
-import { useHeroSection, ApiHeroSection } from "@/hooks/useHeroSection";
+import {
+  useHeroSection,
+  ApiHeroSection,
+  parseImageUrls,
+} from "@/hooks/useHeroSection";
 
 export interface HeroBannerFormData {
   heroSectionId?: string;
@@ -39,35 +42,46 @@ export default function AddEditHeroBannerPage() {
     imageUrls: [],
   });
 
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
   const [errors, setErrors] = useState<
     Partial<Record<keyof HeroBannerFormData, string>>
   >({});
 
+  // Parse localStorage data when in edit mode
   useEffect(() => {
     if (isEditMode) {
       const rawData = localStorage.getItem("tempHeroBannerData");
       if (rawData) {
         try {
           const banner = JSON.parse(rawData);
+          // Parse complex nested JSON string array into clean array of URLs
+          const cleanImages = parseImageUrls(banner.ImageUrls);
+
           setFormData({
             heroSectionId: banner.HeroSectionID || bannerId || undefined,
             heroTitle: banner.HeroTitle || "",
             heroDetails: banner.HeroDetails || "",
             quote: banner.Quote || "",
-            imageUrls: Array.isArray(banner.ImageUrls) ? banner.ImageUrls : [],
+            imageUrls: cleanImages,
           });
         } catch (err) {
-          console.error("Error parsing banner data:", err);
+          console.error("Error parsing hero banner data:", err);
+        } finally {
+          setIsDataLoaded(true);
         }
+      } else {
+        setIsDataLoaded(true);
       }
+    } else {
+      setIsDataLoaded(true);
     }
   }, [isEditMode, bannerId]);
 
   const validate = () => {
     const newErrors: Partial<Record<keyof HeroBannerFormData, string>> = {};
-    if (!formData.heroTitle.trim()) newErrors.heroTitle = "Title is Required. ";
+    if (!formData.heroTitle.trim()) newErrors.heroTitle = "Title is Required.";
     if (formData.imageUrls.length === 0 || !formData.imageUrls[0]) {
-      newErrors.imageUrls = "Banner image is Required.";
+      newErrors.imageUrls = "At least one banner image is Required.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -132,8 +146,8 @@ export default function AddEditHeroBannerPage() {
           submitting
             ? "Submitting..."
             : isEditMode
-              ? "Save Changes"
-              : "Create Banner"
+            ? "Save Changes"
+            : "Create Banner"
         }
         submitIcon={
           isEditMode ? (
@@ -178,28 +192,29 @@ export default function AddEditHeroBannerPage() {
           </div>
         </div>
 
-        {/* Banner Images */}
+        {/* Multi-Image Upload */}
         <div className="space-y-1.5 sm:col-span-2">
           <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
-            Banner Image <span className="text-red-500">*</span>
+            Banner Images <span className="text-red-500">*</span>
           </label>
-          <ImageUpload
-            label="Drag & Drop Banner Image"
-            allowedTypes="image"
-            allowMultiple={false}
-            showCaption={false}
-            initialImages={
-              formData.imageUrls.length > 0
-                ? [{ image: formData.imageUrls[0] }]
-                : []
-            }
-            onImagesChange={(files) =>
-              handleChange(
-                "imageUrls",
-                files.map((f) => f.image).filter(Boolean),
-              )
-            }
-          />
+
+          {isDataLoaded && (
+            <ImageUpload
+              key={formData.imageUrls.join(",")} // Forces full component re-mount once initial images load
+              label="Drag & Drop Banner Images (Multiple Allowed)"
+              allowedTypes="image"
+              allowMultiple={true}
+              showCaption={false}
+              initialImages={formData.imageUrls.map((img) => ({ image: img }))}
+              onImagesChange={(files) =>
+                handleChange(
+                  "imageUrls",
+                  files.map((f) => f.image).filter(Boolean)
+                )
+              }
+            />
+          )}
+
           {errors.imageUrls && (
             <p className="text-xs text-red-600 flex items-center gap-1 ml-1 mt-1">
               <AlertCircle size={12} /> {errors.imageUrls}

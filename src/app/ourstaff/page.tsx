@@ -5,56 +5,77 @@ import PageBanner from "@/components/PageBanner";
 import DanboxLayout from "@/layout/DanboxLayout";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  FaUser,
   FaEnvelope,
   FaSearch,
   FaUsers,
   FaPhone,
   FaBuilding,
   FaProjectDiagram,
-  FaUserCircle
+  FaUserCircle,
+  FaTimes,
+  FaStar,
 } from "react-icons/fa";
-import { staffsData } from "../data/ourstaff";
+import { useStaff, ApiStaff } from "@/hooks/useStaff";
+import { api } from "@/utility/api";
 
-// Staff data from the image with employment type
-const staffData = staffsData || []
-// Filter types
-const filterTypes = ["All", "Regular", "Project"];
+const PRIMARY = "#f86048";
 
 export default function OurStaffPage() {
+  const { staffList, loading, fetchStaff } = useStaff();
   const [selectedType, setSelectedType] = useState("All");
   const [searchTerm, setSearchTerm] = useState("");
   const [visibleCount, setVisibleCount] = useState(12);
-  const [imageErrors, setImageErrors] = useState<{ [key: number]: boolean }>({});
+  const [imageErrors, setImageErrors] = useState<{ [key: string]: boolean }>(
+    {},
+  );
 
-  // Filter staff based on type and search term
+  useEffect(() => {
+    fetchStaff();
+  }, [fetchStaff]);
+
+  // Dynamically extract employment types from API response
+  const filterTypes = useMemo(() => {
+    const types = Array.from(
+      new Set(
+        staffList
+          .map((s) => s.Type)
+          .filter((t): t is string => Boolean(t && t.trim() !== "")),
+      ),
+    );
+    return ["All", ...types];
+  }, [staffList]);
+
+  // Filter staff based on employment type and search term
   const filteredStaff = useMemo(() => {
-    let filtered = staffData;
+    let filtered = staffList;
 
     if (selectedType !== "All") {
-      filtered = filtered.filter(staff => staff.type === selectedType);
+      filtered = filtered.filter((staff) => staff.Type === selectedType);
     }
 
     if (searchTerm.trim()) {
       const term = searchTerm.toLowerCase().trim();
-      filtered = filtered.filter(staff =>
-        staff.name.toLowerCase().includes(term) ||
-        staff.designation.toLowerCase().includes(term) ||
-        staff.type.toLowerCase().includes(term) ||
-        staff.email.toLowerCase().includes(term) ||
-        staff.id.toString().includes(term)
-      );
+      filtered = filtered.filter((staff) => {
+        const idStr = String(staff.StaffID || staff.ID || "");
+        return (
+          (staff.Name && staff.Name.toLowerCase().includes(term)) ||
+          (staff.Position && staff.Position.toLowerCase().includes(term)) ||
+          (staff.Type && staff.Type.toLowerCase().includes(term)) ||
+          (staff.Email && staff.Email.toLowerCase().includes(term)) ||
+          idStr.includes(term)
+        );
+      });
     }
 
     return filtered;
-  }, [selectedType, searchTerm]);
+  }, [staffList, selectedType, searchTerm]);
 
   const visibleStaff = useMemo(() => {
     return filteredStaff.slice(0, visibleCount);
   }, [filteredStaff, visibleCount]);
 
   const handleLoadMore = () => {
-    setVisibleCount(prev => prev + 12);
+    setVisibleCount((prev) => prev + 12);
   };
 
   useEffect(() => {
@@ -62,46 +83,37 @@ export default function OurStaffPage() {
   }, [selectedType, searchTerm]);
 
   const getTypeCount = (type: string) => {
-    if (type === "All") return staffData.length;
-    return staffData.filter(s => s.type === type).length;
+    if (type === "All") return staffList.length;
+    return staffList.filter((s) => s.Type === type).length;
   };
 
-  // Get color for type - using theme color
-  const getTypeColor = (type: string) => {
-    const colors: { [key: string]: string } = {
-      "Regular": "bg-[#f86048]/10 text-[#f86048]",
-      "Project": "bg-[#f86048]/10 text-[#f86048]"
-    };
-    return colors[type] || "bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400";
-  };
-
-  // Get icon for type
-  const getTypeIcon = (type: string) => {
-    if (type === "Project") return FaProjectDiagram;
+  const getTypeIcon = (type?: string) => {
+    if (type?.toLowerCase() === "project") return FaProjectDiagram;
     return FaUserCircle;
   };
 
-  // Handle image error - fallback to initials avatar
-  const handleImageError = (staffId: number) => {
-    setImageErrors(prev => ({ ...prev, [staffId]: true }));
+  const handleImageError = (id: string) => {
+    setImageErrors((prev) => ({ ...prev, [id]: true }));
   };
 
-  // Get initials for avatar fallback
   const getInitials = (name: string) => {
+    if (!name) return "ST";
     return name
-      .split(' ')
-      .filter(word => word.length > 0)
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .filter((word) => word.length > 0)
+      .map((word) => word[0])
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
 
-  // Get color for avatar based on name - using theme color
   const getAvatarColor = (name: string) => {
     const colors = [
-      'bg-[#f86048]', 'bg-[#f86048]/80', 'bg-[#f86048]/70',
-      'bg-[#f86048]/90', 'bg-[#f86048]/60', 'bg-[#f86048]/85'
+      "bg-[#f86048]",
+      "bg-[#f86048]/80",
+      "bg-[#f86048]/70",
+      "bg-[#f86048]/90",
+      "bg-[#f86048]/60",
     ];
     let hash = 0;
     for (let i = 0; i < name.length; i++) {
@@ -110,234 +122,269 @@ export default function OurStaffPage() {
     return colors[Math.abs(hash) % colors.length];
   };
 
-  // Format email as single line with commas
-  const formatEmail = (email: string) => {
-    if (!email || email === "N/A") return "";
-    return email;
+  const getPhotoUrl = (photo: string) => {
+    if (!photo) return "";
+    if (photo.startsWith("http://") || photo.startsWith("https://")) {
+      return photo;
+    }
+    return api.getFileUrl(photo);
   };
 
   return (
     <DanboxLayout header={1}>
-      <main className="bg-white dark:bg-[#0f172a] font-bangla">
-        <PageBanner
-          pageName="Our Staff"
-          pageTitle="Our Dedicated Team"
-        />
+      <main className="bg-[#f8fafc] dark:bg-[#0b1120] font-bangla transition-colors duration-300 min-h-screen">
+        <PageBanner pageName="Our Staff" pageTitle="Our Dedicated Team" />
 
-        <section className="py-16 sm:py-20 lg:py-32 bg-white! dark:bg-[#0f172a]!">
-          <div className="container mx-auto px-4! sm:pl-6!">
-            {/* Header with Stats */}
-            <div className="mb-8 sm:mb-12">
-              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 sm:gap-6">
+        <section className="py-12 md:py-20 lg:py-24 relative overflow-hidden">
+          {/* Background Ambient Glows */}
+          <div className="absolute top-1/4 right-0 w-96 h-96 bg-[#f86048]/5 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-1/3 left-0 w-96 h-96 bg-indigo-500/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="container mx-auto px-4 sm:px-6 lg:max-w-7xl relative z-10">
+            {/* Header & Search */}
+            <div className="bg-white dark:bg-slate-900/90 p-6 sm:p-8 rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-sm mb-8">
+              <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
                 <div>
-                  <h2 className="text-xl sm:text-2xl lg:text-3xl font-black text-slate-900! dark:text-white!">
-                    Meet Our Team
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="h-2 w-2 rounded-full bg-[#f86048] animate-pulse" />
+                    <span className="text-xs font-bold uppercase tracking-widest text-[#f86048]">
+                      Leadership & Operational Team
+                    </span>
+                  </div>
+                  <h2 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">
+                    Meet Our Team Members
                   </h2>
-                  <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400! mt-1! sm:mt-2!">
-                    {filteredStaff.length} staff members ({staffData.filter(s => s.type === "Regular").length} Regular, {staffData.filter(s => s.type === "Project").length} Project)
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                    {filteredStaff.length} team member
+                    {filteredStaff.length === 1 ? "" : "s"} listed
                   </p>
                 </div>
 
-                {/* Search Bar */}
+                {/* Search Bar Input */}
                 <div className="relative w-full lg:w-80">
-                  <FaSearch className="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-slate-400! dark:text-slate-500! text-xs sm:text-sm" />
+                  <FaSearch className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm" />
                   <input
                     type="text"
-                    placeholder="Search staff..."
+                    placeholder="Search staff by name, position..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-9 sm:pl-12 pr-3 sm:pr-4 py-2.5 sm:py-3 rounded-full border-2 border-slate-200 dark:border-slate-700! bg-white! dark:bg-slate-800/50! text-slate-900! dark:text-white! placeholder:text-slate-400 text-sm sm:text-base focus:outline-none focus:border-[#f86048]! transition-colors"
+                    className="w-full pl-11 pr-10 py-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-[#f86048]/50 focus:border-[#f86048] transition-all"
                   />
+                  {searchTerm && (
+                    <button
+                      onClick={() => setSearchTerm("")}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-white"
+                    >
+                      <FaTimes />
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              {/* Employment Type Pills */}
+              <div className="mt-6 pt-6 border-t border-slate-100 dark:border-slate-800 overflow-x-auto no-scrollbar">
+                <div className="flex items-center gap-2 min-w-max">
+                  {filterTypes.map((type) => {
+                    const active = selectedType === type;
+                    return (
+                      <button
+                        key={type}
+                        onClick={() => setSelectedType(type)}
+                        className={`px-4! py-2! rounded-xl! text-xs! font-bold! transition-all duration-300 flex items-center gap-2 cursor-pointer ${
+                          active
+                            ? "bg-[#f86048]! text-white! shadow-lg! shadow-[#f86048]/30!"
+                            : "bg-slate-100! dark:bg-slate-800/60! text-slate-600! dark:text-slate-400! hover:bg-slate-200! dark:hover:bg-slate-800! hover:text-slate-900! dark:hover:text-white!"
+                        }`}
+                      >
+                        <span className={active ? "text-white!" : ""}>
+                          {type}
+                        </span>
+                        <span
+                          className={`px-2! py-0.5! rounded-md! text-[10px]! font-black! ${
+                            active
+                              ? "bg-white/25! text-white!"
+                              : "bg-slate-200! dark:bg-slate-700! text-slate-500! dark:text-slate-400!"
+                          }`}
+                        >
+                          {getTypeCount(type)}
+                        </span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>
 
-            {/* Type Filters - Regular, Project, All - Matching Branch Page Design */}
-            <div className="mb-8! md:mb-12! overflow-x-auto -mx-4! px-4! sm:mx-0! sm:px-0!">
-              <div className="flex flex-nowrap sm:flex-wrap gap-2! sm:gap-3! pb-2! min-w-max sm:min-w-0">
-                {filterTypes.map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => setSelectedType(type)}
-                    className={`px-3! sm:px-5! md:px-6! py-2! sm:py-2.5! rounded-full! text-[10px]! sm:text-xs! font-black! uppercase! tracking-wide! transition-all duration-500! border-2! whitespace-nowrap flex-shrink-0 ${selectedType === type
-                        ? "bg-slate-900! border-slate-900! text-[#f86048]! dark:bg-white! dark:text-slate-900! shadow-lg!"
-                        : "bg-transparent! border-slate-100! text-slate-400! hover:border-[#f86048]! hover:text-[#f86048]! dark:border-slate-800!"
-                      }`}
-                  >
-                    {type} ({getTypeCount(type)})
-                  </button>
+            {/* Loading Skeleton */}
+            {loading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[1, 2, 3, 4, 5, 6].map((n) => (
+                  <div
+                    key={n}
+                    className="h-64 rounded-3xl bg-slate-200/60 dark:bg-slate-800/40 animate-pulse border border-slate-200 dark:border-slate-800"
+                  />
                 ))}
               </div>
-            </div>
+            ) : (
+              /* Staff Grid */
+              <AnimatePresence mode="popLayout">
+                <motion.div
+                  layout
+                  className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+                >
+                  {visibleStaff.map((staff, index) => {
+                    const staffKey = staff.StaffID || staff.ID || String(index);
+                    const TypeIcon = getTypeIcon(staff.Type);
+                    const photoUrl = getPhotoUrl(staff.Photo);
+                    const showImageError = imageErrors[staffKey] || !photoUrl;
 
+                    return (
+                      <motion.div
+                        key={staffKey}
+                        layout
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, scale: 0.95 }}
+                        transition={{ duration: 0.35, delay: index * 0.04 }}
+                        className="group bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200/80 dark:border-slate-800 hover:border-[#f86048]/40 transition-all duration-500 hover:shadow-xl hover:shadow-[#f86048]/5 flex flex-col overflow-hidden"
+                      >
+                        <div className="p-6 flex flex-col flex-1">
+                          {/* Staff Header Avatar + Info */}
+                          <div className="flex items-start gap-4 mb-4">
+                            <div className="relative shrink-0">
+                              {!showImageError ? (
+                                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-[#f86048]/20 group-hover:border-[#f86048] transition-colors shadow-sm">
+                                  <img
+                                    src={photoUrl}
+                                    alt={staff.Name}
+                                    className="w-full h-full object-cover"
+                                    onError={() => handleImageError(staffKey)}
+                                  />
+                                </div>
+                              ) : (
+                                <div
+                                  className={`w-16 h-16 rounded-2xl flex items-center justify-center text-white font-extrabold text-xl shadow-sm ${getAvatarColor(
+                                    staff.Name,
+                                  )}`}
+                                >
+                                  {getInitials(staff.Name)}
+                                </div>
+                              )}
 
-            {/* Staff Cards Grid */}
-            <AnimatePresence mode="popLayout">
-              <motion.div
-                layout
-                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
-              >
-                {visibleStaff.map((staff, index) => {
-                  const TypeIcon = getTypeIcon(staff.type);
-                  const showImageError = imageErrors[staff.id];
-                  const emailText = formatEmail(staff.email);
-
-                  return (
-                    <motion.div
-                      key={staff.id}
-                      layout
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.8 }}
-                      transition={{ duration: 0.4, delay: index * 0.05 }}
-                      className="group bg-white! dark:bg-slate-800/50! rounded-2xl sm:rounded-[2rem] overflow-hidden border-2 border-slate-100 dark:border-slate-700! hover:border-[#f86048]! transition-all duration-500 hover:shadow-2xl hover:shadow-[#f86048]/10 dark:hover:shadow-[#f86048]/5!"
-                    >
-                      <div className="p-4 sm:p-6">
-                        {/* Staff Header with Image */}
-                        <div className="flex items-start gap-3 sm:gap-4 mb-3 sm:mb-4">
-                          {/* Profile Image / Avatar */}
-                          <div className="flex-shrink-0">
-                            {!showImageError && staff.image ? (
-                              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full overflow-hidden border-2 border-[#f86048]/20 group-hover:border-[#f86048] transition-colors">
-                                <img
-                                  src={staff.image}
-                                  alt={staff.name}
-                                  className="w-full h-full object-fill"
-                                  onError={() => handleImageError(staff.id)}
-                                />
-                              </div>
-                            ) : (
-                              <div className={`w-14 h-14 sm:w-16 sm:h-16 rounded-full flex items-center justify-center text-white! font-bold text-lg sm:text-xl ${getAvatarColor(staff.name)}`}>
-                                {getInitials(staff.name)}
-                              </div>
-                            )}
-                          </div>
-
-                          {/* Staff Info */}
-                          <div className="flex-1 min-w-0">
-                            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 mb-1! sm:mb-1.5!">
-                              <span className={`text-[8px] flex items-center sm:text-[10px] font-black uppercase tracking-[0.15em]! sm:tracking-[0.2em]! px-2 sm:px-3 py-0.5 sm:py-1 rounded-full whitespace-nowrap ${getTypeColor(staff.type)}`}>
-                                <TypeIcon className="inline mr-1 text-[8px] sm:text-[10px]" />
-                                {staff.type}
-                              </span>
+                              {staff.IsLead && (
+                                <span
+                                  className="absolute -top-1.5 -right-1.5 p-1 rounded-full text-white text-[10px] shadow-sm"
+                                  style={{ backgroundColor: PRIMARY }}
+                                  title="Leadership Team"
+                                >
+                                  <FaStar size={10} />
+                                </span>
+                              )}
                             </div>
-                            <h3 className="text-sm sm:text-base lg:text-lg font-black text-slate-900! dark:text-white! leading-tight break-words">
-                              {staff.name}
-                            </h3>
-                            <p className="text-[10px] sm:text-xs text-slate-600! dark:text-slate-400! mt-0.5! font-semibold">
-                              {staff.designation}
-                            </p>
+
+                            <div className="flex-1 min-w-0">
+                              <div className="flex flex-wrap items-center gap-1.5 mb-1">
+                                {staff.Type && (
+                                  <span className="text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-md bg-[#f86048]/10 text-[#f86048] border border-[#f86048]/20 inline-flex items-center gap-1">
+                                    <TypeIcon size={10} />
+                                    {staff.Type}
+                                  </span>
+                                )}
+                                {staff.IsLead && (
+                                  <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                                    Lead
+                                  </span>
+                                )}
+                              </div>
+                              <h3 className="text-lg font-black text-slate-900 dark:text-white leading-snug break-words group-hover:text-[#f86048] transition-colors">
+                                {staff.Name}
+                              </h3>
+                              <p className="text-xs text-[#f86048] font-bold mt-0.5">
+                                {staff.Position}
+                              </p>
+                            </div>
                           </div>
-                        </div>
 
-                        {/* Divider */}
-                        <div className="my-3 sm:my-4 h-px bg-slate-200 dark:bg-slate-700"></div>
-
-                        {/* Contact Info - Email in single line with wrapping */}
-                        <div className="space-y-1.5 sm:space-y-2 text-xs sm:text-sm">
-                          {emailText && (
-                            <div className="flex items-center gap-2 sm:gap-3 text-slate-600! dark:text-white!">
-                              <FaEnvelope className="text-[#f86048]! text-[10px] sm:text-xs flex-shrink-0 mt-0.5" />
+                          {/* Contact Details */}
+                          {staff.Email && (
+                            <div className="mt-auto pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
                               <a
-                                href={`mailto:${emailText.split(',')[0].trim()}`}
-                                className="text-[10px] sm:text-xs hover:text-[#f86048]! transition-colors break-words leading-relaxed! dark:text-white!"
+                                href={`mailto:${staff.Email}`}
+                                className="flex items-center gap-2.5 text-slate-600 dark:text-slate-400 hover:text-[#f86048] transition-colors"
                               >
-                                {emailText}
+                                <FaEnvelope className="text-[#f86048] shrink-0" />
+                                <span className="truncate">{staff.Email}</span>
                               </a>
                             </div>
                           )}
-                          {staff.phone && staff.phone !== "N/A" && (
-                            <a
-                              href={`tel:${staff.phone}`}
-                              className="flex items-center gap-2 sm:gap-3 text-slate-600! dark:text-slate-300! hover:text-[#f86048]! transition-colors"
-                            >
-                              <FaPhone className="text-[#f86048]! text-[10px] sm:text-xs flex-shrink-0" />
-                              <span className="font-mono text-xs sm:text-sm">{staff.phone}</span>
-                            </a>
-                          )}
                         </div>
+                      </motion.div>
+                    );
+                  })}
+                </motion.div>
+              </AnimatePresence>
+            )}
 
-                        {/* Action Button */}
-                        {/* <button className="w-full mt-3 sm:mt-4 py-2 sm:py-2.5 rounded-full bg-slate-100! dark:bg-slate-700! text-slate-700 dark:text-slate-300! font-bold text-[9px] sm:text-xs uppercase tracking-widest! hover:bg-[#f86048]! hover:text-white! transition-all duration-300">
-                          View Profile
-                        </button> */}
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </motion.div>
-            </AnimatePresence>
-
-            {/* No Results */}
-            {filteredStaff.length === 0 && (
-              <div className="text-center py-12 sm:py-16">
-                <FaUsers className="text-4xl sm:text-6xl text-slate-300 dark:text-slate-600 mx-auto mb-3 sm:mb-4" />
-                <h3 className="text-lg sm:text-xl font-black text-slate-900 dark:text-white mb-1 sm:mb-2">
-                  No staff members found
+            {/* Empty State */}
+            {!loading && filteredStaff.length === 0 && (
+              <div className="text-center py-16 bg-white dark:bg-slate-900/60 rounded-3xl border border-slate-200 dark:border-slate-800">
+                <FaUsers className="text-5xl text-slate-300 dark:text-slate-700 mx-auto mb-4" />
+                <h3 className="text-xl font-black text-slate-800 dark:text-white mb-2">
+                  No Staff Members Match Your Query
                 </h3>
-                <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
-                  Try adjusting your search or filter criteria
+                <p className="text-sm text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                  Try adjusting your search query or selecting a different
+                  employment type filter.
                 </p>
                 <button
                   onClick={() => {
                     setSelectedType("All");
                     setSearchTerm("");
                   }}
-                  className="mt-3 sm:mt-4 px-5 sm:px-6 py-1.5 sm:py-2 rounded-full bg-[#f86048] text-white font-bold text-xs sm:text-sm hover:bg-[#e05038] transition-colors"
+                  className="mt-6 px-6 py-2.5 rounded-xl bg-[#f86048] text-white font-bold text-xs uppercase tracking-wider hover:bg-[#e05038] transition-all shadow-md"
                 >
-                  Clear filters
+                  Reset Search Criteria
                 </button>
               </div>
             )}
 
             {/* Load More Button */}
-            {visibleCount < filteredStaff.length && (
-              <div className="mt-12 sm:mt-16 text-center">
+            {!loading && visibleCount < filteredStaff.length && (
+              <div className="mt-12 text-center">
                 <button
                   onClick={handleLoadMore}
-                  className="group relative px-8 sm:px-10 lg:px-16 py-3 sm:py-4 lg:py-5 bg-slate-900! dark:bg-white! overflow-hidden rounded-2xl transition-all hover:shadow-[0_20px_50px_rgba(248,96,72,0.3)]"
+                  className="px-8 py-4 bg-slate-900 dark:bg-white text-white dark:text-slate-900 hover:bg-[#f86048] dark:hover:bg-[#f86048] dark:hover:text-white rounded-2xl font-black uppercase tracking-wider text-xs transition-all duration-300 shadow-lg hover:shadow-xl"
                 >
-                  <div className="absolute inset-0 w-0 bg-[#f86048]! transition-all duration-500 group-hover:w-full" />
-                  <span className="relative z-10 text-white! dark:text-slate-900! font-black uppercase tracking-wide! text-[10px] sm:text-xs group-hover:text-white transition-colors">
-                    Load More Staff ({filteredStaff.length - visibleCount} remaining)
-                  </span>
+                  Load More Staff ({filteredStaff.length - visibleCount}{" "}
+                  remaining)
                 </button>
               </div>
             )}
 
-            {/* Showing count */}
-            {filteredStaff.length > 0 && (
-              <div className="mt-6! sm:mt-8! text-center text-xs sm:text-sm text-slate-500! dark:text-slate-400!">
-                Showing {visibleStaff.length} of {filteredStaff.length} staff members
-              </div>
-            )}
-
-            {/* Head Office Info */}
-            <div className="mt-12 sm:mt-16 p-6 sm:p-8 rounded-[2rem] bg-slate-50 dark:bg-slate-800/30! border-2 border-slate-200! dark:border-slate-700!">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div className="flex items-center gap-3">
-                  <FaBuilding className="text-[#f86048] text-xl sm:text-2xl" />
+            {/* Head Office Information Card */}
+            <div className="mt-16 p-6 sm:p-8 rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200/80 dark:border-slate-800 shadow-sm">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-6">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-2xl bg-[#f86048]/10 text-[#f86048] flex items-center justify-center text-xl shrink-0">
+                    <FaBuilding />
+                  </div>
                   <div>
-                    <h4 className="text-sm sm:text-base font-black text-slate-900! dark:text-white!">
-                      Head Office
+                    <h4 className="text-base font-black text-slate-900 dark:text-white">
+                      Head Office Administration
                     </h4>
-                    <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
                       Vill+Po: Charbata, Upazilla: Subarnachar, Dist: Noakhali
                     </p>
                   </div>
                 </div>
-                <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6">
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-xs text-slate-700 dark:text-slate-300">
                   <div className="flex items-center gap-2">
-                    <FaPhone className="text-[#f86048] text-xs sm:text-sm" />
-                    <span className="text-xs sm:text-sm font-mono text-slate-700 dark:text-slate-300">
-                      +880-1865-041206
-                    </span>
+                    <FaPhone className="text-[#f86048]" />
+                    <span className="font-mono">+880-1865-041206</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <FaEnvelope className="text-[#f86048] text-xs sm:text-sm" />
-                    <span className="text-xs sm:text-sm text-slate-700 dark:text-slate-300">
-                      matin_suss@yahoo.com
-                    </span>
+                    <FaEnvelope className="text-[#f86048]" />
+                    <span>matin_suss@yahoo.com</span>
                   </div>
                 </div>
               </div>

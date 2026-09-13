@@ -14,10 +14,11 @@ export interface ApiBranch {
   Thana?: string;
   Upazilla?: string;
   District: string;
-  Phone: string;
+  Phone?: string;
   Email?: string;
   Lat?: string;
   Long?: string;
+  CreditOfficer?: string;
   IsActive: boolean;
   SetDate?: string;
 }
@@ -28,19 +29,18 @@ export function useBranch() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch All Branches: GET /api/Branch/GetAllBranch
+  // 1. Fetch All Public Branches: GET /api/Public/GetAllBranch
   const fetchBranches = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await api.get<ApiBranch[]>("/Branch/GetAllBranch");
+      const data = await api.get<ApiBranch[]>("/Public/GetAllBranch");
       const list = Array.isArray(data) ? data : [];
       setBranches(list);
       return list;
     } catch (err: any) {
       const msg = err.message || "Failed to load branch records.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);

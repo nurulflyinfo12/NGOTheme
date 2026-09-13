@@ -22,14 +22,14 @@ export function useVideoGallery() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch Videos: GET /api/News/GetVideoGallery
+  // 1. Fetch Videos: GET /api/Public/GetVideoGallery
   const fetchVideos = useCallback(async (videoID?: string) => {
     setLoading(true);
     setError("");
     try {
       const url = videoID
-        ? `/News/GetVideoGallery?videoID=${encodeURIComponent(videoID)}`
-        : "/News/GetVideoGallery";
+        ? `/Public/GetVideoGallery?VideoID=${encodeURIComponent(videoID)}`
+        : "/Public/GetVideoGallery";
 
       const data = await api.get<ApiVideoGallery[] | ApiVideoGallery>(url);
       const list = Array.isArray(data) ? data : data ? [data] : [];
@@ -54,7 +54,7 @@ export function useVideoGallery() {
     [fetchVideos]
   );
 
-  // 3. Save or Update Video Gallery Item (Single Endpoint: POST /api/News/CreateVideoGallery)
+  // 3. Save or Update Video (Admin / News Endpoint)
   const saveOrUpdateVideo = async (payload: ApiVideoGallery) => {
     setSubmitting(true);
     setError("");

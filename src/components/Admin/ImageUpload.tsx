@@ -274,7 +274,7 @@ const ImageUpload: React.FC<FileUploadProps> = ({
                           onChange={(e) =>
                             handleCaptionChange(index, e.target.value)
                           }
-                          className="w-full px-3 py-2 text-sm border-2 border-slate-200/80 rounded-xl text-slate-800 placeholder-slate-400 focus:border-[#f86048] outline-none bg-white/70"
+                          className="w-full px-3 py-2 text-sm border-2 border-slate-200/80 rounded-xl text-black placeholder-slate-400 focus:border-[#f86048] outline-none bg-white/70"
                         />
                       </div>
                     )

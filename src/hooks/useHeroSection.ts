@@ -13,26 +13,71 @@ export interface ApiHeroSection {
   ImageUrls: string[];
 }
 
+// Utility: Recursively unpacks multi-layer JSON strings and array structures
+export const parseImageUrls = (imageUrls?: any): string[] => {
+  if (!imageUrls) return [];
+  const parsedUrls: string[] = [];
+
+  const extractString = (val: any) => {
+    if (val === null || val === undefined) return;
+
+    if (Array.isArray(val)) {
+      val.forEach(extractString);
+      return;
+    }
+
+    if (typeof val === "string") {
+      const trimmed = val.trim();
+      // Check if stringified JSON array or string
+      if (
+        (trimmed.startsWith("[") && trimmed.endsWith("]")) ||
+        (trimmed.startsWith('"') && trimmed.endsWith('"'))
+      ) {
+        try {
+          const parsed = JSON.parse(trimmed);
+          extractString(parsed);
+          return;
+        } catch {
+          // If JSON parse fails, process as raw string below
+        }
+      }
+
+      // Clean up escaped backslashes and surrounding double quotes
+      const cleanUrl = trimmed.replace(/^["']|["']$/g, "").replace(/\\/g, "");
+      if (cleanUrl.startsWith("http") || cleanUrl.startsWith("/")) {
+        parsedUrls.push(cleanUrl);
+      }
+    }
+  };
+
+  extractString(imageUrls);
+
+  return parsedUrls.map((url) => {
+    if (url.startsWith("http")) return url;
+    return api.getFileUrl(url);
+  });
+};
+
 export function useHeroSection() {
   const [heroSections, setHeroSections] = useState<ApiHeroSection[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
+  // 1. Fetch Hero Section: GET /api/Public/GetHeroSection
   const fetchHeroSections = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const data = await api.get<ApiHeroSection[] | ApiHeroSection>(
-        "/HeroSectionSetup/GetHeroSection",
+        "/Public/GetHeroSection"
       );
       const list = Array.isArray(data) ? data : data ? [data] : [];
       setHeroSections(list);
       return list;
     } catch (err: any) {
-      const msg = err.message || "Failed to load hero banners.";
+      const msg = err.message || "Failed to load hero banner.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
@@ -49,7 +94,7 @@ export function useHeroSection() {
         {
           ...payload,
           SetDate: payload.SetDate || new Date().toISOString(),
-        },
+        }
       );
 
       if (
@@ -93,7 +138,7 @@ export function useHeroSection() {
     }
   };
 
-  // 3. Delete Hero Section (if endpoint exists or handled client side)
+  // 3. Delete Hero Section
   const deleteHeroSection = async (banner: ApiHeroSection) => {
     const bannerId = banner.HeroSectionID || "";
 
@@ -120,9 +165,9 @@ export function useHeroSection() {
       try {
         await api.post(
           `/HeroSectionSetup/DeleteHeroSection?heroSectionId=${encodeURIComponent(
-            bannerId,
+            bannerId
           )}`,
-          {},
+          {}
         );
         Swal.fire({
           title: "Deleted!",

@@ -15,8 +15,7 @@ const PRIMARY = "#f86048";
 const parseDateParts = (dateString?: string) => {
   if (!dateString) return { day: "15", month: "Mar", fullDate: "15 Mar 2026" };
   const d = new Date(dateString);
-  if (isNaN(d.getTime()))
-    return { day: "15", month: "Mar", fullDate: dateString };
+  if (isNaN(d.getTime())) return { day: "15", month: "Mar", fullDate: dateString };
 
   const day = d.getDate().toString().padStart(2, "0");
   const month = d.toLocaleDateString("en-US", { month: "short" });
@@ -38,13 +37,12 @@ const getImageUrl = (photo?: string) => {
 };
 
 /* ============================================================================
-   Event1 Component (2-Column Grid with Scroll Animations & API Data)
+   Event1 Component
    ============================================================================ */
 export const Event1 = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [isVisible, setIsVisible] = useState(false);
-  const { projects, loading, fetchProjectsByCategorySlug, fetchProjects } =
-    useProjects();
+  const { projects, loading, fetchProjectsByCategorySlug, fetchProjects } = useProjects();
 
   useEffect(() => {
     async function loadEvents() {
@@ -72,7 +70,7 @@ export const Event1 = () => {
           observer.unobserve(entry.target);
         }
       },
-      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" },
+      { threshold: 0.1, rootMargin: "0px 0px -50px 0px" }
     );
 
     if (sectionRef.current) observer.observe(sectionRef.current);
@@ -88,7 +86,6 @@ export const Event1 = () => {
       className="section-padding bg-slate-50/50 dark:bg-[#0f172a] py-16 lg:py-24 overflow-hidden relative"
     >
       <div className="container mx-auto px-4 sm:px-6 lg:max-w-7xl">
-        {/* Header */}
         <div className="text-center mb-12 lg:mb-16 max-w-2xl mx-auto">
           <span
             className="inline-flex items-center gap-2 font-black tracking-[0.25em] uppercase text-xs"
@@ -106,7 +103,6 @@ export const Event1 = () => {
           </p>
         </div>
 
-        {/* Loading Skeleton */}
         {loading ? (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 lg:gap-8 animate-pulse">
             {[1, 2].map((n) => (
@@ -137,7 +133,6 @@ export const Event1 = () => {
                     transitionDelay: cardDelays[i % cardDelays.length],
                   }}
                 >
-                  {/* Left Thumbnail Image */}
                   <div className="relative w-full sm:w-5/12 h-56 sm:h-auto shrink-0 overflow-hidden bg-slate-900">
                     <Image
                       src={imgUrl}
@@ -147,7 +142,6 @@ export const Event1 = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-slate-950/40 via-transparent to-transparent" />
 
-                    {/* Date Badge */}
                     <div className="absolute top-4 left-4 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md text-center px-3 py-2 rounded-2xl shadow-md border border-white/20 dark:border-slate-700">
                       <div
                         className="text-[10px] font-black uppercase tracking-wider leading-none"
@@ -161,10 +155,8 @@ export const Event1 = () => {
                     </div>
                   </div>
 
-                  {/* Right Content */}
                   <div className="w-full sm:w-7/12 p-6 sm:p-7 flex flex-col justify-between">
                     <div>
-                      {/* Meta Tags */}
                       <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500 dark:text-slate-400 mb-3 font-medium">
                         {project.Time && (
                           <div className="flex items-center gap-1.5">
@@ -186,7 +178,6 @@ export const Event1 = () => {
                         )}
                       </div>
 
-                      {/* Title */}
                       <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white mb-2 leading-snug line-clamp-2">
                         <Link
                           href={detailLink}
@@ -196,13 +187,11 @@ export const Event1 = () => {
                         </Link>
                       </h3>
 
-                      {/* Description */}
                       <p className="text-slate-600 dark:text-slate-400 text-xs sm:text-sm leading-relaxed line-clamp-2 mb-4">
                         {description}
                       </p>
                     </div>
 
-                    {/* Footer Action */}
                     <div className="pt-4 border-t border-slate-100 dark:border-slate-800">
                       <Link
                         href={detailLink}
@@ -225,7 +214,7 @@ export const Event1 = () => {
 };
 
 /* ============================================================================
-   Event2 Component (Grid Card Section)
+   Event2 Component
    ============================================================================ */
 export const Event2 = () => {
   const { projects, loading, fetchProjectsByCategorySlug, fetchProjects } =
@@ -270,7 +259,7 @@ export const Event2 = () => {
             {projects.map((event, index) => {
               const dateParts = parseDateParts(event.Date);
               const imgUrl = getImageUrl(event.Photo);
-              const detailLink = `/core-program-details/${event.ProjectID}`;
+              const detailLink = `/upcoming-events/${event.ProjectID}`;
               const description =
                 stripHtml(event.Details) || event.Subtitle || "";
 
@@ -352,7 +341,7 @@ export const Event2 = () => {
 };
 
 /* ============================================================================
-   Event3 Component (Swiper Carousel Slider)
+   Event3 Component
    ============================================================================ */
 export const Event3 = () => {
   const { projects, fetchProjectsByCategorySlug, fetchProjects } =
@@ -376,13 +365,10 @@ export const Event3 = () => {
             {projects.map((event, index) => {
               const dateParts = parseDateParts(event.Date);
               const imgUrl = getImageUrl(event.Photo);
-              const detailLink = `/core-program-details/${event.ProjectID}`;
+              const detailLink = `/upcoming-events/${event.ProjectID}`;
 
               return (
-                <SwiperSlide
-                  key={event.ProjectID || index}
-                  className="swiper-slide"
-                >
+                <SwiperSlide key={event.ProjectID || index} className="swiper-slide">
                   <div className="group rounded-3xl overflow-hidden shadow-lg aspect-square relative flex items-end p-6 bg-slate-900 border border-slate-200/80 dark:border-slate-800">
                     <Image
                       src={imgUrl}
@@ -394,7 +380,7 @@ export const Event3 = () => {
 
                     <div className="relative z-10 text-white w-full">
                       <div className="flex items-center gap-4">
-                        <div className="bg-[#f86048] text-white p-2.5 rounded-2xl text-center min-w-[54px] shadow-md shrink-0">
+                        <div className="bg-[#f86048] text-[#ffffff] p-2.5 rounded-2xl text-center min-w-[54px] shadow-md shrink-0">
                           <span className="block text-xl font-black leading-none">
                             {dateParts.day}
                           </span>
@@ -404,9 +390,7 @@ export const Event3 = () => {
                         </div>
                         <div className="min-w-0">
                           <span className="text-[10px] uppercase font-black tracking-widest text-[#f86048] block mb-0.5">
-                            {event.SubcategoryName ||
-                              event.CategoryName ||
-                              "Event"}
+                            {event.SubcategoryName || event.CategoryName || "Event"}
                           </span>
                           <h4 className="text-base font-bold leading-snug line-clamp-2">
                             <Link
@@ -431,7 +415,7 @@ export const Event3 = () => {
 };
 
 /* ============================================================================
-   EventPage Component (Tabbed View Filtering by Category)
+   EventPage Component (Default Export)
    ============================================================================ */
 export const EventPage = () => {
   const { projects, loading, fetchProjectsByCategorySlug, fetchProjects } =
@@ -466,7 +450,7 @@ export const EventPage = () => {
     if (activeTab === "all") return projects;
     return projects.filter(
       (p) =>
-        p.SubcategoryName?.toLowerCase().replace(/\s+/g, "-") === activeTab,
+        p.SubcategoryName?.toLowerCase().replace(/\s+/g, "-") === activeTab
     );
   }, [projects, activeTab]);
 
@@ -477,12 +461,8 @@ export const EventPage = () => {
           activeKey={activeTab}
           onSelect={(k) => setActiveTab(k || "all")}
         >
-          {/* Tab Filter Header */}
           <div className="mb-10 overflow-x-auto pb-2 no-scrollbar">
-            <Nav
-              as="ul"
-              className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2"
-            >
+            <Nav as="ul" className="flex flex-nowrap sm:flex-wrap justify-start sm:justify-center gap-2">
               {tabs.map((tab) => {
                 const isActive = activeTab === tab.key;
                 return (
@@ -492,7 +472,7 @@ export const EventPage = () => {
                       className={`px-5 py-2.5 rounded-full text-xs font-black uppercase tracking-wider transition-all duration-300 flex items-center gap-2 whitespace-nowrap ${
                         isActive
                           ? "bg-[#f86048] text-white shadow-lg shadow-[#f86048]/25"
-                          : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-white"
+                          : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-900 dark:hover:text-[#ffffff]"
                       }`}
                     >
                       {tab.label}
@@ -503,7 +483,6 @@ export const EventPage = () => {
             </Nav>
           </div>
 
-          {/* Grid Content */}
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 animate-pulse">
               {[1, 2, 3].map((n) => (
@@ -520,7 +499,7 @@ export const EventPage = () => {
                   {filteredProjects.map((event, index) => {
                     const imgUrl = getImageUrl(event.Photo);
                     const dateParts = parseDateParts(event.Date);
-                    const detailLink = `/core-program-details/${event.ProjectID}`;
+                    const detailLink = `/upcoming-events/${event.ProjectID}`;
                     const description =
                       stripHtml(event.Details) || event.Subtitle || "";
 
@@ -559,8 +538,7 @@ export const EventPage = () => {
                             href={detailLink}
                             className="inline-flex items-center gap-2 text-xs font-bold text-[#f86048] hover:gap-3 transition-all"
                           >
-                            Event Details{" "}
-                            <i className="far fa-long-arrow-right" />
+                            Event Details <i className="far fa-long-arrow-right" />
                           </Link>
                         </div>
                       </div>
@@ -575,3 +553,6 @@ export const EventPage = () => {
     </section>
   );
 };
+
+// Next.js App Router Page Default Export
+export default EventPage;

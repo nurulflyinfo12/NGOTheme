@@ -7,13 +7,14 @@ import { api } from "@/utility/api";
 export interface ApiStaff {
   StaffID?: string;
   ID?: string;
-  Type: string;
+  CompanyID?: string;
+  Type?: string;
   Name: string;
   Photo: string;
   Position: string;
-  Email: string;
+  Email?: string;
   IsLead?: boolean;
-  IsActive: boolean;
+  IsActive?: boolean;
   SetDate?: string;
 }
 
@@ -23,51 +24,49 @@ export function useStaff() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Get All Staff: GET /api/Staff/GetAllStaff
+  // 1. Get Leadership Team: GET /api/Public/GetLeadershipTeam
+  const fetchLeadershipTeam = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await api.get<ApiStaff[]>("/Public/GetLeadershipTeam");
+      const list = Array.isArray(data) ? data : [];
+      setStaffList(list);
+      return list;
+    } catch (err: any) {
+      const msg = err.message || "Failed to load leadership team.";
+      setError(msg);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 2. Get All Staff: GET /api/Public/GetAllStaff
   const fetchStaff = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await api.get<ApiStaff[]>("/Staff/GetAllStaff");
+      const data = await api.get<ApiStaff[]>("/Public/GetAllStaff");
       const list = Array.isArray(data) ? data : [];
       setStaffList(list);
       return list;
     } catch (err: any) {
       const msg = err.message || "Failed to load staff records.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 2. Get Active Staff Only: GET /api/Staff/GetActiveStaff
-  const fetchActiveStaff = useCallback(async () => {
-    setLoading(true);
-    setError("");
-    try {
-      const data = await api.get<ApiStaff[]>("/Staff/GetActiveStaff");
-      const list = Array.isArray(data) ? data : [];
-      setStaffList(list);
-      return list;
-    } catch (err: any) {
-      const msg = err.message || "Failed to load active staff records.";
-      setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
-      return [];
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  // 3. Get Staff By ID: GET /api/Staff/GetStaffById?staffId={id}
+  // 3. Get Staff By ID: GET /api/Public/GetStaffById?staffId={id}
   const fetchStaffById = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
     try {
       const res = await api.get<ApiStaff | ApiStaff[]>(
-        `/Staff/GetStaffById?staffId=${encodeURIComponent(id)}`
+        `/Public/GetStaffById?staffId=${encodeURIComponent(id)}`
       );
       const member = Array.isArray(res) ? res[0] : res;
       return member || null;
@@ -80,7 +79,7 @@ export function useStaff() {
     }
   }, []);
 
-  // 4. Save or Update Staff: POST /api/Staff/SaveUpdateStaff
+  // 4. Save or Update Staff (Admin)
   const saveOrUpdateStaff = async (payload: Partial<ApiStaff>) => {
     setSubmitting(true);
     setError("");
@@ -91,7 +90,6 @@ export function useStaff() {
         SetDate: payload.SetDate || new Date().toISOString(),
       });
 
-      // Handle custom backend error messages
       if (res?.MessageType === 3 || (res?.MessageType && res.MessageType !== 1)) {
         const msg = res?.CurrentMessage || "Failed to save staff record.";
         setError(msg);
@@ -120,7 +118,7 @@ export function useStaff() {
     }
   };
 
-  // 5. Delete Staff: POST /api/Staff/DeleteStaff?staffId={id}
+  // 5. Delete Staff (Admin)
   const deleteStaff = async (staffMember: ApiStaff) => {
     const staffId = staffMember.StaffID || staffMember.ID || "";
 
@@ -168,8 +166,8 @@ export function useStaff() {
     loading,
     submitting,
     error,
+    fetchLeadershipTeam,
     fetchStaff,
-    fetchActiveStaff,
     fetchStaffById,
     saveOrUpdateStaff,
     deleteStaff,

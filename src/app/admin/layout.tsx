@@ -59,6 +59,11 @@ const navItems = [
     icon: Layers,
   },
   {
+    name: "Sub Category",
+    href: "/admin/subcategory",
+    icon: Layers,
+  },
+  {
     name: "Banner",
     href: "/admin/herobanner",
     icon: Layout,

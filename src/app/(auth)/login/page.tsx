@@ -98,12 +98,9 @@ export default function AdminLogin() {
       window.location.href = "/admin/dashboard";
     } catch (err: any) {
       const errorMessage =
-        err?.response?.data?.CurrentMessage ||
-        err?.response?.data?.message ||
-        err?.message ||
-        "Unable to establish a connection with the authentication server.";
+        "We couldn't sign you in. Please check your username and password and try again.";
 
-      showErrorAlert("Authentication Error", errorMessage);
+      showErrorAlert("Login Failed", errorMessage);
     } finally {
       setIsLoading(false);
     }

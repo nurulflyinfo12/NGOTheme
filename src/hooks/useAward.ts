@@ -20,32 +20,31 @@ export function useAward() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch All Awards: GET /api/Award/GetAllAward
+  // 1. Fetch All Awards: GET /api/Public/GetAllAward
   const fetchAwards = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await api.get<ApiAward[]>("/Award/GetAllAward");
+      const data = await api.get<ApiAward[]>("/Public/GetAllAward");
       const list = Array.isArray(data) ? data : [];
       setAwards(list);
       return list;
     } catch (err: any) {
       const msg = err.message || "Failed to load awards.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 2. Fetch Award By ID: GET /api/Award/GetAwardById?awardId={id}
+  // 2. Fetch Award By ID: GET /api/Public/GetAwardById?awardId={id}
   const fetchAwardById = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
     try {
       const res = await api.get<ApiAward | ApiAward[]>(
-        `/Award/GetAwardById?awardId=${encodeURIComponent(id)}`
+        `/Public/GetAwardById?awardId=${encodeURIComponent(id)}`
       );
       const item = Array.isArray(res) ? res[0] : res;
       return item || null;

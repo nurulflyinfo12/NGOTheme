@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Save, Plus, BookOpen, Tag, Heading, FileText } from "lucide-react";
+import { Save, Plus, BookOpen, Tag, Heading } from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import StatusSelect from "@/components/Admin/StatusSelect";
 import ImageUpload from "@/components/Admin/ImageUpload";
 import { TextField } from "@/components/Admin/TextField";
+import { DropdownSelect } from "@/components/Admin/DropdownSelect";
 import { usePublication, ApiPublication } from "@/hooks/usePublication";
 
 export interface PublicationFormData {
@@ -18,6 +19,13 @@ export interface PublicationFormData {
   fileUpload: string;
   isActive: boolean;
 }
+
+const PUBLICATION_CATEGORIES = [
+  "Annual Reports",
+  "Brochures & Leaflets",
+  "Newsletters",
+  "Others",
+];
 
 export default function AddEditPublicationPage() {
   const router = useRouter();
@@ -88,9 +96,9 @@ export default function AddEditPublicationPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof PublicationFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
+    if (!formData.title.trim()) newErrors.title = "Title is Required.";
     if (!formData.category.trim())
-      newErrors.category = "Category is Required. ";
+      newErrors.category = "Category is Required.";
     if (!formData.fileUpload.trim())
       newErrors.fileUpload = "Publication file is Required.";
     setErrors(newErrors);
@@ -181,11 +189,12 @@ export default function AddEditPublicationPage() {
           error={errors.subtitle}
         />
 
-        {/* Category */}
-        <TextField
+        {/* Category Dropdown */}
+        <DropdownSelect
           label="Category*"
           icon={Tag}
-          placeholder="e.g. Reports, Newsletters, Research"
+          placeholder="Select a category"
+          options={PUBLICATION_CATEGORIES}
           value={formData.category}
           onChange={(e) => handleChange("category", e.target.value)}
           error={errors.category}

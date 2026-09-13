@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Save,
@@ -34,7 +34,7 @@ export interface BranchFormData {
   isActive: boolean;
 }
 
-export default function AddEditBranchPage() {
+function AddEditBranchContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const idParam = searchParams.get("id");
@@ -133,7 +133,8 @@ export default function AddEditBranchPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof BranchFormData, string>> = {};
-    if (!formData.branchName.trim()) newErrors.branchName = "Branch name is Required.";
+    if (!formData.branchName.trim())
+      newErrors.branchName = "Branch name is Required.";
     if (!formData.district.trim()) newErrors.district = "District is Required.";
     if (!formData.phone.trim()) newErrors.phone = "Phone is Required.";
     setErrors(newErrors);
@@ -152,7 +153,6 @@ export default function AddEditBranchPage() {
     const currentUserStr = localStorage.getItem("user");
     const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
 
-    // Default numeric ID strings to "0" to eliminate SQL conversion errors
     const branchIdValue = formData.branchId || idParam || "0";
     const companyIdValue = currentUser?.CompanyID || formData.companyId || "0";
 
@@ -267,7 +267,7 @@ export default function AddEditBranchPage() {
         onChange={(e) => handleChange("village", e.target.value)}
         error={errors.village}
       />
-
+      {/* 
       <TextField
         label="Phone*"
         icon={PhoneIcon}
@@ -275,7 +275,7 @@ export default function AddEditBranchPage() {
         value={formData.phone}
         onChange={(e) => handleChange("phone", e.target.value)}
         error={errors.phone}
-      />
+      /> */}
 
       <TextField
         label="Email"
@@ -296,16 +296,28 @@ export default function AddEditBranchPage() {
         error={errors.lat}
       />
 
-      <div className="sm:col-span-2">
-        <TextField
-          label="Longitude"
-          icon={Globe}
-          placeholder="e.g. 90.3795"
-          value={formData.long}
-          onChange={(e) => handleChange("long", e.target.value)}
-          error={errors.long}
-        />
-      </div>
+      <TextField
+        label="Longitude"
+        icon={Globe}
+        placeholder="e.g. 90.3795"
+        value={formData.long}
+        onChange={(e) => handleChange("long", e.target.value)}
+        error={errors.long}
+      />
     </FormCard>
+  );
+}
+
+export default function AddEditBranchPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-6 text-center text-gray-500">
+          Loading branch form...
+        </div>
+      }
+    >
+      <AddEditBranchContent />
+    </Suspense>
   );
 }

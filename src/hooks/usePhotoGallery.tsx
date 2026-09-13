@@ -26,14 +26,14 @@ export function usePhotoGallery() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch Galleries: GET /api/News/GetPhotoGallery
+  // 1. Fetch Public Galleries: GET /api/Public/GetPhotoGallery
   const fetchGalleries = useCallback(async (photoGalleryID?: string) => {
     setLoading(true);
     setError("");
     try {
       const url = photoGalleryID
-        ? `/News/GetPhotoGallery?photoGalleryID=${encodeURIComponent(photoGalleryID)}`
-        : "/News/GetPhotoGallery";
+        ? `/Public/GetPhotoGallery?PhotoGalleryID=${encodeURIComponent(photoGalleryID)}`
+        : "/Public/GetPhotoGallery";
 
       const data = await api.get<ApiPhotoGallery[] | ApiPhotoGallery>(url);
       const list = Array.isArray(data) ? data : data ? [data] : [];
@@ -42,7 +42,6 @@ export function usePhotoGallery() {
     } catch (err: any) {
       const msg = err.message || "Failed to load photo galleries.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
@@ -58,7 +57,7 @@ export function usePhotoGallery() {
     [fetchGalleries]
   );
 
-  // 3. Save or Update Photo Gallery (Single POST Endpoint: /api/News/CreatePhotoGallery)
+  // 3. Save or Update Photo Gallery (Admin Endpoint: /api/News/CreatePhotoGallery)
   const saveOrUpdateGallery = async (payload: ApiPhotoGallery) => {
     setSubmitting(true);
     setError("");

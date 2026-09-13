@@ -11,6 +11,8 @@ import {
   Clock,
   Type,
   Heading,
+  Calendar,
+  FolderTree,
 } from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
@@ -20,6 +22,7 @@ import { TextField } from "@/components/Admin/TextField";
 import { DropdownSelect } from "@/components/Admin/DropdownSelect";
 import { useProjects, ApiProject } from "@/hooks/useProjects";
 import { useCategories } from "@/hooks/useCategories";
+import { useSubCategory } from "@/hooks/useSubCategory";
 
 export interface ProjectFormData {
   projectId?: string;
@@ -28,10 +31,12 @@ export interface ProjectFormData {
   subtitle: string;
   photo: string;
   categoryId: string;
-  categoryName: string;
+  categorySlug: string;
+  subCategoryId: string;
   details: string;
   location: string;
   time: string;
+  date: string;
   isActive: boolean;
 }
 
@@ -43,16 +48,19 @@ export default function AddEditProjectPage() {
 
   const { submitting, fetchProjectById, saveOrUpdateProject } = useProjects();
   const { categories, fetchCategories } = useCategories();
+  const { subCategories, fetchSubCategories } = useSubCategory();
 
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     subtitle: "",
     photo: "",
     categoryId: "",
-    categoryName: "",
+    categorySlug: "",
+    subCategoryId: "",
     details: "",
     location: "",
     time: "",
+    date: "",
     isActive: true,
   });
 
@@ -60,10 +68,17 @@ export default function AddEditProjectPage() {
     Partial<Record<keyof ProjectFormData, string>>
   >({});
 
-  // Fetch Category options for the dropdown
+  // Fetch Categories on Load
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  // Fetch Subcategories when Category is selected
+  useEffect(() => {
+    if (formData.categoryId) {
+      fetchSubCategories(formData.categoryId);
+    }
+  }, [formData.categoryId, fetchSubCategories]);
 
   useEffect(() => {
     if (isEditMode && projectIdParam) {
@@ -78,10 +93,12 @@ export default function AddEditProjectPage() {
             subtitle: item.Subtitle || "",
             photo: item.Photo || "",
             categoryId: item.CategoryID || "",
-            categoryName: item.CategoryName || "",
+            categorySlug: item.CategorySlug || "",
+            subCategoryId: item.SubCategoryId || "",
             details: item.Details || "",
             location: item.Location || "",
             time: item.Time || "",
+            date: item.Date ? item.Date.split("T")[0] : "",
             isActive: item.IsActive ?? true,
           });
         } catch (e) {
@@ -97,10 +114,12 @@ export default function AddEditProjectPage() {
               subtitle: item.Subtitle || "",
               photo: item.Photo || "",
               categoryId: item.CategoryID || "",
-              categoryName: item.CategoryName || "",
+              categorySlug: item.CategorySlug || "",
+              subCategoryId: item.SubCategoryId || "",
               details: item.Details || "",
               location: item.Location || "",
               time: item.Time || "",
+              date: item.Date ? item.Date.split("T")[0] : "",
               isActive: item.IsActive ?? true,
             });
           }
@@ -117,10 +136,12 @@ export default function AddEditProjectPage() {
       subtitle: "",
       photo: "",
       categoryId: "",
-      categoryName: "",
+      categorySlug: "",
+      subCategoryId: "",
       details: "",
       location: "",
       time: "",
+      date: "",
       isActive: true,
     });
     setErrors({});
@@ -128,13 +149,10 @@ export default function AddEditProjectPage() {
 
   const validate = () => {
     const newErrors: Partial<Record<keyof ProjectFormData, string>> = {};
-    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
-    if (!formData.subtitle.trim())
-      newErrors.subtitle = "SubTitle is Required. ";
-    if (!formData.categoryId.trim())
-      newErrors.categoryId = "Category selection is Required";
-    if (!formData.photo.trim()) newErrors.photo = "Photo is Required. ";
-    if (!formData.time.trim()) newErrors.time = "Time is ";
+    if (!formData.title.trim()) newErrors.title = "Title is Required.";
+    if (!formData.subtitle.trim()) newErrors.subtitle = "SubTitle is Required.";
+    if (!formData.categoryId.trim()) newErrors.categoryId = "Category selection is Required.";
+    if (!formData.photo.trim()) newErrors.photo = "Photo is Required.";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -146,12 +164,13 @@ export default function AddEditProjectPage() {
 
   const handleCategorySelect = (selectedId: string) => {
     const selectedCat = categories.find(
-      (c) => (c.CategoryID || "") === selectedId,
+      (c) => (c.CategoryID || "") === selectedId
     );
     setFormData((prev) => ({
       ...prev,
       categoryId: selectedId,
-      categoryName: selectedCat ? selectedCat.CategoryName : "",
+      categorySlug: selectedCat?.CategorySlug || "",
+      subCategoryId: "", // reset subcategory when main category changes
     }));
     if (errors.categoryId) setErrors((prev) => ({ ...prev, categoryId: "" }));
   };
@@ -172,10 +191,12 @@ export default function AddEditProjectPage() {
       Subtitle: formData.subtitle,
       Photo: formData.photo,
       CategoryID: formData.categoryId,
-      CategoryName: formData.categoryName,
+      CategorySlug: formData.categorySlug,
+      SubCategoryId: formData.subCategoryId,
       Details: formData.details,
       Location: formData.location,
       Time: formData.time,
+      Date: formData.date ? new Date(formData.date).toISOString() : undefined,
       IsActive: formData.isActive,
       SetDate: new Date().toISOString(),
     };
@@ -191,6 +212,11 @@ export default function AddEditProjectPage() {
   const categoryOptions = categories.map((cat) => ({
     label: cat.CategoryName || "",
     value: cat.CategoryID || "",
+  }));
+
+  const subCategoryOptions = subCategories.map((sub) => ({
+    label: sub.SubCategoryName || "",
+    value: sub.SubCategoryID || "",
   }));
 
   return (
@@ -242,6 +268,16 @@ export default function AddEditProjectPage() {
         error={errors.categoryId}
       />
 
+      <DropdownSelect
+        label="Subcategory"
+        icon={FolderTree}
+        placeholder="Select Subcategory"
+        options={subCategoryOptions}
+        value={formData.subCategoryId}
+        onChange={(e) => handleChange("subCategoryId", e.target.value)}
+        error={errors.subCategoryId}
+      />
+
       <TextField
         label="Location"
         icon={MapPin}
@@ -250,9 +286,29 @@ export default function AddEditProjectPage() {
         error={errors.location}
       />
 
-      {/* Datetime Picker Field */}
+      {/* Date Field */}
+      <div className="space-y-1.5">
+        <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
+          Project Date
+        </label>
+        <div className="relative group w-full">
+          <Calendar
+            className="absolute left-4 top-1/2 -translate-y-1/2 transition-colors pointer-events-none z-10 text-slate-400 group-focus-within:text-[#f86048]"
+            size={18}
+          />
+          <input
+            type="date"
+            value={formData.date}
+            onChange={(e) => handleChange("date", e.target.value)}
+            className={`w-full py-3 sm:py-3.5 pl-11 pr-4 text-sm sm:text-base border-2 rounded-2xl outline-none bg-white/70 focus:bg-white transition-all shadow-sm ${
+              formData.date ? "text-black font-medium" : "text-black"
+            } border-slate-200/80 focus:border-[#f86048]`}
+          />
+        </div>
+      </div>
+
       {/* Time Picker Field */}
-      <div className="sm:col-span-2 space-y-1.5">
+      <div className="space-y-1.5">
         <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
           Time / Schedule
         </label>
@@ -261,7 +317,7 @@ export default function AddEditProjectPage() {
             className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors pointer-events-none z-10 ${
               errors.time
                 ? "text-red-400 group-focus-within:text-red-500"
-                : "text-slate-400 group-focus-within:text-[#f86048]"
+                : "text-black group-focus-within:text-[#f86048]"
             }`}
             size={18}
           />
@@ -270,7 +326,7 @@ export default function AddEditProjectPage() {
             value={formData.time}
             onChange={(e) => handleChange("time", e.target.value)}
             className={`w-full py-3 text-black sm:py-3.5 pl-11 pr-4 text-sm sm:text-base border-2 rounded-2xl outline-none bg-white/70 focus:bg-white transition-all shadow-sm ${
-              formData.time ? "text-slate-900 font-medium" : "text-slate-400"
+              formData.time ? "text-black font-medium" : "text-black"
             } ${
               errors.time
                 ? "border-red-300 focus:border-red-500 text-red-900"

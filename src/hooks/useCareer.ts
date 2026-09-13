@@ -21,32 +21,31 @@ export function useCareer() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch All Careers: GET /api/Career/GetAllCareer
+  // 1. Fetch All Public Careers: GET /api/Public/GetAllCareer
   const fetchCareers = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await api.get<ApiCareer[]>("/Career/GetAllCareer");
+      const data = await api.get<ApiCareer[]>("/Public/GetAllCareer");
       const list = Array.isArray(data) ? data : [];
       setCareers(list);
       return list;
     } catch (err: any) {
       const msg = err.message || "Failed to load career openings.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 2. Fetch Single Career by ID: GET /api/Career/GetCareerById?careerId={id}
+  // 2. Fetch Single Career by ID: GET /api/Public/GetCareerById?careerId={id}
   const fetchCareerById = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
     try {
       const res = await api.get<ApiCareer | ApiCareer[]>(
-        `/Career/GetCareerById?careerId=${encodeURIComponent(id)}`
+        `/Public/GetCareerById?careerId=${encodeURIComponent(id)}`
       );
       const item = Array.isArray(res) ? res[0] : res;
       return item || null;
@@ -59,7 +58,7 @@ export function useCareer() {
     }
   }, []);
 
-  // 3. Save or Update Career: POST /api/Career/SaveUpdateCareer
+  // 3. Save or Update Career (Admin): POST /api/Career/SaveUpdateCareer
   const saveOrUpdateCareer = async (payload: ApiCareer) => {
     setSubmitting(true);
     setError("");
@@ -87,7 +86,7 @@ export function useCareer() {
     }
   };
 
-  // 4. Delete Career: POST /api/Career/DeleteCareer?careerId={id}
+  // 4. Delete Career (Admin): POST /api/Career/DeleteCareer?careerId={id}
   const deleteCareer = async (item: ApiCareer) => {
     const careerId = item.CareerID || "";
 

@@ -20,32 +20,31 @@ export function useKeyInitiatives() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch All Key Initiatives: GET /api/KeyInitiatives/GetAllKeyInitiatives
+  // 1. Fetch All Key Initiatives using Public API
   const fetchInitiatives = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await api.get<ApiKeyInitiative[]>("/KeyInitiatives/GetAllKeyInitiatives");
+      const data = await api.get<ApiKeyInitiative[]>("/Public/GetAllKeyInitiatives");
       const list = Array.isArray(data) ? data : [];
       setInitiatives(list);
       return list;
     } catch (err: any) {
       const msg = err.message || "Failed to load key initiatives.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 2. Fetch Single Key Initiative by ID: GET /api/KeyInitiatives/GetKeyInitiativesById?initiativeId={id}
+  // 2. Fetch Single Key Initiative by ID
   const fetchInitiativeById = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
     try {
       const res = await api.get<ApiKeyInitiative | ApiKeyInitiative[]>(
-        `/KeyInitiatives/GetKeyInitiativesById?initiativeId=${encodeURIComponent(id)}`
+        `/Public/GetKeyInitiativesById?initiativeId=${encodeURIComponent(id)}`
       );
       const item = Array.isArray(res) ? res[0] : res;
       return item || null;
@@ -58,7 +57,7 @@ export function useKeyInitiatives() {
     }
   }, []);
 
-  // 3. Save or Update Key Initiative: POST /api/KeyInitiatives/SaveUpdateKeyInitiatives
+  // 3. Save or Update Key Initiative (Admin)
   const saveOrUpdateInitiative = async (payload: ApiKeyInitiative) => {
     setSubmitting(true);
     setError("");
@@ -86,7 +85,7 @@ export function useKeyInitiatives() {
     }
   };
 
-  // 4. Delete Key Initiative: POST /api/KeyInitiatives/DeleteKeyInitiatives?initiativeId={id}
+  // 4. Delete Key Initiative (Admin)
   const deleteInitiative = async (item: ApiKeyInitiative) => {
     const initiativeId = item.InitiativeID || "";
 
@@ -108,7 +107,9 @@ export function useKeyInitiatives() {
     if (result.isConfirmed) {
       try {
         await api.post(
-          `/KeyInitiatives/DeleteKeyInitiatives?initiativeId=${encodeURIComponent(initiativeId)}`,
+          `/KeyInitiatives/DeleteKeyInitiatives?initiativeId=${encodeURIComponent(
+            initiativeId
+          )}`,
           {}
         );
         Swal.fire({

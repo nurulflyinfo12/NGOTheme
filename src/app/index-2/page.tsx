@@ -5,7 +5,6 @@ import { Cta1, Cta2 } from "@/components/Cta";
 import { Event2 } from "@/components/Event";
 import { Faq2 } from "@/components/Faq";
 import { Feature1 } from "@/components/Feature";
-import { Gallery1 } from "@/components/Gallery";
 import { Hero2 } from "@/components/Hero";
 import { News2 } from "@/components/News";
 import { Promo1 } from "@/components/Promo";
@@ -28,7 +27,7 @@ const Home2 = () => {
       <Event2 />
       <Testimonial2 />
       <News2 />
-      <Gallery1 />
+      {/* <Gallery1 /> */}
       <Cta2 />
     </DanboxLayout>
   );

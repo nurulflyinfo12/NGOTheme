@@ -2,12 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Save, Plus, AlertCircle, Heading } from "lucide-react";
+import { Save, Plus, AlertCircle, Heading, Tag } from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import ImageUpload from "@/components/Admin/ImageUpload";
 import StatusSelect from "@/components/Admin/StatusSelect";
 import { TextField } from "@/components/Admin/TextField";
+import { DropdownSelect } from "@/components/Admin/DropdownSelect";
 import { usePhotoGallery, ApiPhotoGallery } from "@/hooks/usePhotoGallery";
 
 interface GalleryFormData {
@@ -21,6 +22,14 @@ interface GalleryFormData {
   publishedDate?: string;
 }
 
+const GALLERY_CATEGORIES = [
+  "Health",
+  "Education",
+  "Disaster relief",
+  "Cultural",
+  "Award",
+];
+
 export default function AddEditGalleryPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -32,6 +41,7 @@ export default function AddEditGalleryPage() {
   const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [formData, setFormData] = useState<GalleryFormData>({
     title: "",
+    categoryId: "",
     images: [],
     status: "Active",
     isStory: false,
@@ -105,6 +115,7 @@ export default function AddEditGalleryPage() {
   const validate = () => {
     const newErrors: Partial<Record<keyof GalleryFormData, string>> = {};
     if (!formData.title.trim()) newErrors.title = "Gallery Title is required";
+    if (!formData.categoryId?.trim()) newErrors.categoryId = "Category is required";
     if (formData.images.length === 0)
       newErrors.images = "At least one gallery image is required";
 
@@ -147,7 +158,7 @@ export default function AddEditGalleryPage() {
     setFormData({
       photoGalleryId: isEditMode ? formData.photoGalleryId : undefined,
       companyId: formData.companyId,
-      categoryId: formData.categoryId,
+      categoryId: "",
       title: "",
       images: [],
       status: "Active",
@@ -192,7 +203,7 @@ export default function AddEditGalleryPage() {
       >
         {/* Title */}
         <TextField
-          label="Gallery Title"
+          label="Gallery Title*"
           icon={Heading}
           value={formData.title}
           onChange={(e) => {
@@ -200,6 +211,20 @@ export default function AddEditGalleryPage() {
             if (errors.title) setErrors({ ...errors, title: "" });
           }}
           error={errors.title}
+        />
+
+        {/* Category Select */}
+        <DropdownSelect
+          label="Category*"
+          icon={Tag}
+          placeholder="Select Category"
+          options={GALLERY_CATEGORIES}
+          value={formData.categoryId}
+          onChange={(e) => {
+            setFormData((prev) => ({ ...prev, categoryId: e.target.value }));
+            if (errors.categoryId) setErrors((prev) => ({ ...prev, categoryId: "" }));
+          }}
+          error={errors.categoryId}
         />
 
         {/* Status Select */}
@@ -212,7 +237,7 @@ export default function AddEditGalleryPage() {
           error={errors.status}
         />
 
-        {/* Images Upload */}
+        {/* Images Upload with Caption Support */}
         <div className="space-y-2 sm:col-span-2">
           <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
             Gallery Images <span className="text-red-500">*</span>
@@ -231,7 +256,7 @@ export default function AddEditGalleryPage() {
               if (errors.images) setErrors((prev) => ({ ...prev, images: "" }));
             }}
             allowMultiple={true}
-            showCaption={false}
+            showCaption={true}
           />
 
           {errors.images && (

@@ -21,32 +21,31 @@ export function usePublication() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch all publications: GET /api/Publication/GetAllPublication
+  // 1. Fetch all public publications: GET /api/Public/GetAllPublication
   const fetchPublications = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
-      const data = await api.get<ApiPublication[]>("/Publication/GetAllPublication");
+      const data = await api.get<ApiPublication[]>("/Public/GetAllPublication");
       const list = Array.isArray(data) ? data : [];
       setPublications(list);
       return list;
     } catch (err: any) {
       const msg = err.message || "Failed to load publications.";
       setError(msg);
-      Swal.fire({ icon: "error", title: "Error", text: msg });
       return [];
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // 2. Fetch single publication: GET /api/Publication/GetPublicationById?publicationId={id}
+  // 2. Fetch single publication: GET /api/Public/GetPublicationById?publicationId={id}
   const fetchPublicationById = useCallback(async (id: string) => {
     setLoading(true);
     setError("");
     try {
       const res = await api.get<ApiPublication | ApiPublication[]>(
-        `/Publication/GetPublicationById?publicationId=${encodeURIComponent(id)}`
+        `/Public/GetPublicationById?publicationId=${encodeURIComponent(id)}`
       );
       const pub = Array.isArray(res) ? res[0] : res;
       return pub || null;
@@ -59,7 +58,7 @@ export function usePublication() {
     }
   }, []);
 
-  // 3. Save or Update publication: POST /api/Publication/SaveUpdatePublication
+  // 3. Save or Update publication (Admin): POST /api/Publication/SaveUpdatePublication
   const saveOrUpdatePublication = async (payload: Partial<ApiPublication>) => {
     setSubmitting(true);
     setError("");
@@ -87,7 +86,7 @@ export function usePublication() {
     }
   };
 
-  // 4. Delete publication: POST /api/Publication/DeletePublication?publicationId={id}
+  // 4. Delete publication (Admin): POST /api/Publication/DeletePublication?publicationId={id}
   const deletePublication = async (pub: ApiPublication) => {
     const pubId = pub.PublicationID || "";
     if (!pubId) {

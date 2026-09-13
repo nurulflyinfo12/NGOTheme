@@ -1,156 +1,182 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import PageBanner from "@/components/PageBanner";
+import { motion } from "framer-motion";
 import DanboxLayout from "@/layout/DanboxLayout";
-import programs from "@/app/data/programs.json";
+import PageBanner from "@/components/PageBanner";
+import { useProjects, ApiProject } from "@/hooks/useProjects";
+import { api } from "@/utility/api";
 
-type Sector = {
-  cat: string;
-  items: string;
-};
+const PRIMARY = "#f86048";
 
-type Program = {
-  title: string;
-  category?: string;
-  established: string;
-  branches: string;
-  intro: string;
-  stats: string;
-  sectors: Sector[];
-  ceiling?: string;
-  duration?: string;
-  charge: string;
-  installments?: string;
-  src?: string;
-};
-
-const ProgramDetails = () => {
+const CoreProgramDetails = () => {
   const params = useParams();
-  const slug = params.slug as string;
+  const slug = params?.slug as string;
 
-  const currentProgram = programs[slug as keyof typeof programs] as Program;
+  const { fetchProjectById } = useProjects();
 
-  if (!currentProgram) {
+  const [project, setProject] = useState<ApiProject | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    if (!slug || slug === "undefined") return;
+
+    const loadProject = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const data = await fetchProjectById(decodeURIComponent(slug));
+
+        if (!data) {
+          setError("Project not found.");
+          return;
+        }
+
+        setProject(data);
+      } catch (err: any) {
+        setError(err?.message || "Failed to load project details.");
+      }
+      {
+        setLoading(false);
+      }
+    };
+
+    loadProject();
+  }, [slug, fetchProjectById]);
+
+  if (loading) {
     return (
-      <DanboxLayout>
-        <div className="p-40 text-center">
-          <h2 className="text-2xl font-bold text-gray-400">
-            Program Not Found
-          </h2>
-        </div>
+      <DanboxLayout header={1}>
+        <PageBanner pageName="Our Programs" pageTitle="Program Details" />
+
+        <section className="py-24 bg-white dark:bg-[#0f172a]">
+          <div className="container mx-auto px-6 lg:max-w-7xl">
+            <div className="animate-pulse">
+              <div className="h-[400px] rounded-3xl bg-slate-100 dark:bg-slate-800 mb-10" />
+              <div className="h-10 w-2/3 rounded bg-slate-100 dark:bg-slate-800 mb-5" />
+              <div className="h-5 w-full rounded bg-slate-100 dark:bg-slate-800 mb-3" />
+              <div className="h-5 w-5/6 rounded bg-slate-100 dark:bg-slate-800" />
+            </div>
+          </div>
+        </section>
       </DanboxLayout>
     );
   }
 
+  if (error || !project) {
+    return (
+      <DanboxLayout header={1}>
+        <PageBanner pageName="Our Programs" pageTitle="Program Details" />
+
+        <section className="py-24 bg-white dark:bg-[#0f172a]">
+          <div className="container mx-auto px-6 lg:max-w-7xl text-center">
+            <div className="py-20">
+              <h1 className="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                Program Not Found
+              </h1>
+              <p className="text-slate-500 dark:text-slate-400">
+                {error || "The requested program could not be found."}
+              </p>
+            </div>
+          </div>
+        </section>
+      </DanboxLayout>
+    );
+  }
+
+  const image = project.Photo
+    ? api.getFileUrl(project.Photo)
+    : "/assets/img/factbg.webp";
+
+  const cleanDetails = project.Details?.replace(/<[^>]*>?/gm, "") || "";
+
   return (
     <DanboxLayout header={1}>
-      <PageBanner pageName={currentProgram.title} pageImage={currentProgram.src} />
+      <PageBanner
+        pageName={project.CategoryName || "Our Programs"}
+        pageTitle={project.Title || "Program Details"}
+      />
 
-      <section className="program-details-section py-24! lg:py-32! bg-white dark:bg-[#0f172a]!">
-        <div className="container mx-auto px-4">
-          <div className="max-w-5xl mx-auto">
-            
-            {/* Stats Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12!">
-              <div className="bg-blue-600 p-8 rounded-3xl text-white shadow-xl">
-                <p className="text-blue-100! text-sm uppercase tracking-widest! font-bold mb-2!">
-                  প্রতিষ্ঠা
+      <section className="relative py-20 lg:py-28 bg-white dark:bg-[#0f172a] overflow-hidden">
+        <div
+          className="absolute top-0 right-0 w-[480px] h-[480px] rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none"
+          style={{ backgroundColor: `${PRIMARY}08` }}
+        />
+
+        <div className="container relative mx-auto px-6 lg:max-w-7xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-start">
+            <motion.div
+              initial={{ opacity: 0, x: -40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7 }}
+              className="relative overflow-hidden rounded-[2rem] bg-slate-100 dark:bg-slate-800 shadow-xl"
+            >
+              <img
+                src={image}
+                alt={project.Title}
+                className="w-full aspect-[4/3] object-cover"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/30 via-transparent to-transparent pointer-events-none" />
+            </motion.div>
+            <motion.div
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.7, delay: 0.15 }}
+            >
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[1.05] tracking-tight">
+                {project.Title}
+                <span style={{ color: PRIMARY }}>.</span>
+              </h1>
+
+              {project.Subtitle && (
+                <p className="mt-6 text-lg lg:text-xl font-medium text-slate-500 dark:text-slate-400 leading-relaxed">
+                  {project.Subtitle}
                 </p>
-                <h4 className="text-3xl font-bold dark:text-white!">
-                  {currentProgram.established}
-                </h4>
-              </div>
-
-              <div className="bg-white dark:bg-slate-800! p-8! rounded-3xl border border-gray-100 dark:border-slate-700! shadow-sm">
-                <p className="text-gray-400 dark:text-gray-500! text-sm uppercase tracking-widest! font-bold mb-2!">
-                  শাখা সংখ্যা
-                </p>
-                <h4 className="text-3xl font-bold text-gray-900 dark:text-white!">
-                  {currentProgram.branches}
-                </h4>
-              </div>
-
-              <div className="bg-white! dark:bg-slate-800! p-8 rounded-3xl border! border-gray-100! dark:border-slate-700! shadow-sm">
-                <p className="text-gray-400 dark:text-gray-500! text-sm! uppercase tracking-widest font-bold mb-2">
-                  সার্ভিস চার্জ
-                </p>
-                <h4 className="text-3xl font-bold text-gray-900 dark:text-white!">
-                  {currentProgram.charge}
-                </h4>
-              </div>
-            </div>
-
-            {/* Introduction Section */}
-            <div>
-              <h3 className="text-3xl font-bold text-gray-900! dark:text-white! mb-6!">
-                ভূমিকা ও উদ্দেশ্য
-              </h3>
-
-              <div className="text-gray-600! dark:text-gray-300! leading-relaxed! space-y-4! text-lg">
-                <p>{currentProgram.intro}</p>
-                <p>{currentProgram.stats}</p>
-              </div>
-            </div>
-
-            {/* Sectors Section */}
-            <div className="mt-20!">
-              <h3 className="text-2xl font-bold text-gray-900! dark:text-white! mb-6! border-l-4! border-blue-600! pl-4!">
-                ঋণের খাত সমূহ
-              </h3>
-
-              <div className="grid gap-4">
-                {currentProgram.sectors?.map((sector, idx) => (
-                  <div
-                    key={idx}
-                    className="bg-gray-50! dark:bg-slate-800/80! p-6 rounded-2xl hover:bg-blue-50! dark:hover:bg-slate-700! transition"
-                  >
-                    <h5 className="font-bold text-blue-900! dark:text-blue-400! mb-1!">
-                      {sector.cat}
-                    </h5>
-                    <p className="text-gray-600! dark:text-gray-400! text-sm">
-                      {sector.items}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Additional Info Cards */}
-            <div className="mt-16! grid md:grid-cols-3 gap-6">
-              {currentProgram.ceiling && (
-                <div className="p-6! border! border-gray-100! dark:border-slate-700! rounded-2xl bg-white! dark:bg-slate-800!">
-                  <p className="text-gray-400! dark:text-gray-500! text-sm mb-1!">ঋণের সীমা</p>
-                  <h4 className="font-bold text-gray-900! dark:text-white!">
-                    {currentProgram.ceiling}
-                  </h4>
-                </div>
               )}
-
-              {currentProgram.duration && (
-                <div className="p-6! border! border-gray-100! dark:border-slate-700! rounded-2xl bg-white! dark:bg-slate-800!">
-                  <p className="text-gray-400! dark:text-gray-500! text-sm mb-1!">মেয়াদ</p>
-                  <h4 className="font-bold text-gray-900! dark:text-white!">
-                    {currentProgram.duration}
-                  </h4>
-                </div>
-              )}
-
-              {currentProgram.installments && (
-                <div className="p-6! border! border-gray-100! dark:border-slate-700! rounded-2xl bg-white! dark:bg-slate-800!">
-                  <p className="text-gray-400! dark:text-gray-500! text-sm mb-1!">কিস্তি</p>
-                  <h4 className="font-bold text-gray-900! dark:text-white!">
-                    {currentProgram.installments}
-                  </h4>
-                </div>
-              )}
-            </div>
-
+            </motion.div>
           </div>
+
+          {cleanDetails && (
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.7 }}
+              className="mt-20 lg:mt-28 max-w-4xl"
+            >
+              <div className="flex items-center gap-4 mb-6">
+                <div
+                  className="h-[2px] w-10 rounded-full"
+                  style={{ backgroundColor: PRIMARY }}
+                />
+                <span
+                  className="text-[11px] font-semibold uppercase tracking-[0.25em]"
+                  style={{ color: PRIMARY }}
+                >
+                  About This Program
+                </span>
+              </div>
+
+              <h2 className="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white mb-8">
+                Program Details
+                <span style={{ color: PRIMARY }}>.</span>
+              </h2>
+
+              <div
+                className="prose prose-lg max-w-none dark:prose-invert text-slate-600 dark:text-slate-300"
+                dangerouslySetInnerHTML={{
+                  __html: project.Details,
+                }}
+              />
+            </motion.div>
+          )}
         </div>
       </section>
     </DanboxLayout>
   );
 };
 
-export default ProgramDetails;
+export default CoreProgramDetails;
