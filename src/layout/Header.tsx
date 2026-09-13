@@ -328,13 +328,18 @@ const Header4 = ({ open }: { open: () => void }) => {
 };
 
 // ==================== UPDATED NAV WITH ACTIVE STATE ====================
+
 const Nav = () => {
   const pathname = usePathname();
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
   const isActive = (path: string) => {
     if (path === "/") return pathname === "/";
     return pathname?.startsWith(path);
   };
+
+  const handleMouseEnter = (menu: string) => setOpenMenu(menu);
+  const handleMouseLeave = () => setOpenMenu(null);
 
   return (
     <div className="main-menu d-none d-xl-block">
@@ -344,10 +349,16 @@ const Nav = () => {
             <Link href="/">Home</Link>
           </li>
 
-          <li className={`has-dropdown ${isActive("/ourbranch") || isActive("/ourstaff") || isActive("/ourleadership") || isActive("/executivemessage") ? "active" : ""}`}>
+          <li className={`has-dropdown ${isActive("/ourbranch") || isActive("/ourstaff") || isActive("/ourleadership") || isActive("/executivemessage") ? "active" : ""}`} onMouseEnter={() => handleMouseEnter("about")}
+            onMouseLeave={handleMouseLeave}>
             <Link href="/">
               About Us
-              <i className="fas fa-angle-down" />
+              {/* <i className="fas fa-angle-down" /> */}
+              <i
+                className={`fas fa-angle-down transition-transform duration-300 ${
+                  openMenu === "about" ? "rotate-180" : ""
+                }`}
+              />
             </Link>
             <ul className="submenu">
               <li className={isActive("/ourbranch") ? "active" : ""}>
@@ -365,10 +376,15 @@ const Nav = () => {
             </ul>
           </li>
 
-          <li className={`has-dropdown ${isActive("/ourfounder") || isActive("/edmessage") || isActive("/vision-mission") || isActive("/background") || isActive("/goal-objectives") ? "active" : ""}`}>
+          <li className={`has-dropdown ${isActive("/ourfounder") || isActive("/edmessage") || isActive("/vision-mission") || isActive("/background") || isActive("/goal-objectives") ? "active" : ""}`} onMouseEnter={() => handleMouseEnter("sagarika")} onMouseLeave={handleMouseLeave}>
             <Link href="/">
               We are Sagarika
-              <i className="fas fa-angle-down" />
+              {/* <i className="fas fa-angle-down" /> */}
+              <i
+                className={`fas fa-angle-down transition-transform duration-300 ${
+                  openMenu === "sagarika" ? "rotate-180" : ""
+                }`}
+              />
             </Link>
             <ul className="submenu">
               <li className={isActive("/ourfounder") ? "active" : ""}>
@@ -389,10 +405,15 @@ const Nav = () => {
             </ul>
           </li>
 
-          <li className={`has-dropdown ${isActive("/core-programs") || isActive("/project") || isActive("/special-project") ? "active" : ""}`}>
+          <li className={`has-dropdown ${isActive("/core-programs") || isActive("/project") || isActive("/special-project") ? "active" : ""}`} onMouseEnter={() => handleMouseEnter("activities")} onMouseLeave={handleMouseLeave}>
             <Link href="/">
               Sagarika's Activities
-              <i className="fas fa-angle-down" />
+              {/* <i className="fas fa-angle-down" /> */}
+              <i
+                className={`fas fa-angle-down transition-transform duration-300 ${
+                  openMenu === "activities" ? "rotate-180" : ""
+                }`}
+              />
             </Link>
             <ul className="submenu">
               <li className={isActive("/core-programs") ? "active" : ""}>
@@ -407,10 +428,15 @@ const Nav = () => {
             </ul>
           </li>
 
-          <li className={`has-dropdown ${isActive("/gallery") || isActive("/video") ? "active" : ""}`}>
+          <li className={`has-dropdown ${isActive("/gallery") || isActive("/video") ? "active" : ""}`} onMouseEnter={() => handleMouseEnter("media")} onMouseLeave={handleMouseLeave}>
             <Link href="/">
               Media
-              <i className="fas fa-angle-down" />
+              {/* <i className="fas fa-angle-down" /> */}
+              <i
+                className={`fas fa-angle-down transition-transform duration-300 ${
+                  openMenu === "media" ? "rotate-180" : ""
+                }`}
+              />
             </Link>
             <ul className="submenu">
               <li className={isActive("/gallery") ? "active" : ""}>
@@ -442,6 +468,7 @@ const Nav = () => {
     </div>
   );
 };
+
 // =====================================================================
 
 const SearchPopup = ({ open, close }: { open: boolean; close: () => void }) => (
@@ -569,6 +596,19 @@ const MobileNav = () => {
     display: activeMenu === menu ? "block" : "none",
   });
 
+  const ExpandIcon = ({ menu }: { menu: string }) => (
+    <a
+      href="#"
+      className="mean-expand"
+      onClick={(e) => {
+        e.preventDefault();
+        toggleMenu(menu);
+      }}
+    >
+      <i className={activeMenu === menu ? "far fa-minus" : "far fa-plus"} />
+    </a>
+  );
+
   return (
     <div className="mobile-menu fix mb-3 mean-container">
       <div className="mean-bar">
@@ -577,14 +617,24 @@ const MobileNav = () => {
             <li className={isActive("/") ? "active" : ""}>
               <Link href="/">Home</Link>
             </li>
-            {/* about us  */}
-            <li className={`has-dropdown ${isActive("/ourbranch") || isActive("/ourstaff") || isActive("/ourleadership") || isActive("/executivemessage") ? "active" : ""}`}>
-              <Link href="/about">
+
+            {/* About Us */}
+            <li
+              className={`has-dropdown ${
+                isActive("/ourbranch") ||
+                isActive("/ourstaff") ||
+                isActive("/ourleadership") ||
+                isActive("/executivemessage")
+                  ? "active"
+                  : ""
+              }`}
+            >
+              <Link href="#">
                 About Us
                 <i className="fas fa-angle-down" />
               </Link>
 
-              <ul className="submenu" style={showMenu("sagarika")}>
+              <ul className="submenu" style={showMenu("about")}>
                 <li className={isActive("/ourbranch") ? "active" : ""}>
                   <Link href="/ourbranch">Our Branches</Link>
                 </li>
@@ -599,21 +649,22 @@ const MobileNav = () => {
                 </li>
               </ul>
 
-              <a
-                href="#"
-                className="mean-expand"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleMenu("sagarika");
-                }}
-              >
-                <i className="far fa-plus" />
-              </a>
+              <ExpandIcon menu="about" />
             </li>
 
             {/* We are Sagarika */}
-            <li className={`has-dropdown ${isActive("/ourfounder") || isActive("/edmessage") || isActive("/vision-mission") || isActive("/background") || isActive("/goal-objectives") ? "active" : ""}`}>
-              <Link href="/about">
+            <li
+              className={`has-dropdown ${
+                isActive("/ourfounder") ||
+                isActive("/edmessage") ||
+                isActive("/vision-mission") ||
+                isActive("/background") ||
+                isActive("/goal-objectives")
+                  ? "active"
+                  : ""
+              }`}
+            >
+              <Link href="#">
                 We are Sagarika
                 <i className="fas fa-angle-down" />
               </Link>
@@ -622,9 +673,6 @@ const MobileNav = () => {
                 <li className={isActive("/ourfounder") ? "active" : ""}>
                   <Link href="/ourfounder">About Our Founder</Link>
                 </li>
-                {/* <li className={isActive("/edmessage") ? "active" : ""}>
-                  <Link href="/edmessage">Executive Director Message</Link>
-                </li> */}
                 <li className={isActive("/vision-mission") ? "active" : ""}>
                   <Link href="/vision-mission">Vision & Mission</Link>
                 </li>
@@ -636,21 +684,20 @@ const MobileNav = () => {
                 </li>
               </ul>
 
-              <a
-                href="#"
-                className="mean-expand"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleMenu("sagarika");
-                }}
-              >
-                <i className="far fa-plus" />
-              </a>
+              <ExpandIcon menu="sagarika" />
             </li>
 
             {/* Activities */}
-            <li className={`has-dropdown ${isActive("/core-programs") || isActive("/project") || isActive("/special-project") ? "active" : ""}`}>
-              <Link href="/">
+            <li
+              className={`has-dropdown ${
+                isActive("/core-programs") ||
+                isActive("/project") ||
+                isActive("/special-project")
+                  ? "active"
+                  : ""
+              }`}
+            >
+              <Link href="#">
                 Sagarika's Activities
                 <i className="fas fa-angle-down" />
               </Link>
@@ -667,21 +714,16 @@ const MobileNav = () => {
                 </li>
               </ul>
 
-              <a
-                href="#"
-                className="mean-expand"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleMenu("activities");
-                }}
-              >
-                <i className="far fa-plus" />
-              </a>
+              <ExpandIcon menu="activities" />
             </li>
 
             {/* Media */}
-            <li className={`has-dropdown ${isActive("/gallery") || isActive("/video") ? "active" : ""}`}>
-              <Link href="/">
+            <li
+              className={`has-dropdown ${
+                isActive("/gallery") || isActive("/video") ? "active" : ""
+              }`}
+            >
+              <Link href="#">
                 Media
                 <i className="fas fa-angle-down" />
               </Link>
@@ -695,24 +737,15 @@ const MobileNav = () => {
                 </li>
               </ul>
 
-              <a
-                href="#"
-                className="mean-expand"
-                onClick={(e) => {
-                  e.preventDefault();
-                  toggleMenu("media");
-                }}
-              >
-                <i className="far fa-plus" />
-              </a>
+              <ExpandIcon menu="media" />
             </li>
-
-            {/* <li className={isActive("/blog") ? "active" : ""}>
-              <Link href="/blog">Blog</Link>
-            </li> */}
 
             <li className={isActive("/publication") ? "active" : ""}>
               <Link href="/publication">Publication</Link>
+            </li>
+
+            <li className={isActive("/careers") ? "active" : ""}>
+              <Link href="/careers">Careers</Link>
             </li>
 
             <li className={`mean-last ${isActive("/contact") ? "active" : ""}`}>
