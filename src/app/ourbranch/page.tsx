@@ -303,7 +303,7 @@ export default function BranchPage() {
                             disabled={!mapUrl}
                             className={`w-full py-3! rounded-xl! font-bold text-xs uppercase tracking-wider transition-all duration-300 flex items-center justify-center gap-2 ${
                               mapUrl
-                                ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-[#f86048] hover:text-white cursor-pointer shadow-sm"
+                                ? "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 !hover:bg-[#f86048] !hover:text-white cursor-pointer shadow-sm"
                                 : "bg-slate-100 dark:bg-slate-800/50 text-slate-400 dark:text-slate-600 cursor-not-allowed opacity-60"
                             }`}
                           >
