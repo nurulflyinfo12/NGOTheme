@@ -254,7 +254,7 @@ const SpecialPrograms = ({
                           }}
                           className="px-6! py-2! bg-white/10! backdrop-blur-xl! border! border-white/20! rounded-2xl! text-[10px]! font-black text-white! uppercase! tracking-[0.3em]! inline-block"
                         >
-                          Section 0{idx + 1}
+                          0{idx + 1}
                         </motion.span>
                       </motion.div>
                     </motion.div>
@@ -287,7 +287,15 @@ const SpecialPrograms = ({
                       initial="hidden"
                       whileInView="visible"
                       viewport={{ once: true, margin: "-50px" }}
-                      className="p-8 sm:p-10 bg-slate-50 dark:bg-slate-900/60! rounded-[3rem] border border-slate-100 dark:border-slate-800! space-y-8"
+                      className="
+    w-full! max-w-full! min-w-0
+    p-5! sm:p-8! md:p-10!
+    bg-slate-50 dark:bg-slate-900/60!
+    rounded-2xl! sm:rounded-3xl! lg:rounded-[3rem]!
+    border border-slate-100 dark:border-slate-800!
+    space-y-6! sm:space-y-8!
+    overflow-hidden!
+  "
                     >
                       {group.items.map((item, i) => {
                         const itemPhoto = item.Photo
@@ -298,46 +306,77 @@ const SpecialPrograms = ({
                           <motion.div
                             key={item.ProjectID || i}
                             variants={itemVariants}
-                            className="group flex flex-col sm:flex-row items-start gap-5 transition-all"
+                            className="
+          group
+          flex flex-col
+          items-start gap-3! sm:gap-5!
+          transition-all
+          w-full! max-w-full! min-w-0
+        "
                           >
                             {/* Info Area */}
-                            <div className="flex-1 min-w-0 space-y-1">
-                              {/* Title */}
-                              <h4 className="font-extrabold text-slate-900 dark:text-white! text-lg sm:text-xl leading-snug group-hover:text-[#f86048] transition-colors">
-                                {item.Title}
-                              </h4>
-
-                              {/* Subtitle */}
-                              {item.Subtitle && (
-                                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300!">
-                                  {item.Subtitle}
-                                </p>
-                              )}
-
-                              {/* HTML Details Description */}
+                            <div className="flex-1 min-w-0 w-full! max-w-full! space-y-1!">
+                              {/* HTML Details */}
                               {item.Details && (
                                 <div
                                   dangerouslySetInnerHTML={{
                                     __html: item.Details,
                                   }}
                                   className="
-                                    text-xs text-slate-500 dark:text-slate-400!
-                                    leading-relaxed pt-1
+                w-full! max-w-full! min-w-0
+                overflow-x-auto
+                break-words
 
-                                    /* Kill inline styles from rich-text editor */
-                                    [&_*]:!bg-transparent
-                                    [&_*]:[color:inherit]!
+                text-xs! sm:text-sm! md:text-base!
+                text-black! dark:text-black!
+                leading-relaxed pt-1!
 
-                                    [&_h1]:text-sm [&_h1]:font-bold [&_h1]:text-slate-900 dark:[&_h1]:text-white! [&_h1]:mt-3 [&_h1]:mb-2
-                                    [&_h2]:text-sm [&_h2]:font-bold [&_h2]:text-slate-900 dark:[&_h2]:text-white! [&_h2]:mt-3 [&_h2]:mb-2
-                                    [&_h3]:text-xs [&_h3]:font-bold [&_h3]:text-slate-900 dark:[&_h3]:text-white! [&_h3]:mt-2 [&_h3]:mb-1
-                                    [&_p]:mb-2
-                                    [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2 [&_ul]:space-y-0.5
-                                    [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:mb-2 [&_ol]:space-y-0.5
-                                    [&_li]:text-slate-500 dark:[&_li]:text-slate-400!
-                                    [&_strong]:text-slate-900 dark:[&_strong]:text-white! [&_strong]:font-bold
-                                    [&_a]:text-[#f86048] [&_a]:underline
-                                  "
+                [&_*]:!max-w-full
+                [&_*]:!box-border
+                [&_*]:!bg-transparent
+                [&_*]:[color:inherit]!
+                [&_*]:break-words
+                [&_*]:!min-w-0
+
+                /* Headings — scale with breakpoints */
+                [&_h1]:text-base! [&_h1]:sm:text-lg! [&_h1]:font-bold! [&_h1]:text-slate-900! dark:[&_h1]:text-white! [&_h1]:mt-3! [&_h1]:mb-2!
+                [&_h2]:text-sm! [&_h2]:sm:text-base! [&_h2]:font-bold! [&_h2]:text-slate-900! dark:[&_h2]:text-white! [&_h2]:mt-3! [&_h2]:mb-2!
+                [&_h3]:text-xs! [&_h3]:sm:text-sm! [&_h3]:font-bold! [&_h3]:text-slate-900! dark:[&_h3]:text-white! [&_h3]:mt-2! [&_h3]:mb-1!
+
+                /* Paragraphs */
+                [&_p]:mb-2! [&_p]:leading-relaxed!
+
+                /* Lists */
+                [&_ul]:list-disc [&_ul]:pl-4! [&_ul]:sm:pl-6! [&_ul]:mb-2! [&_ul]:space-y-0.5
+                [&_ol]:list-decimal [&_ol]:pl-4! [&_ol]:sm:pl-6! [&_ol]:mb-2! [&_ol]:space-y-0.5
+                [&_li]:text-slate-500! dark:[&_li]:text-slate-400!
+
+                /* Bold */
+                [&_strong]:text-slate-900! dark:[&_strong]:text-white! [&_strong]:font-bold!
+
+                /* Links */
+                [&_a]:text-[#f86048] [&_a]:underline [&_a]:break-all
+
+                /* Images */
+                [&_img]:block [&_img]:w-auto [&_img]:max-w-full [&_img]:h-auto [&_img]:rounded-md!
+
+                /* Tables — scroll on mobile */
+                [&_table]:w-full [&_table]:max-w-full [&_table]:border-collapse [&_table]:text-xs!
+                [&_table]:block [&_table]:sm:table [&_table]:overflow-x-auto
+                [&_th]:px-2! [&_th]:sm:px-3! [&_th]:py-2! [&_th]:text-left [&_th]:font-semibold!
+                [&_td]:px-2! [&_td]:sm:px-3! [&_td]:py-2!
+
+                /* Pre / code */
+                [&_pre]:max-w-full [&_pre]:overflow-x-auto [&_pre]:whitespace-pre-wrap [&_pre]:break-words
+                [&_code]:break-words [&_code]:whitespace-pre-wrap
+
+                /* Iframes / videos */
+                [&_iframe]:max-w-full [&_iframe]:w-full
+                [&_video]:max-w-full [&_video]:h-auto
+
+                /* Blockquotes */
+                [&_blockquote]:border-l-2 [&_blockquote]:border-slate-300! dark:[&_blockquote]:border-slate-600! [&_blockquote]:pl-3! [&_blockquote]:my-2!
+              "
                                 />
                               )}
                             </div>
