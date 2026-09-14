@@ -15,7 +15,7 @@ interface SelectedVideoType {
   embedUrl: string;
 }
 
-// Utility to extract YouTube Video ID from any YouTube URL format
+// Extract YouTube Video ID from any URL format
 const getYouTubeId = (url: string): string => {
   if (!url) return "";
   const regExp =
@@ -27,7 +27,7 @@ const getYouTubeId = (url: string): string => {
 export default function VideoGalleryPage() {
   const { videos, loading, error, fetchVideos } = useVideoGallery();
   const [selectedVideo, setSelectedVideo] = useState<SelectedVideoType | null>(
-    null,
+    null
   );
 
   useEffect(() => {
@@ -74,9 +74,14 @@ export default function VideoGalleryPage() {
     <DanboxLayout header={1}>
       <PageBanner pageName="Video Gallery" pageTitle="Stories of Impact" />
 
-      <section className="py-24 lg:py-32 bg-white dark:bg-[#0f172a] overflow-hidden relative">
-        <div className="container mx-auto px-6 lg:max-w-7xl">
-          <div className="flex flex-col md:flex-row justify-between items-start xl:items-end mb-16 gap-10">
+      <section className="py-24! lg:py-32! bg-white dark:bg-[#0f172a]! overflow-hidden relative">
+        {/* Decorative blobs (optional, matches other pages) */}
+        <div className="absolute top-0 right-0 w-[480px] h-[480px] bg-[#f86048]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[360px] h-[360px] bg-slate-200/40 dark:bg-slate-800/30! rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+
+        <div className="container relative mx-auto px-6! lg:max-w-7xl">
+          {/* ---------- Header ---------- */}
+          <div className="flex flex-col md:flex-row justify-between items-start xl:items-end! mb-16 gap-10">
             <div className="max-w-2xl">
               <motion.div
                 initial={{ opacity: 0, x: -20 }}
@@ -95,13 +100,21 @@ export default function VideoGalleryPage() {
                   Video Gallery
                 </span>
               </motion.div>
-              <h2 className="text-4xl lg:text-6xl font-black text-slate-900 dark:text-white leading-[0.95] tracking-tight">
+
+              <motion.h2
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+                className="text-4xl lg:text-6xl font-black! text-slate-900! dark:text-white! leading-[0.95]! tracking-tight!"
+              >
                 Documenting Our <br /> Mission in Motion
                 <span style={{ color: PRIMARY }}>.</span>
-              </h2>
+              </motion.h2>
             </div>
           </div>
 
+          {/* ---------- Loading ---------- */}
           {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div
@@ -110,31 +123,34 @@ export default function VideoGalleryPage() {
                   borderColor: `${PRIMARY} transparent ${PRIMARY} ${PRIMARY}`,
                 }}
               />
-              <p className="mt-6 text-slate-500 dark:text-slate-400 font-medium text-sm">
+              <p className="mt-6 text-slate-500 dark:text-slate-400! font-medium text-sm">
                 Loading videos...
               </p>
             </div>
           ) : error ? (
+            /* ---------- Error ---------- */
             <div className="text-center py-20">
               <div className="text-5xl mb-4">😢</div>
-              <p className="text-slate-600 dark:text-slate-400 text-base mb-6">
+              <p className="text-slate-600 dark:text-slate-400! text-base mb-6">
                 {error}
               </p>
               <button
                 onClick={() => fetchVideos()}
-                className="px-8 py-3 bg-[#f86048] text-white rounded-full font-bold hover:bg-[#e04a32] transition-colors text-xs uppercase tracking-wider"
+                className="px-8 py-3 bg-[#f86048] text-white! rounded-full font-bold hover:bg-[#e04a32] transition-colors text-xs uppercase tracking-wider"
               >
                 Retry Loading
               </button>
             </div>
           ) : videos.length === 0 ? (
+            /* ---------- Empty ---------- */
             <div className="text-center py-20">
               <div className="text-5xl mb-4">📺</div>
-              <p className="text-slate-600 dark:text-slate-400 text-base">
+              <p className="text-slate-600 dark:text-slate-400! text-base">
                 No videos available in the gallery.
               </p>
             </div>
           ) : (
+            /* ---------- Grid ---------- */
             <motion.div
               layout
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
@@ -142,7 +158,6 @@ export default function VideoGalleryPage() {
               <AnimatePresence mode="popLayout">
                 {videos.map((video: ApiVideoGallery, idx: number) => {
                   const thumbUrl = getThumbnailUrl(video);
-                  const videoId = getYouTubeId(video.VideoLink);
 
                   return (
                     <motion.div
@@ -152,10 +167,11 @@ export default function VideoGalleryPage() {
                       animate={{ opacity: 1, y: 0 }}
                       exit={{ opacity: 0, scale: 0.9 }}
                       transition={{ duration: 0.4, delay: idx * 0.05 }}
-                      className="group relative bg-white dark:bg-slate-900/60 rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/40 dark:shadow-none border border-slate-200/80 dark:border-slate-800 hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
+                      className="group relative bg-white dark:bg-slate-900/60! rounded-[2rem] overflow-hidden shadow-xl shadow-slate-200/40 dark:shadow-none! border border-slate-200/80 dark:border-slate-800! hover:-translate-y-1.5 transition-all duration-300 flex flex-col"
                     >
+                      {/* Thumbnail */}
                       <div
-                        className="relative aspect-video overflow-hidden cursor-pointer bg-slate-900"
+                        className="relative aspect-video overflow-hidden cursor-pointer bg-slate-900 dark:bg-slate-950!"
                         onClick={() => openVideoModal(video)}
                       >
                         <img
@@ -168,28 +184,28 @@ export default function VideoGalleryPage() {
                           <motion.div
                             whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
-                            className="w-14 h-14 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/30 text-white transition-all duration-300 group-hover:bg-[#f86048] group-hover:border-[#f86048]"
+                            className="w-14 h-14 rounded-2xl flex items-center justify-center backdrop-blur-md border border-white/30! text-white! transition-all duration-300 group-hover:bg-[#f86048] group-hover:border-[#f86048]"
                           >
-                            <i className="fas fa-play text-lg ml-1"></i>
+                            <i className="fas fa-play text-lg ml-1" />
                           </motion.div>
                         </div>
 
                         {video.PublishedTime && (
-                          <div className="absolute bottom-3 right-3 bg-slate-900/80 text-white text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider backdrop-blur-sm">
+                          <div className="absolute bottom-3 right-3 bg-slate-900/80 text-white! text-[10px] font-bold px-2.5 py-1 rounded-md tracking-wider backdrop-blur-sm">
                             {formatDate(video.PublishedTime)}
                           </div>
                         )}
                       </div>
 
-                      {/* Video Title & Links */}
+                      {/* Title & Links */}
                       <div className="p-6 flex flex-col flex-1 justify-between">
                         <div>
-                          <h4 className="text-lg font-extrabold text-slate-900 dark:text-white leading-snug mb-3 line-clamp-2 group-hover:text-[#f86048] transition-colors">
+                          <h4 className="text-lg font-extrabold text-slate-900! dark:text-white! leading-snug! mb-3 line-clamp-2 group-hover:text-[#f86048] transition-colors">
                             {video.VideoHeadline}
                           </h4>
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800 text-slate-400 text-[11px] font-bold uppercase tracking-wider">
+                        <div className="flex items-center justify-between pt-4 border-t border-slate-100 dark:border-slate-800! text-slate-400 dark:text-slate-500! text-[11px] font-bold uppercase tracking-wider">
                           <span>
                             <i
                               className="far fa-calendar-alt mr-1.5"
@@ -220,6 +236,7 @@ export default function VideoGalleryPage() {
           )}
         </div>
 
+        {/* ---------- Video Modal ---------- */}
         <AnimatePresence>
           {selectedVideo && (
             <motion.div
@@ -238,12 +255,13 @@ export default function VideoGalleryPage() {
               >
                 <button
                   onClick={() => setSelectedVideo(null)}
-                  className="absolute -top-10 right-0 text-white hover:text-[#f86048] transition-colors text-xl font-bold"
+                  className="absolute -top-10 right-0 text-white! hover:text-[#f86048] transition-colors text-xl font-bold"
+                  aria-label="Close video"
                 >
                   <i className="fas fa-times" />
                 </button>
 
-                <div className="relative pt-[56.25%] bg-slate-950 rounded-2xl overflow-hidden shadow-2xl border border-slate-800">
+                <div className="relative pt-[56.25%] bg-slate-950! rounded-2xl overflow-hidden shadow-2xl border border-slate-800!">
                   <iframe
                     src={`${selectedVideo.embedUrl}?autoplay=1&rel=0`}
                     title={selectedVideo.title}
@@ -252,7 +270,8 @@ export default function VideoGalleryPage() {
                     allowFullScreen
                   />
                 </div>
-                <h3 className="text-white text-lg font-bold mt-4">
+
+                <h3 className="text-white! text-lg font-bold mt-4">
                   {selectedVideo.title}
                 </h3>
               </motion.div>

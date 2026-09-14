@@ -49,30 +49,34 @@ export function useProjects() {
     }
   }, []);
 
-  const fetchProjectById = useCallback(async (id: string) => {
-    if (!id || id === "undefined") return null;
-    setLoading(true);
-    setError("");
-    try {
-      const res = await api.get<ApiProject | ApiProject[]>(
-        `/Public/GetProjectById?projectId=${encodeURIComponent(id)}`
-      );
-      const item = Array.isArray(res) ? res[0] : res;
-      return item || null;
-    } catch (err: any) {
-      setError(err.message || "Failed to fetch project details.");
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchProjectById = useCallback(
+    async (id: string | undefined | null) => {
+      if (!id || id === "undefined" || id === "null") return null;
+      setLoading(true);
+      setError("");
+      try {
+        const res = await api.get<ApiProject | ApiProject[]>(
+          `/Public/GetProjectById?projectId=${encodeURIComponent(id)}`,
+        );
+
+        const item = Array.isArray(res) ? res[0] : res;
+        return item || null;
+      } catch (err: any) {
+        setError(err.message || "Failed to fetch project details.");
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   const fetchProjectsByCategorySlug = useCallback(async (slug: string) => {
     setLoading(true);
     setError("");
     try {
       const data = await api.get<ApiProject[]>(
-        `/Public/GetProjectsByCategorySlug?categorySlug=${encodeURIComponent(slug)}`
+        `/Public/GetProjectsByCategorySlug?categorySlug=${encodeURIComponent(slug)}`,
       );
       const list = Array.isArray(data) ? data : [];
       setProjects(list);
@@ -99,7 +103,8 @@ export function useProjects() {
       const errorMessage = res?.CurrentMessage || res?.message;
 
       if (isErrorType || (res?.MessageType && res.MessageType !== 1)) {
-        const msg = errorMessage || "Failed to save project due to a server error.";
+        const msg =
+          errorMessage || "Failed to save project due to a server error.";
         setError(msg);
         Swal.fire({
           icon: "error",
@@ -158,7 +163,7 @@ export function useProjects() {
       try {
         await api.post(
           `/Project/DeleteProject?projectId=${encodeURIComponent(projectId)}`,
-          {}
+          {},
         );
         Swal.fire({
           title: "Deleted!",

@@ -2,7 +2,7 @@ import { About2 } from "@/components/About";
 import { Causes2 } from "@/components/Causes";
 import { CounterSection1 } from "@/components/CounterSection";
 import { Cta1, Cta2 } from "@/components/Cta";
-import { Event2 } from "@/components/Event";
+// import { Event2 } from "@/components/Event";
 import { Faq2 } from "@/components/Faq";
 import { Feature1 } from "@/components/Feature";
 import { Hero2 } from "@/components/Hero";
@@ -24,7 +24,7 @@ const Home2 = () => {
       <Cta1 />
       <Faq2 />
       <Causes2 />
-      <Event2 />
+      {/* <Event2 /> */}
       <Testimonial2 />
       <News2 />
       {/* <Gallery1 /> */}

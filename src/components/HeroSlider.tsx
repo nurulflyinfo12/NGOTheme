@@ -8,23 +8,20 @@ import { api } from "@/utility/api";
 
 const PRIMARY = "#f86048";
 
-// Robust Helper: Handles malformed/stringified JSON arrays and raw URL strings
 const parseImageUrls = (imageUrls?: any[]): string[] => {
   if (!imageUrls || imageUrls.length === 0) return [];
 
-  // 1. Join array elements into a single raw text block in case the server split a stringified array across indices
-  const rawString = Array.isArray(imageUrls) ? imageUrls.join(",") : String(imageUrls);
+  const rawString = Array.isArray(imageUrls)
+    ? imageUrls.join(",")
+    : String(imageUrls);
 
-  // 2. Extract anything that looks like a valid HTTP(S) or root relative URL
   const urlRegex = /(https?:\/\/[^\s"',\]]+|\/[^\s"',\]]+)/g;
   const matches = rawString.match(urlRegex) || [];
 
-  // 3. Clean up trailing backslashes, quotes, or brackets
   const cleaned = matches.map((url) =>
     url.replace(/[\\\]"' border]+$/g, "").replace(/\\/g, "")
   );
 
-  // Deduplicate URLs
   const uniqueUrls = Array.from(new Set(cleaned));
 
   return uniqueUrls.map((url) => {
@@ -41,7 +38,6 @@ export const HeroSlider1 = () => {
     fetchHeroSections();
   }, [fetchHeroSections]);
 
-  // Transform API response into slide items
   const slides = useMemo(() => {
     if (heroSections.length === 0) {
       return [
@@ -81,7 +77,6 @@ export const HeroSlider1 = () => {
     return compiledSlides;
   }, [heroSections]);
 
-  // Auto slide interval
   useEffect(() => {
     if (slides.length <= 1) return;
     const interval = setInterval(() => {
@@ -96,7 +91,13 @@ export const HeroSlider1 = () => {
   };
 
   return (
-    <section className="relative h-[95vh] min-h-[580px] w-full overflow-hidden bg-white dark:bg-[#0f172a]">
+    <section
+      className="
+        relative w-full overflow-hidden bg-white dark:bg-[#0f172a]!
+        h-[100svh] min-h-[500px] max-h-[900px]
+        sm:h-[95vh] sm:min-h-[580px]
+      "
+    >
       {/* Background Image Slides */}
       {slides.map((slide, i) => (
         <div
@@ -122,9 +123,9 @@ export const HeroSlider1 = () => {
       ))}
 
       {/* Hero Text Content */}
-      <div className="container relative z-10 mx-auto h-full px-4 sm:px-6 lg:max-w-7xl">
-        <div className="flex h-full items-center py-12 md:py-0">
-          <div className="max-w-4xl">
+      <div className="container relative z-10 mx-auto h-full px-4 xs:px-5 sm:px-6 lg:px-8 lg:max-w-7xl">
+        <div className="flex h-full items-center py-16 sm:py-12 md:py-0">
+          <div className="w-full max-w-4xl">
             <AnimatePresence mode="wait">
               {slides.map((slide, i) =>
                 activeIndex === i ? (
@@ -135,24 +136,29 @@ export const HeroSlider1 = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ duration: 0.6 }}
-                        className="mb-4 flex items-center gap-3"
+                        className="mb-3 sm:mb-4 flex items-center gap-2 sm:gap-3"
                       >
                         <span
-                          className="h-[2px] w-12 rounded-full"
+                          className="h-[2px] w-8 sm:w-12 rounded-full shrink-0"
                           style={{ backgroundColor: PRIMARY }}
                         />
-                        <span className="text-xs sm:text-sm md:text-base font-bold uppercase tracking-[0.25em] text-white/90">
+                        <span className="text-[10px] xs:text-[11px] sm:text-xs md:text-sm lg:text-base font-bold uppercase tracking-[0.15em] xs:tracking-[0.2em] sm:tracking-[0.25em] text-white/90">
                           {slide.mission}
                         </span>
                       </motion.div>
                     )}
 
-                    {/* Main Title */}
+                    {/* Main Title — FLUID CLAMP TYPOGRAPHY */}
                     <motion.h1
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.8, delay: 0.2 }}
-                      className="whitespace-pre-line text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-tight tracking-tight"
+                      className="
+                        whitespace-pre-line font-black text-white
+                        leading-[1.1] tracking-tight
+                        break-words
+                        text-[clamp(1.5rem,5vw+1rem,4.5rem)]
+                      "
                     >
                       {slide.h1}
                       <span style={{ color: PRIMARY }}>.</span>
@@ -164,7 +170,14 @@ export const HeroSlider1 = () => {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="mt-6 max-w-2xl text-sm sm:text-base md:text-lg text-slate-300 leading-relaxed line-clamp-3"
+                        className="
+                          mt-4 sm:mt-6
+                          max-w-2xl
+                          text-slate-300
+                          leading-relaxed
+                          line-clamp-3
+                          text-[clamp(0.875rem,1.5vw+0.5rem,1.125rem)]
+                        "
                       >
                         {slide.details}
                       </motion.p>
@@ -178,19 +191,20 @@ export const HeroSlider1 = () => {
       </div>
 
       {/* Bottom Gradient Fade */}
-      <div className="absolute bottom-0 left-0 z-20 h-32 w-full bg-gradient-to-t from-white dark:from-[#0f172a] to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 z-20 h-24 sm:h-32 w-full bg-gradient-to-t from-white dark:from-[#0f172a]! to-transparent pointer-events-none" />
 
       {/* Slider Navigation Dots */}
       {slides.length > 1 && (
-        <div className="absolute bottom-12 left-6 z-30 flex flex-col gap-3 lg:left-12">
+        <div className="absolute bottom-6 xs:bottom-8 sm:bottom-10 md:bottom-12 left-4 xs:left-5 sm:left-6 lg:left-12 z-30 flex flex-col gap-2.5 sm:gap-3">
           {slides.map((_, index) => (
             <button
               key={index}
               onClick={() => goToSlide(index)}
+              aria-label={`Go to slide ${index + 1}`}
               className={`w-1.5 rounded-full transition-all duration-500 ${
                 activeIndex === index
-                  ? "h-10 bg-[#f86048]"
-                  : "h-6 bg-white/40 hover:bg-white/70"
+                  ? "h-8 sm:h-10 bg-[#f86048]"
+                  : "h-5 sm:h-6 bg-white/40 hover:bg-white/70"
               }`}
             />
           ))}

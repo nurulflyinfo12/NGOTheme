@@ -70,16 +70,8 @@ const SpecialPrograms = ({
   };
 
   const itemVariants = {
-    hidden: {
-      opacity: 0,
-      x: -40,
-      y: 20,
-    },
-    visible: {
-      opacity: 1,
-      x: 0,
-      y: 0,
-    },
+    hidden: { opacity: 0, x: -40, y: 20 },
+    visible: { opacity: 1, x: 0, y: 0 },
   };
 
   return (
@@ -186,12 +178,12 @@ const SpecialPrograms = ({
               {[1, 2].map((n) => (
                 <div
                   key={n}
-                  className="h-96 w-full rounded-[2.5rem] bg-slate-100 dark:bg-slate-800"
+                  className="h-96 w-full rounded-[2.5rem] bg-slate-100 dark:bg-slate-800!"
                 />
               ))}
             </div>
           ) : groupedProjects.length === 0 ? (
-            <div className="text-center py-20 text-slate-400 font-medium">
+            <div className="text-center py-20 text-slate-400 dark:text-slate-500! font-medium">
               No special program initiatives found.
             </div>
           ) : (
@@ -230,7 +222,7 @@ const SpecialPrograms = ({
                         duration: 0.6,
                         ease: [0.25, 0.46, 0.45, 0.94],
                       }}
-                      className="aspect-[4/5] rounded-[2rem] lg:rounded-[4rem]! overflow-hidden shadow-2xl relative group bg-slate-900"
+                      className="aspect-[4/5] rounded-[2rem] lg:rounded-[4rem]! overflow-hidden shadow-2xl relative group bg-slate-900 dark:bg-slate-950!"
                     >
                       <motion.img
                         whileHover={{ scale: 1.1 }}
@@ -283,19 +275,19 @@ const SpecialPrograms = ({
                     >
                       <h3 className="text-3xl sm:text-4xl lg:text-5xl font-black! text-slate-900! dark:text-white! tracking-wide!">
                         {group.title}
-                        <span className="ml-2 text-slate-300 dark:text-slate-700">
+                        <span className="ml-2 text-slate-300 dark:text-slate-700!">
                           /
                         </span>
                       </h3>
                     </motion.div>
 
-                    {/* Outer Card Container matching design screenshot */}
+                    {/* Outer Card Container */}
                     <motion.div
                       variants={containerVariants}
                       initial="hidden"
                       whileInView="visible"
                       viewport={{ once: true, margin: "-50px" }}
-                      className="p-8 sm:p-10 bg-slate-50 dark:bg-slate-900/60 rounded-[3rem] border border-slate-100 dark:border-slate-800 space-y-8"
+                      className="p-8 sm:p-10 bg-slate-50 dark:bg-slate-900/60! rounded-[3rem] border border-slate-100 dark:border-slate-800! space-y-8"
                     >
                       {group.items.map((item, i) => {
                         const itemPhoto = item.Photo
@@ -311,13 +303,13 @@ const SpecialPrograms = ({
                             {/* Info Area */}
                             <div className="flex-1 min-w-0 space-y-1">
                               {/* Title */}
-                              <h4 className="font-extrabold text-slate-900 dark:text-white text-lg sm:text-xl leading-snug group-hover:text-[#f86048] transition-colors">
+                              <h4 className="font-extrabold text-slate-900 dark:text-white! text-lg sm:text-xl leading-snug group-hover:text-[#f86048] transition-colors">
                                 {item.Title}
                               </h4>
 
                               {/* Subtitle */}
                               {item.Subtitle && (
-                                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300">
+                                <p className="text-xs font-semibold text-slate-600 dark:text-slate-300!">
                                   {item.Subtitle}
                                 </p>
                               )}
@@ -328,7 +320,24 @@ const SpecialPrograms = ({
                                   dangerouslySetInnerHTML={{
                                     __html: item.Details,
                                   }}
-                                  className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed pt-1"
+                                  className="
+                                    text-xs text-slate-500 dark:text-slate-400!
+                                    leading-relaxed pt-1
+
+                                    /* Kill inline styles from rich-text editor */
+                                    [&_*]:!bg-transparent
+                                    [&_*]:[color:inherit]!
+
+                                    [&_h1]:text-sm [&_h1]:font-bold [&_h1]:text-slate-900 dark:[&_h1]:text-white! [&_h1]:mt-3 [&_h1]:mb-2
+                                    [&_h2]:text-sm [&_h2]:font-bold [&_h2]:text-slate-900 dark:[&_h2]:text-white! [&_h2]:mt-3 [&_h2]:mb-2
+                                    [&_h3]:text-xs [&_h3]:font-bold [&_h3]:text-slate-900 dark:[&_h3]:text-white! [&_h3]:mt-2 [&_h3]:mb-1
+                                    [&_p]:mb-2
+                                    [&_ul]:list-disc [&_ul]:pl-4 [&_ul]:mb-2 [&_ul]:space-y-0.5
+                                    [&_ol]:list-decimal [&_ol]:pl-4 [&_ol]:mb-2 [&_ol]:space-y-0.5
+                                    [&_li]:text-slate-500 dark:[&_li]:text-slate-400!
+                                    [&_strong]:text-slate-900 dark:[&_strong]:text-white! [&_strong]:font-bold
+                                    [&_a]:text-[#f86048] [&_a]:underline
+                                  "
                                 />
                               )}
                             </div>
