@@ -1,50 +1,73 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import Image from "next/image";
+import React, { useState, useEffect, useMemo } from "react";
+import DanboxLayout from "@/layout/DanboxLayout";
+import PageBanner from "@/components/PageBanner";
 import { motion, AnimatePresence } from "framer-motion";
-import gallery from "@/app/data/gallery.json";
+import { usePhotoGallery } from "@/hooks/usePhotoGallery";
+import { api } from "@/utility/api";
 
 const ITEMS_PER_PAGE = 9;
 const PRIMARY = "#f86048";
 
+interface FlattenedGalleryItem {
+  id: string;
+  title: string;
+  category: string;
+  image: string;
+  caption?: string;
+  date?: string;
+}
 
-export const Gallery1 = () => {
-  // const galleryData: {
-  //   img: string;
-  //   delay: string;
-  // }[] = [
-  //   {
-  //     img: "/assets/img/gallery/gallery-6.jpg",
-  //     delay: ".2s",
-  //   },
-  //   {
-  //     img: "/assets/img/gallery/gallery-7.jpg",
-  //     delay: ".4s",
-  //   },
-  //   {
-  //     img: "/assets/img/gallery/gallery-8.jpg",
-  //     delay: ".6s",
-  //   },
-  //   {
-  //     img: "/assets/img/gallery/gallery-9.jpg",
-  //     delay: ".8s",
-  //   },
-  //   {
-  //     img: "/assets/img/gallery/gallery-10.jpg",
-  //     delay: ".9s",
-  //   },
-  // ];
-
-  const categories = ["All", ...new Set(gallery.map((g) => g.category))];
+const GalleryPage = () => {
+  const { galleries, loading, fetchGalleries } = usePhotoGallery();
   const [activeFilter, setActiveFilter] = useState("All");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState<FlattenedGalleryItem | null>(null);
 
-  const filteredItems =
-    activeFilter === "All"
-      ? gallery
-      : gallery.filter((item) => item.category === activeFilter);
+  useEffect(() => {
+    fetchGalleries();
+  }, [fetchGalleries]);
+
+  // Flatten nested gallery photos into individual items
+  const allPhotoItems = useMemo(() => {
+    const items: FlattenedGalleryItem[] = [];
+
+    galleries
+      ?.filter((g) => g.Status)
+      .forEach((gallery, gIdx) => {
+        const category = gallery.CategoryID || gallery.GalleryTitle || "General";
+
+        if (Array.isArray(gallery.Photos)) {
+          gallery.Photos.forEach((photo, pIdx) => {
+            if (photo.PhotoUrl) {
+              items.push({
+                id: `${gallery.PhotoGalleryID || gIdx}-${pIdx}`,
+                title: photo.Caption || gallery.GalleryTitle,
+                category: category,
+                image: api.getFileUrl(photo.PhotoUrl),
+                caption: photo.Caption,
+                date: gallery.PublishedDate,
+              });
+            }
+          });
+        }
+      });
+
+    return items;
+  }, [galleries]);
+
+  // Dynamic Categories list from API data
+  const categories = useMemo(() => {
+    const cats = new Set(allPhotoItems.map((item) => item.category));
+    return ["All", ...Array.from(cats)];
+  }, [allPhotoItems]);
+
+  const filteredItems = useMemo(() => {
+    return activeFilter === "All"
+      ? allPhotoItems
+      : allPhotoItems.filter((item) => item.category === activeFilter);
+  }, [activeFilter, allPhotoItems]);
 
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
@@ -61,9 +84,12 @@ export const Gallery1 = () => {
   const handleLoadMore = () => {
     setVisibleCount((prev) => prev + ITEMS_PER_PAGE);
   };
+
   return (
-    <>
-      <section className="py-24! lg:py-15! bg-white dark:bg-[#0f172a]! overflow-hidden">
+    <DanboxLayout header={1}>
+      <PageBanner pageName="Media Gallery" pageTitle="Our Impact in Focus" />
+
+      <section className="py-24! lg:py-32! bg-white dark:bg-[#0f172a]! overflow-hidden">
         <div className="container mx-auto px-6! lg:max-w-7xl">
           <div className="flex flex-col md:flex-row justify-between items-start! md:items-end! mb-12! md:mb-16! gap-8 md:gap-12">
             <div className="max-w-2xl w-full">
@@ -91,15 +117,17 @@ export const Gallery1 = () => {
               </h2>
             </div>
 
+            {/* Dynamic Categories */}
             <div className="flex flex-wrap gap-3 justify-start md:justify-end w-full! md:w-auto!">
               {categories.map((cat) => (
                 <button
                   key={cat}
                   onClick={() => setActiveFilter(cat)}
-                  className={`px-5! sm:px-6! py-2.5! rounded-full! text-xs! font-black! uppercase! tracking-wide! transition-all duration-500! border-2! whitespace-nowrap ${activeFilter === cat
+                  className={`px-5! sm:px-6! py-2.5! rounded-full! text-xs! font-black! uppercase! tracking-wide! transition-all duration-500! border-2! whitespace-nowrap ${
+                    activeFilter === cat
                       ? "bg-slate-900! border-slate-900! text-[#f86048]! dark:bg-white! dark:text-slate-900! shadow-lg!"
                       : "bg-transparent! border-slate-100! text-slate-400! hover:border-[#f86048]! hover:text-[#f86048]! dark:border-slate-800!"
-                    }`}
+                  }`}
                 >
                   {cat}
                 </button>
@@ -107,44 +135,56 @@ export const Gallery1 = () => {
             </div>
           </div>
 
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredItems.slice(0, visibleCount).map((item, idx) => (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  onClick={() => setSelectedImage(item)}
-                  className="group relative aspect-[4/5] overflow-hidden rounded-[2rem] sm:rounded-[2.5rem]! bg-slate-100! dark:bg-slate-800! shadow-2xl shadow-slate-200/50! dark:shadow-none! cursor-pointer"
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110!"
-                  />
-
-                  <div className="absolute inset-0 bg-gradient-to-t! from-slate-900! via-slate-900/20! to-transparent opacity-80 lg:opacity-0! lg:group-hover:opacity-95 transition-all duration-500">
-                    <div className="absolute inset-0 p-6! sm:p-8! lg:p-10! flex flex-col justify-end transform translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-500">
-                      <span className="text-[10px]! font-black! uppercase tracking-[0.3em]! mb-3! inline-block! px-3! py-1! bg-white/10! backdrop-blur-md! rounded-full w-fit! text-white!">
-                        {item.category}
-                      </span>
-                      <h4 className="text-2xl font-black! text-white! leading-tight! mb-6!">
-                        {item.title}
-                      </h4>
-                    </div>
-                  </div>
-                </motion.div>
+          {loading ? (
+            /* Skeleton Loading State */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div
+                  key={n}
+                  className="aspect-[4/5] rounded-[2rem] bg-slate-200 dark:bg-slate-800 animate-pulse"
+                />
               ))}
-            </AnimatePresence>
-          </motion.div>
+            </div>
+          ) : (
+            <motion.div
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredItems.slice(0, visibleCount).map((item, idx) => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.5, delay: idx * 0.05 }}
+                    onClick={() => setSelectedImage(item)}
+                    className="group relative aspect-[4/5] overflow-hidden rounded-[2rem] sm:rounded-[2.5rem]! bg-slate-100! dark:bg-slate-800! shadow-2xl shadow-slate-200/50! dark:shadow-none! cursor-pointer"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110!"
+                    />
 
-          {visibleCount < filteredItems.length && (
+                    <div className="absolute inset-0 bg-gradient-to-t! from-slate-900! via-slate-900/20! to-transparent opacity-80 lg:opacity-0! lg:group-hover:opacity-95 transition-all duration-500">
+                      <div className="absolute inset-0 p-6! sm:p-8! lg:p-10! flex flex-col justify-end transform translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-500">
+                        <span className="text-[10px]! font-black! uppercase tracking-[0.3em]! mb-3! inline-block! px-3! py-1! bg-white/10! backdrop-blur-md! rounded-full w-fit! text-white!">
+                          {item.category}
+                        </span>
+                        <h4 className="text-2xl font-black! text-white! leading-tight! mb-6!">
+                          {item.title}
+                        </h4>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
+          {!loading && visibleCount < filteredItems.length && (
             <div className="mt-24! text-center">
               <button
                 onClick={handleLoadMore}
@@ -159,65 +199,184 @@ export const Gallery1 = () => {
           )}
         </div>
 
+        {/* Lightbox Modal */}
         <AnimatePresence>
           {selectedImage && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setSelectedImage(null)}
-              className="fixed inset-0 z-[9999] flex items-center justify-center bg-slate-950/95! backdrop-blur-xl p-6 lg:p-12! cursor-zoom-out"
+              className="fixed inset-0 z-[9999] bg-gradient-to-br from-slate-900/98 via-slate-950/98 to-black/98 backdrop-blur-2xl"
             >
+              {/* Close Button - Top Right */}
               <motion.button
-                className="absolute top-4 right-4 lg:top-10 lg:right-10 text-2xl lg:text-4xl text-white! hover:text-[#f86048]! transition-colors"
+                initial={{ opacity: 0, scale: 0.5, rotate: -90 }}
+                animate={{ opacity: 1, scale: 1, rotate: 0 }}
+                exit={{ opacity: 0, scale: 0.5, rotate: 90 }}
+                transition={{ type: "spring", damping: 15 }}
                 onClick={() => setSelectedImage(null)}
+                className="absolute top-6 right-6 lg:top-8 lg:right-8 z-50 w-14 h-14 rounded-2xl bg-white/5 backdrop-blur-xl border border-white/10 flex items-center justify-center text-white hover:bg-red-500/20 hover:border-red-500/30 hover:text-red-400 transition-all group shadow-2xl"
               >
-                <i className="fal fa-times"></i>
+                <i className="fal fa-times text-xl group-hover:scale-110 transition-transform"></i>
               </motion.button>
 
-              <motion.div
-                initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                animate={{ scale: 1, opacity: 1, y: 0 }}
-                exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                onClick={(e) => e.stopPropagation()}
-                className="relative max-w-5xl w-full bg-slate-900! rounded-[2rem] sm:rounded-[3rem]! overflow-hidden shadow-[0_0_100px_rgba(0,0,0,0.5)] cursor-default"
-              >
-                <div className="flex flex-col lg:flex-row h-full max-h-[85vh]">
-                  <div className="lg:w-2/3 bg-black max-h-[40vh] lg:max-h-full">
+              {/* Main Content Container */}
+              <div className="w-full h-full flex items-center justify-center p-4 lg:p-8">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.95, y: 20 }}
+                  transition={{ type: "spring", damping: 25, stiffness: 300 }}
+                  className="relative w-full max-w-7xl max-h-[90vh] flex flex-col lg:flex-row gap-6 lg:gap-8"
+                >
+                  {/* Image Section */}
+                  <div className="flex-1 relative overflow-hidden bg-black/40! backdrop-blur-sm shadow-2xl">
                     <img
+                      id="fullscreen-image"
                       src={selectedImage.image}
                       alt={selectedImage.title}
-                      className="w-full h-full object-contain"
+                      className="w-full h-full object-contain max-h-[50vh] lg:max-h-[80vh]"
                     />
+                    
+                    <div className="absolute inset-0 bg-gradient-to-t! from-black/50 via-transparent to-transparent lg:hidden"></div>
                   </div>
 
-                  <div className="lg:w-1/3 p-6 sm:p-8 lg:p-12 flex flex-col justify-center bg-slate-900 lg:border-l! border-white/5!">
-                    <span
-                      className="text-xs font-black! uppercase tracking-[0.4em]! mb-4!"
-                      style={{ color: PRIMARY }}
+                  {/* Information Panel */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2, duration: 0.5 }}
+                    className="lg:w-96 xl:w-[28rem] flex flex-col justify-center p-8! lg:p-10! rounded-3xl bg-white/5 backdrop-blur-xl border border-white/10 shadow-2xl"
+                  >
+                    {/* Category Badge */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.3 }}
                     >
-                      {selectedImage.category}
-                    </span>
-                    <h3 className="text-2xl lg:text-3xl font-black! text-white! leading-tight! mb-6!">
+                      <span
+                        className="inline-flex items-center gap-2 text-xs font-black uppercase tracking-[0.3em] mb-6 px-4 py-2 rounded-full border"
+                        style={{
+                          color: PRIMARY,
+                          borderColor: PRIMARY,
+                          backgroundColor: `${PRIMARY}10`,
+                        }}
+                      >
+                        <span className="w-2 h-2 rounded-full animate-pulse" style={{ backgroundColor: PRIMARY }}></span>
+                        {selectedImage.category}
+                      </span>
+                    </motion.div>
+
+                    {/* Title */}
+                    <motion.h2
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.4 }}
+                      className="text-3xl lg:text-4xl xl:text-5xl font-black text-white leading-[1.1]! mb-6!"
+                    >
                       {selectedImage.title}
-                    </h3>
-                    <div
-                      className="h-1 w-12 rounded-full mb-8!"
+                    </motion.h2>
+
+                    {/* Divider */}
+                    <motion.div
+                      initial={{ width: 0 }}
+                      animate={{ width: "5rem" }}
+                      transition={{ delay: 0.5, duration: 0.8 }}
+                      className="h-1 rounded-full mb-8!"
                       style={{ backgroundColor: PRIMARY }}
-                    ></div>
-                    <p className="text-slate-400! text-sm! leading-relaxed! mb-10!">
-                      Visual documentation of our ongoing efforts in coastal
-                      resilience and community empowerment.
-                    </p>
-                    <button
-                      onClick={() => setSelectedImage(null)}
-                      className="w-fit! px-8! py-3! rounded-xl! border! border-white/10! text-white text-[10px]! font-black uppercase tracking-widest! hover:bg-white! hover:text-slate-900! transition-all"
+                    ></motion.div>
+
+                    {/* Description / Caption */}
+                    <motion.p
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.6 }}
+                      className="text-slate-300 text-base lg:text-lg leading-relaxed! mb-8! font-light"
                     >
-                      Close Preview
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
+                      {selectedImage.caption || "Visual documentation of our ongoing efforts in community development, resilience, and empowerment."}
+                    </motion.p>
+
+                    {/* Published Date */}
+                    {selectedImage.date && (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.7 }}
+                        className="grid grid-cols-1 gap-4 mb-8"
+                      >
+                        <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
+                          <span className="text-xs text-slate-400 uppercase tracking-wider! block mb-1!">Published Date</span>
+                          <span className="text-sm font-bold text-white">{selectedImage.date}</span>
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {/* Action Buttons */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: 0.8 }}
+                      className="flex gap-3"
+                    >
+                      {/* Full Screen Button */}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const imgElement = document.getElementById('fullscreen-image');
+                          if (imgElement) {
+                            if (imgElement.requestFullscreen) {
+                              imgElement.requestFullscreen();
+                            } else if ((imgElement as any).webkitRequestFullscreen) {
+                              (imgElement as any).webkitRequestFullscreen();
+                            } else if ((imgElement as any).msRequestFullscreen) {
+                              (imgElement as any).msRequestFullscreen();
+                            }
+                          }
+                        }}
+                        className="flex-1 px-6 py-4 rounded-2xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-all group flex items-center justify-center gap-2"
+                      >
+                        <i className="fal fa-expand group-hover:scale-110 transition-transform"></i>
+                        <span className="text-xs font-bold uppercase tracking-wider!">Full Screen</span>
+                      </button>
+
+                      {/* Share Button */}
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          try {
+                            if (navigator.share) {
+                              await navigator.share({
+                                title: selectedImage.title,
+                                text: `${selectedImage.title} - ${selectedImage.category}`,
+                                url: window.location.href,
+                              });
+                            } else {
+                              await navigator.clipboard.writeText(selectedImage.image);
+                              const toast = document.createElement('div');
+                              toast.className = 'fixed top-6 left-1/2 transform -translate-x-1/2 bg-emerald-500/90 backdrop-blur-md text-white px-8 py-4 rounded-2xl text-sm font-bold z-[10000] shadow-2xl';
+                              toast.innerHTML = '<i class="fal fa-check-circle mr-2"></i> Image link copied to clipboard!';
+                              document.body.appendChild(toast);
+                              setTimeout(() => {
+                                toast.style.opacity = '0';
+                                toast.style.transform = 'translate(-50%, -20px)';
+                                toast.style.transition = 'all 0.5s ease';
+                                setTimeout(() => toast.remove(), 500);
+                              }, 2000);
+                            }
+                          } catch (error) {
+                            console.error('Error sharing:', error);
+                          }
+                        }}
+                        className="flex-1 px-6 py-4 rounded-2xl text-white hover:opacity-90 transition-all group flex items-center justify-center gap-2 font-bold"
+                        style={{ backgroundColor: PRIMARY }}
+                      >
+                        <i className="fal fa-share-alt group-hover:scale-110 transition-transform"></i>
+                        <span className="text-xs font-bold uppercase tracking-wider!">Share</span>
+                      </button>
+                    </motion.div>
+                  </motion.div>
+                </motion.div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -228,100 +387,8 @@ export const Gallery1 = () => {
           </h1>
         </div>
       </section>
-      {/* <div className="gallery-section fix section-padding pt-0">
-      <div className="container-fluid">
-        <div className="gallery-wrappper">
-          {galleryData.map((item, index) => (
-            <div
-              key={index}
-              className="gallery-image wow fadeInUp"
-              data-wow-delay={item.delay}
-            >
-              <Image
-                width={0}
-                height={0}
-                sizes="100vw"
-                style={{ width: "300px", height: "auto" }}
-                src={item.img}
-                alt="img"
-              />
-              <div className="gallery-content">
-                <a href={item.img} className="img-popup">
-                  <i className="far fa-search text-white" />
-                </a>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div> */}
-    </>
+    </DanboxLayout>
   );
 };
 
-export const Gallery2 = () => {
-  const galleryItems: {
-    image: string;
-    category: string;
-    title: string;
-  }[] = [
-      {
-        image: "/assets/img/gallery/gallery-1.jpg",
-        category: "Charity",
-        title: "Education",
-      },
-      {
-        image: "/assets/img/gallery/gallery-2.jpg",
-        category: "Charity",
-        title: "Education",
-      },
-      {
-        image: "/assets/img/gallery/gallery-3.jpg",
-        category: "Charity",
-        title: "Education",
-      },
-      {
-        image: "/assets/img/gallery/gallery-4.jpg",
-        category: "Charity",
-        title: "Education",
-      },
-      {
-        image: "/assets/img/gallery/gallery-5.jpg",
-        category: "Charity",
-        title: "Education",
-      },
-    ];
-
-  return (
-    <div className="gallery-section fix section-padding">
-      <div className="container-fluid">
-        <div className="gallery-wrappper">
-          {galleryItems.map((item, index) => {
-            const delay = (0.2 + index * 0.2).toFixed(1) + "s";
-            return (
-              <div
-                key={index}
-                className="gallery-image wow fadeInUp"
-                data-wow-delay={delay}
-              >
-                <Image
-                  width={0}
-                  height={0}
-                  sizes="100vw"
-                  style={{ width: "320px", height: "auto" }}
-                  src={item.image}
-                  alt="img"
-                />
-
-                <div className="gallery-content">
-                  <p>{item.category}</p>
-                  <h4>{item.title}</h4>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-};
+export default GalleryPage;

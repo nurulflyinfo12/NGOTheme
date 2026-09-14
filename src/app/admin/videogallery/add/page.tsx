@@ -2,19 +2,30 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Save, UserPlus, AlertCircle } from "lucide-react";
-import Swal from "sweetalert2";
+import {
+  Save,
+  Plus,
+  AlertCircle,
+  Heading,
+  Link as LinkIcon,
+} from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import ImageUpload from "@/components/Admin/ImageUpload";
 import StatusSelect from "@/components/Admin/StatusSelect";
+import { TextField } from "@/components/Admin/TextField";
+import { useVideoGallery, ApiVideoGallery } from "@/hooks/useVideoGallery";
 
 interface VideoFormData {
-  title: string;
-  videoUrl: string;
+  videoId?: string;
+  companyId?: string;
+  categoryId?: string;
+  headline: string;
+  videoLink: string;
   thumbnail: string;
-  platform: "YouTube" | "Vimeo" | "Custom";
   status: "Active" | "Inactive";
+  isStory: boolean;
+  publishedTime?: string;
 }
 
 export default function AddEditVideoPage() {
@@ -23,143 +34,214 @@ export default function AddEditVideoPage() {
   const id = searchParams.get("id");
   const isEditMode = Boolean(id);
 
+  const { submitting, fetchVideoById, saveOrUpdateVideo } = useVideoGallery();
+
+  const [initialLoading, setInitialLoading] = useState(isEditMode);
   const [formData, setFormData] = useState<VideoFormData>({
-    title: "",
-    videoUrl: "",
+    headline: "",
+    videoLink: "",
     thumbnail: "",
-    platform: "YouTube",
     status: "Active",
+    isStory: false,
   });
 
-  const [errors, setErrors] = useState<any>({});
-  const [submitting, setSubmitting] = useState(false);
+  const [errors, setErrors] = useState<
+    Partial<Record<keyof VideoFormData, string>>
+  >({});
 
   useEffect(() => {
-    if (isEditMode) {
+    let isMounted = true;
+
+    if (isEditMode && id) {
       const raw = localStorage.getItem("tempVideoData");
       if (raw) {
-        const data = JSON.parse(raw);
-        setFormData(data);
+        try {
+          const data: ApiVideoGallery = JSON.parse(raw);
+          if (isMounted) {
+            setFormData({
+              videoId: data.VideoID || id,
+              companyId: data.CompanyID || "0011",
+              categoryId: data.CategoryID || "",
+              headline: data.VideoHeadline || "",
+              videoLink: data.VideoLink || "",
+              thumbnail: data.VideoImage || "",
+              status: data.Status ? "Active" : "Inactive",
+              isStory: data.isStory ?? false,
+              publishedTime: data.PublishedTime,
+            });
+            setInitialLoading(false);
+          }
+        } catch (err) {
+          console.error("Error parsing video data:", err);
+          if (isMounted) setInitialLoading(false);
+        }
+      } else {
+        fetchVideoById(id).then((data) => {
+          if (isMounted) {
+            if (data) {
+              setFormData({
+                videoId: data.VideoID || id,
+                companyId: data.CompanyID || "0011",
+                categoryId: data.CategoryID || "",
+                headline: data.VideoHeadline || "",
+                videoLink: data.VideoLink || "",
+                thumbnail: data.VideoImage || "",
+                status: data.Status ? "Active" : "Inactive",
+                isStory: data.isStory ?? false,
+                publishedTime: data.PublishedTime,
+              });
+            }
+            setInitialLoading(false);
+          }
+        });
       }
     }
-  }, [isEditMode]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [isEditMode, id, fetchVideoById]);
 
   const validate = () => {
-    const err: any = {};
-    if (!formData.title) err.title = "Title required";
-    if (!formData.videoUrl) err.videoUrl = "Video URL required";
+    const newErrors: Partial<Record<keyof VideoFormData, string>> = {};
+    if (!formData.headline.trim()) newErrors.headline = "Headline is required";
+    if (!formData.videoLink.trim())
+      newErrors.videoLink = "Video Link is required";
 
-    setErrors(err);
-    return Object.keys(err).length === 0;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    setSubmitting(true);
+    const currentUserStr = localStorage.getItem("user");
+    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
 
-    setTimeout(() => {
-      Swal.fire({
-        icon: "success",
-        title: isEditMode ? "Updated!" : "Created!",
-        timer: 1500,
-        showConfirmButton: false,
-      });
+    const payload: ApiVideoGallery = {
+      CompanyID: formData.companyId || currentUser?.CompanyID || "0011",
+      ...(formData.videoId ? { VideoID: formData.videoId } : {}),
+      VideoHeadline: formData.headline,
+      VideoLink: formData.videoLink,
+      VideoImage: formData.thumbnail,
+      Status: formData.status === "Active",
+      isStory: formData.isStory,
+      CategoryID: formData.categoryId || "",
+      PublishedTime: formData.publishedTime || new Date().toLocaleString(),
+    };
 
+    const success = await saveOrUpdateVideo(payload);
+
+    if (success) {
       localStorage.removeItem("tempVideoData");
       router.push("/admin/videogallery");
-    }, 800);
+    }
   };
 
-  const inputClass = `
-    w-full rounded-xl border px-4 py-2.5 text-sm outline-none text-black
-    border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10
-  `;
+  const handleClear = () => {
+    setFormData({
+      videoId: isEditMode ? formData.videoId : undefined,
+      companyId: formData.companyId,
+      categoryId: formData.categoryId,
+      headline: "",
+      videoLink: "",
+      thumbnail: "",
+      status: "Active",
+      isStory: false,
+    });
+    setErrors({});
+  };
+
+  if (initialLoading) {
+    return (
+      <div className="flex h-64 w-full items-center justify-center">
+        <span className="text-sm font-semibold text-slate-500 animate-pulse">
+          Loading video details...
+        </span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen">
       <FormCard
-        title={isEditMode ? "Edit Video" : "Add Video"}
-        description="Manage video content"
-        onBack={() => router.push("/admin/videogallery")}
-        backButtonLabel="Back"
-        submitLabel={submitting ? "Saving..." : "Save"}
-        submitIcon={isEditMode ? <Save size={16} /> : <UserPlus size={16} />}
+        title={isEditMode ? "Edit Video" : "Add New Video"}
+        description="Manage video gallery details"
+        onBack={() => {
+          localStorage.removeItem("tempVideoData");
+          router.push("/admin/videogallery");
+        }}
+        backButtonLabel="Back to List"
+        onClear={handleClear}
+        clearButtonLabel="Clear"
+        submitLabel={
+          submitting
+            ? "Saving..."
+            : isEditMode
+              ? "Save Changes"
+              : "Create Video"
+        }
+        submitIcon={
+          isEditMode ? (
+            <Save className="h-4 w-4" />
+          ) : (
+            <Plus className="h-4 w-4" />
+          )
+        }
         onSubmit={handleSubmit}
       >
-        {/* Title */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold">Title *</label>
-          <input
-            value={formData.title}
-            onChange={(e) =>
-              setFormData({ ...formData, title: e.target.value })
-            }
-            className={inputClass}
-          />
-          {errors.title && (
-            <p className="text-xs text-red-500 flex gap-1">
-              <AlertCircle size={12} /> {errors.title}
-            </p>
-          )}
-        </div>
+        {/* Headline */}
+        <TextField
+          label="Video Headline*"
+          icon={Heading}
+          value={formData.headline}
+          onChange={(e) => {
+            setFormData({ ...formData, headline: e.target.value });
+            if (errors.headline) setErrors({ ...errors, headline: "" });
+          }}
+          error={errors.headline}
+        />
 
-        {/* Video URL */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold">Video URL *</label>
-          <input
-            value={formData.videoUrl}
-            onChange={(e) =>
-              setFormData({ ...formData, videoUrl: e.target.value })
-            }
-            className={inputClass}
-            placeholder="https://youtube.com/..."
-          />
-        </div>
+        {/* Video Link */}
+        <TextField
+          label="Video Link / URL*"
+          icon={LinkIcon}
+          placeholder="https://youtube.com/..."
+          value={formData.videoLink}
+          onChange={(e) => {
+            setFormData({ ...formData, videoLink: e.target.value });
+            if (errors.videoLink) setErrors({ ...errors, videoLink: "" });
+          }}
+          error={errors.videoLink}
+        />
 
-        {/* Platform */}
-        <div className="space-y-2">
-          <label className="text-sm font-semibold">Platform</label>
-          <select
-            value={formData.platform}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                platform: e.target.value as any,
-              })
-            }
-            className={inputClass}
-          >
-            <option>YouTube</option>
-            <option>Vimeo</option>
-            <option>Custom</option>
-          </select>
-        </div>
-        <div className="space-y-2">
-          <StatusSelect
-            label="Status"
-            value={formData.status}
-            onChange={(val) =>
-              setFormData((prev) => ({ ...prev, status: val }))
-            }
-          />
-        </div>
+        {/* Status */}
+        <StatusSelect
+          label="Status"
+          value={formData.status}
+          onChange={(val) => setFormData((prev) => ({ ...prev, status: val }))}
+          error={errors.status}
+        />
 
-        {/* Thumbnail */}
+        {/* Thumbnail Upload */}
         <div className="space-y-2 sm:col-span-2">
-          <label className="text-sm font-semibold">Thumbnail</label>
+          <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
+            Video Thumbnail Image
+          </label>
+
           <ImageUpload
             initialImages={
               formData.thumbnail ? [{ image: formData.thumbnail }] : []
             }
             onImagesChange={(imgs) =>
-              setFormData({
-                ...formData,
+              setFormData((prev) => ({
+                ...prev,
                 thumbnail: imgs[0]?.image || "",
-              })
+              }))
             }
             allowMultiple={false}
+            showCaption={false}
           />
         </div>
       </FormCard>

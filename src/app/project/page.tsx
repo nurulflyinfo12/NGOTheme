@@ -1,22 +1,30 @@
 "use client";
 
+import React, { useEffect } from "react";
 import { motion } from "framer-motion";
 import Link from "next/link";
 import DanboxLayout from "@/layout/DanboxLayout";
 import PageBanner from "@/components/PageBanner";
-import projects from "@/app/data/project.json";
+import { useProjects } from "@/hooks/useProjects";
+import { api } from "@/utility/api";
 
 const PRIMARY = "#f86048";
 
-interface Project {
-  slug: string;
-  title: string;
-  fullName?: string;
-  category: string;
-  src: string;
+interface AllProjectsProps {
+  categorySlug?: string;
 }
 
-const AllProjects = () => {
+const AllProjects = ({ categorySlug = "check" }: AllProjectsProps) => {
+  const { projects, loading, fetchProjectsByCategorySlug, fetchProjects } = useProjects();
+
+  useEffect(() => {
+    if (categorySlug) {
+      fetchProjectsByCategorySlug(categorySlug);
+    } else {
+      fetchProjects();
+    }
+  }, [categorySlug, fetchProjectsByCategorySlug, fetchProjects]);
+
   return (
     <DanboxLayout header={1}>
       <PageBanner pageName="Portfolio" pageTitle="Global Initiatives" />
@@ -76,88 +84,105 @@ const AllProjects = () => {
             </motion.div>
           </div>
 
-          {/* Portfolio Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
-            {(projects as Project[]).map((project, index) => (
-              <motion.div
-                key={project.slug}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.08 }}
-                className="h-full"
-              >
-                <Link
-                  // href={`/projects/${project.slug}`}
-                  href="#"
-                  className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-[#f86048] rounded-[2.5rem]"
-                >
-                  <div className="h-full flex flex-col bg-white dark:bg-slate-900/90! rounded-[2.5rem] overflow-hidden border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-2xl hover:shadow-[#f86048]/10 hover:border-[#f86048]/30 transition-all duration-500 hover:-translate-y-2 relative">
+          {/* Portfolio Grid / Loading State */}
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div
+                  key={n}
+                  className="h-[480px] rounded-[2.5rem] bg-slate-100 dark:bg-slate-800 animate-pulse"
+                />
+              ))}
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="text-center py-20 text-slate-400 font-medium">
+              No project operations currently found.
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8 lg:gap-10">
+              {projects.map((project, index) => {
+                const categoryLabel =
+                  project.SubcategoryName || project.CategoryName || "Initiative";
+                const imageSrc = api.getFileUrl(project.Photo);
 
-                    {/* Media Container */}
-                    <div className="relative h-72 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
-                      <img
-                        src={project.src}
-                        alt={project.title}
-                        className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                        loading="lazy"
-                      />
+                return (
+                  <motion.div
+                    key={project.ProjectID || index}
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.5, delay: index * 0.08 }}
+                    className="h-full"
+                  >
+                    <Link
+                      href={project.ProjectID ? `/project/${project.ProjectID}` : "#"}
+                      className="group block h-full outline-none focus-visible:ring-2 focus-visible:ring-[#f86048] rounded-[2.5rem]"
+                    >
+                      <div className="h-full flex flex-col bg-white dark:bg-slate-900/90! rounded-[2.5rem] overflow-hidden border border-slate-200/80 dark:border-slate-800/80 shadow-sm hover:shadow-2xl hover:shadow-[#f86048]/10 hover:border-[#f86048]/30 transition-all duration-500 hover:-translate-y-2 relative">
+                        {/* Media Container */}
+                        <div className="relative h-72 w-full overflow-hidden bg-slate-100 dark:bg-slate-800 shrink-0">
+                          <img
+                            src={imageSrc}
+                            alt={project.Title}
+                            className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                            loading="lazy"
+                          />
 
-                      {/* Category Pill */}
-                      <div className="absolute top-6 left-6 z-20">
-                        <span className="px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest! text-white bg-slate-950/70 backdrop-blur-md border border-white/10 shadow-lg">
-                          {project.category}
-                        </span>
-                      </div>
+                          {/* Category Pill */}
+                          <div className="absolute top-6 left-6 z-20">
+                            <span className="px-4 py-1.5 rounded-full text-[10px] font-extrabold uppercase tracking-widest! text-white bg-slate-950/70 backdrop-blur-md border border-white/10 shadow-lg">
+                              {categoryLabel}
+                            </span>
+                          </div>
 
-                      {/* Top Right Index Marker */}
-                      <div className="absolute bottom-6 right-6 z-20">
-                        <span className="text-3xl font-black text-white/30 dark:text-white/20! group-hover:text-white/60 transition-colors">
-                          0{index + 1}
-                        </span>
-                      </div>
+                          {/* Top Right Index Marker */}
+                          <div className="absolute bottom-6 right-6 z-20">
+                            <span className="text-3xl font-black text-white/30 dark:text-white/20! group-hover:text-white/60 transition-colors">
+                              {String(index + 1).padStart(2, "0")}
+                            </span>
+                          </div>
 
-                      {/* Gradient Transition overlay to card body */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
-                    </div>
-
-                    {/* Content Body */}
-                    <div className="p-8 lg:p-9 flex-1 flex flex-col justify-between relative z-10">
-                      <div className="mb-6">
-                        <h3 className="text-2xl font-bold text-slate-900 dark:text-white! group-hover:text-[#f86048]! transition-colors duration-300 leading-snug mb-2!">
-                          {project.title}
-                        </h3>
-                        {project.fullName && (
-                          <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold tracking-wider uppercase leading-relaxed">
-                            {project.fullName}
-                          </p>
-                        )}
-                      </div>
-
-                      {/* Card Footer Line */}
-                      <div className="pt-6 mt-auto border-t border-slate-100 dark:border-slate-800/80! flex items-center justify-between">
-                        <div className="flex items-center gap-2.5">
-                          <span className="relative flex h-2 w-2">
-                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                            <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
-                          </span>
-                          <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400!">
-                            Active Operation
-                          </span>
+                          {/* Gradient Transition overlay to card body */}
+                          <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />
                         </div>
 
-                        {/* Interactive Circle Arrow */}
-                        {/* <div className="w-11 h-11 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-[#f86048] flex items-center justify-center text-slate-700 dark:text-slate-200 group-hover:text-white transition-all duration-300 group-hover:scale-110 shadow-sm">
-                          <i className="far fa-arrow-right text-sm transition-transform duration-300 group-hover:translate-x-0.5" />
-                        </div> */}
-                      </div>
-                    </div>
+                        {/* Content Body */}
+                        <div className="p-8 lg:p-9 flex-1 flex flex-col justify-between relative z-10">
+                          <div className="mb-6">
+                            <h3 className="text-2xl font-bold text-slate-900 dark:text-white! group-hover:text-[#f86048]! transition-colors duration-300 leading-snug mb-2!">
+                              {project.Title}
+                            </h3>
+                            {project.Subtitle && (
+                              <p className="text-slate-500 dark:text-slate-400 text-xs font-semibold tracking-wider uppercase leading-relaxed line-clamp-2">
+                                {project.Subtitle}
+                              </p>
+                            )}
+                          </div>
 
-                  </div>
-                </Link>
-              </motion.div>
-            ))}
-          </div>
+                          {/* Card Footer Line */}
+                          <div className="pt-6 mt-auto border-t border-slate-100 dark:border-slate-800/80! flex items-center justify-between">
+                            <div className="flex items-center gap-2.5">
+                              <span className="relative flex h-2 w-2">
+                                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
+                              </span>
+                              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400!">
+                                Active Operation
+                              </span>
+                            </div>
+
+                            <div className="w-11 h-11 rounded-full bg-slate-100 dark:bg-slate-800 group-hover:bg-[#f86048] flex items-center justify-center text-slate-700 dark:text-slate-200 group-hover:text-white transition-all duration-300 group-hover:scale-110 shadow-sm">
+                              <i className="far fa-arrow-right text-sm transition-transform duration-300 group-hover:translate-x-0.5" />
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
     </DanboxLayout>

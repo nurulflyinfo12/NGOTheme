@@ -2,15 +2,13 @@
 import { useState } from "react";
 
 const ContactPage = () => {
-
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();           
+    e.preventDefault();
     e.stopPropagation();
 
     console.log("Form submission prevented - No reload");
-    
   };
 
   return (
@@ -27,13 +25,19 @@ const ContactPage = () => {
                     <i className="fal fa-envelope" />
                   </div>
                   <div className="title mt-4 sm:mt-6 lg:mt-8">
-                    <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold">Email Address</h4>
-                    <span className="text-blue-500 text-sm sm:text-base lg:text-lg">Send mail anytime</span>
+                    <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                      Email Address
+                    </h4>
+                    <span className="text-blue-500 text-sm sm:text-base lg:text-lg">
+                      Send mail anytime
+                    </span>
                   </div>
                 </div>
                 <div className="bottom-part mt-auto pt-6 sm:pt-8 lg:pt-12 flex items-center justify-between gap-2">
                   <div className="info">
-                    <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-medium break-all">matin_ssus@yahoo.com</p>
+                    <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-medium break-all">
+                      matin_ssus@yahoo.com
+                    </p>
                   </div>
                   <div className="icon w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl !bg-gray-100 group-hover:bg-white group-hover:text-black transition-all shrink-0">
                     <i className="fal fa-arrow-right !font-extrabold text-amber-500" />
@@ -50,13 +54,19 @@ const ContactPage = () => {
                     <i className="fal fa-phone" />
                   </div>
                   <div className="title mt-4 sm:mt-6 lg:mt-8">
-                    <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold">Phone Number</h4>
-                    <span className="text-emerald-500 text-sm sm:text-base lg:text-lg">Call us anytime</span>
+                    <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                      Phone Number
+                    </h4>
+                    <span className="text-emerald-500 text-sm sm:text-base lg:text-lg">
+                      Call us anytime
+                    </span>
                   </div>
                 </div>
                 <div className="bottom-part mt-auto pt-6 sm:pt-8 lg:pt-12 flex items-center justify-between gap-2">
                   <div className="info">
-                    <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-medium">+880-1865-041206</p>
+                    <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-medium">
+                      +880-1865-041206
+                    </p>
                   </div>
                   <div className="icon w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl !bg-gray-100 group-hover:bg-white group-hover:text-black transition-all shrink-0">
                     <i className="fal fa-arrow-right !font-extrabold text-amber-500" />
@@ -73,14 +83,22 @@ const ContactPage = () => {
                     <i className="fal fa-map-marker-alt" />
                   </div>
                   <div className="title mt-4 sm:mt-6 lg:mt-8">
-                    <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold">Office Address</h4>
-                    <span className="text-amber-500 text-sm sm:text-base lg:text-lg">Visit us anytime</span>
+                    <h4 className="text-xl sm:text-2xl lg:text-3xl font-bold">
+                      Office Address
+                    </h4>
+                    <span className="text-amber-500 text-sm sm:text-base lg:text-lg">
+                      Visit us anytime
+                    </span>
                   </div>
                 </div>
                 <div className="bottom-part mt-auto pt-6 sm:pt-8 lg:pt-12 flex items-center justify-between gap-2">
                   <div className="info">
-                    <p className="text-sm sm:text-base lg:text-lg">Vill+Po: Charbata, Upazilla: Subarnachar</p>
-                    <p className="text-sm sm:text-base lg:text-lg">Dist: Noakhali, Bangladesh</p>
+                    <p className="text-sm sm:text-base lg:text-lg">
+                      Vill+Po: Charbata, Upazilla: Subarnachar
+                    </p>
+                    <p className="text-sm sm:text-base lg:text-lg">
+                      Dist: Noakhali, Bangladesh
+                    </p>
                   </div>
                   <div className="icon w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-xl sm:rounded-2xl flex items-center justify-center text-2xl sm:text-3xl !bg-gray-100 group-hover:bg-white group-hover:text-black transition-all shrink-0">
                     <i className="fal fa-arrow-right !font-extrabold text-amber-500" />
@@ -111,7 +129,9 @@ const ContactPage = () => {
               <span className="sub-title color-2 inline-flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-blue-50 rounded-full text-sm sm:text-base">
                 <i className="fal fa-pen" /> Write Here
               </span>
-              <h2 className="mt-char-animation text-2xl sm:text-3xl lg:text-4xl font-bold mt-4 sm:mt-5">Get In Touch</h2>
+              <h2 className="mt-char-animation text-2xl sm:text-3xl lg:text-4xl font-bold mt-4 sm:mt-5">
+                Get In Touch
+              </h2>
             </div>
 
             <form
@@ -127,7 +147,6 @@ const ContactPage = () => {
                       type="text"
                       name="name"
                       placeholder="Your Name*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
@@ -138,7 +157,6 @@ const ContactPage = () => {
                       type="email"
                       name="email"
                       placeholder="Your Email*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
@@ -149,7 +167,6 @@ const ContactPage = () => {
                       type="tel"
                       name="phone"
                       placeholder="Phone*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
@@ -160,7 +177,6 @@ const ContactPage = () => {
                       type="text"
                       name="subject"
                       placeholder="Subject*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
@@ -170,7 +186,6 @@ const ContactPage = () => {
                     <textarea
                       name="message"
                       placeholder="Write Message*"
-                      required
                       className="w-full px-4 py-4 sm:px-6 sm:py-5 lg:px-7 rounded-2xl sm:rounded-3xl border border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-200 bg-white outline-none transition-all h-32 sm:h-36 lg:h-40 text-sm sm:text-base"
                     />
                   </div>

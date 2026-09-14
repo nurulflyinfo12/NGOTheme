@@ -2,35 +2,44 @@
 
 import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Save, PlusCircle, AlertCircle } from "lucide-react";
-import Swal from "sweetalert2";
+import { Save, PlusCircle, Tag, FileText } from "lucide-react";
 
 import FormCard from "@/components/Admin/FormCard";
 import StatusSelect from "@/components/Admin/StatusSelect";
+import ImageUpload from "@/components/Admin/ImageUpload";
+import { TextField } from "@/components/Admin/TextField";
+import { useCategories, ApiCategory } from "@/hooks/useCategories";
 
-interface CategoryFormData {
+export interface CategoryFormData {
+  categoryId?: string;
+  categoryCode?: string;
   name: string;
+  nameNative?: string;
+  slug?: string;
   description: string;
-  status: "Active" | "Inactive";
+  bannerImage: string;
+  isActive: boolean;
 }
 
 export default function AddEditCategoryPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const categoryId = searchParams.get("id");
-  const isEditMode = Boolean(categoryId);
+  const categoryIdParam = searchParams.get("id");
+  const isEditMode = Boolean(categoryIdParam);
+
+  const { submitting, saveCategory } = useCategories();
 
   const [formData, setFormData] = useState<CategoryFormData>({
     name: "",
     description: "",
-    status: "Active",
+    bannerImage: "",
+    isActive: true,
   });
 
   const [errors, setErrors] = useState<
     Partial<Record<keyof CategoryFormData, string>>
   >({});
-  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (isEditMode) {
@@ -39,75 +48,87 @@ export default function AddEditCategoryPage() {
         try {
           const cat = JSON.parse(raw);
           setFormData({
-            name: cat.name || "",
-            description: cat.description || "",
-            status: cat.status === "Active" ? "Active" : "Inactive",
+            categoryId: cat.CategoryID || categoryIdParam,
+            categoryCode: cat.CategoryCode || "",
+            name: cat.CategoryName || cat.name || "",
+            nameNative: cat.CategoryNameNative || "",
+            slug: cat.CategorySlug || "",
+            description: cat.Description || cat.description || "",
+            bannerImage: cat.BannerImage || "",
+            isActive: cat.IsActive ?? cat.status === "Active",
           });
         } catch (err) {
-          console.error(err);
+          console.error("Error parsing category data:", err);
         }
       }
     }
-  }, [isEditMode]);
+  }, [isEditMode, categoryIdParam]);
 
   const validate = () => {
     const newErrors: Partial<Record<keyof CategoryFormData, string>> = {};
 
-    if (!formData.name.trim()) newErrors.name = "Category name is required";
+    if (!formData.name.trim()) newErrors.name = "Category name is Required. ";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleChange = (name: keyof CategoryFormData, value: any) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    if (errors[name]) setErrors((prev) => ({ ...prev, [name]: "" }));
+  const handleChange = (field: keyof CategoryFormData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors((prev) => ({ ...prev, [field]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
 
-    setSubmitting(true);
+    const currentUserStr = localStorage.getItem("user");
+    const currentUser = currentUserStr ? JSON.parse(currentUserStr) : null;
 
-    try {
-      console.log("Payload:", formData);
+    const payload: ApiCategory = {
+      CompanyID: currentUser?.CompanyID || "",
+      CategoryID: formData.categoryId || (isEditMode ? categoryIdParam! : ""),
+      CategoryCode: formData.categoryCode || "",
+      CategoryName: formData.name,
+      CategoryNameNative: formData.nameNative || "",
+      CategorySlug:
+        formData.slug || formData.name.toLowerCase().replace(/\s+/g, "-"),
+      Description: formData.description,
+      BannerImage: formData.bannerImage,
+      IsActive: formData.isActive,
+      CategoryViewType: 0,
+      IsOpinion: false,
+      Priority: 0,
+      UserId: currentUser?.UserId || "",
+      isNavView: true,
+      isVideo: false,
+      isPhotos: false,
+      isHomeView: true,
+      SectionLevel: "1",
+      SetDate: new Date().toISOString(),
+    };
 
+    const success = await saveCategory(payload);
+
+    if (success) {
       localStorage.removeItem("tempCategoryData");
-
-      Swal.fire({
-        icon: "success",
-        title: isEditMode ? "Updated!" : "Created!",
-        text: `Category ${isEditMode ? "updated" : "created"} successfully.`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
-
       router.push("/admin/category");
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setSubmitting(false);
     }
   };
 
   const handleClear = () => {
     setFormData({
+      categoryId: isEditMode ? formData.categoryId : undefined,
+      categoryCode: formData.categoryCode,
       name: "",
+      nameNative: "",
+      slug: "",
       description: "",
-      status: "Active",
+      bannerImage: "",
+      isActive: true,
     });
     setErrors({});
   };
-
-  const inputClass = (field: keyof CategoryFormData) => `
-    w-full rounded-xl border px-4 py-2.5 text-sm outline-none transition-all text-black
-    ${
-      errors[field]
-        ? "border-red-500 focus:ring-4 focus:ring-red-500/10"
-        : "border-gray-300 focus:border-primary focus:ring-4 focus:ring-primary/10"
-    }
-  `;
 
   return (
     <div className="min-h-screen">
@@ -139,43 +160,38 @@ export default function AddEditCategoryPage() {
         }
         onSubmit={handleSubmit}
       >
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">
-            Category Name <span className="text-red-500">*</span>
-          </label>
-          <input
-            value={formData.name}
-            onChange={(e) => handleChange("name", e.target.value)}
-            className={inputClass("name")}
+        <TextField
+          label="Category Name*"
+          icon={Tag}
+          placeholder="e.g. Technology"
+          value={formData.name}
+          onChange={(e) => handleChange("name", e.target.value)}
+          error={errors.name}
+        />
+
+        <div className="space-y-[#f86048]">
+          <StatusSelect
+            label="Status"
+            value={formData.isActive ? "Active" : "Inactive"}
+            onChange={(val) =>
+              setFormData((prev) => ({
+                ...prev,
+                isActive: val === "Active",
+              }))
+            }
           />
-          {errors.name && (
-            <p className="text-xs text-red-600 flex items-center gap-1 ml-1">
-              <AlertCircle size={12} /> {errors.name}
-            </p>
-          )}
         </div>
 
-        <div className="space-y-2">
-          <label className="text-sm font-semibold ml-1">Description</label>
+        <div className="space-y-1.5 sm:col-span-2">
+          <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
+            Description
+          </label>
           <textarea
             rows={3}
             value={formData.description}
             onChange={(e) => handleChange("description", e.target.value)}
-            className={inputClass("description")}
-          />
-        </div>
-
-        <div className="space-y-2">
-          <StatusSelect
-            label="Status"
-            required
-            value={formData.status}
-            onChange={(val) =>
-              setFormData((prev) => ({
-                ...prev,
-                status: val,
-              }))
-            }
+            className="w-full py-3 px-4 text-sm sm:text-base border-2 border-slate-200/80 rounded-2xl text-slate-800 placeholder-slate-400 outline-none bg-white/70 focus:bg-white focus:border-[#f86048] transition-all shadow-sm"
+            placeholder="Category description..."
           />
         </div>
       </FormCard>

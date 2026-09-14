@@ -6,513 +6,115 @@ import { Nav, Tab } from "react-bootstrap";
 import { Swiper, SwiperSlide } from "swiper/react";
 import Image from "next/image";
 import Link from "next/link";
-// import { motion, AnimatePresence } from "framer-motion";
-// import { useState, useEffect, useRef, TouchEvent } from "react";
-
-// export const Causes1 = () => {
-//   const causesData: {
-//     img: string;
-//     title: string;
-//     description: string;
-//     progress: number;
-//     raised: string;
-//     goal: string;
-//     delay: string;
-//   }[] = [
-//     {
-//       img: "/assets/img/microfinance/micro1.webp",
-//       title: "Micro Finance Programme",
-//       description:
-//         "Providing microcredit and income generating opportunities to poor families for poverty reduction and women empowerment.",
-//       progress: 85,
-//       raised: "৳50,000,000",
-//       goal: "৳60,000,000",
-//       delay: ".3s",
-//     },
-//     {
-//       img: "/assets/img/waterdistribution/1.webp",
-//       title: "Rural WASH for Human Capital Development",
-//       description:
-//         "Increasing access to safe water, sanitary latrines, and hygiene practices to achieve SDG Goal 6 in rural communities.",
-//       progress: 65,
-//       raised: "৳12,000,000",
-//       goal: "৳20,000,000",
-//       delay: ".5s",
-//     },
-//     {
-//       img: "/assets/img/factbg.webp",
-//       title: "Disaster Management & Climate Adaptation",
-//       description:
-//         "Supporting disaster preparedness, climate resilience, and emergency response for vulnerable coastal communities.",
-//       progress: 55,
-//       raised: "৳8,500,000",
-//       goal: "৳15,000,000",
-//       delay: ".3s",
-//     },
-//     {
-//       img: "/assets/img/scolarship/hh.jpg.jpg",
-//       title: "Education Scholarship Program",
-//       description:
-//         "Providing scholarships to meritorious students from extremely poor families of microcredit beneficiaries.",
-//       progress: 70,
-//       raised: "৳6,000,000",
-//       goal: "৳10,000,000",
-//       delay: ".5s",
-//     },
-//     {
-//       img: "/assets/img/factbg.webp",
-//       title: "Adolescent Girl Empowerment Programme",
-//       description:
-//         "Building awareness and leadership among adolescent girls through training, clubs, and community engagement.",
-//       progress: 60,
-//       raised: "৳3,500,000",
-//       goal: "৳7,000,000",
-//       delay: ".3s",
-//     },
-//     {
-//       img: "/assets/img/factbg.webp",
-//       title: "Sustainable Microenterprise & Resilient Transformation (SMART)",
-//       description:
-//         "Supporting microenterprises in agribusiness, manufacturing, and services with climate-resilient technologies.",
-//       progress: 40,
-//       raised: "৳5,000,000",
-//       goal: "৳12,000,000",
-//       delay: ".5s",
-//     },
-//   ];
-
-//   const [currentIndex, setCurrentIndex] = useState<number>(0);
-//   const [isAutoPlaying, setIsAutoPlaying] = useState<boolean>(true);
-//   const [direction, setDirection] = useState<number>(0);
-//   const [slidesPerView, setSlidesPerView] = useState<number>(2);
-//   const sliderRef = useRef<HTMLDivElement>(null);
-//   const touchStartX = useRef<number>(0);
-//   const touchEndX = useRef<number>(0);
-
-//   // Detect screen size using media query
-//   useEffect(() => {
-//     const mobileQuery = window.matchMedia("(max-width: 767px)");
-//     const tabletQuery = window.matchMedia("(min-width: 768px) and (max-width: 1279px)");
-//     const desktopQuery = window.matchMedia("(min-width: 1280px)");
-
-//     const updateSlidesPerView = () => {
-//       if (mobileQuery.matches) {
-//         setSlidesPerView(1);
-//       } else if (tabletQuery.matches) {
-//         setSlidesPerView(1);
-//       } else {
-//         setSlidesPerView(2);
-//       }
-//     };
-
-//     updateSlidesPerView();
-
-//     mobileQuery.addEventListener("change", updateSlidesPerView);
-//     tabletQuery.addEventListener("change", updateSlidesPerView);
-//     desktopQuery.addEventListener("change", updateSlidesPerView);
-
-//     return () => {
-//       mobileQuery.removeEventListener("change", updateSlidesPerView);
-//       tabletQuery.removeEventListener("change", updateSlidesPerView);
-//       desktopQuery.removeEventListener("change", updateSlidesPerView);
-//     };
-//   }, []);
-
-//   const totalSlides = Math.ceil(causesData.length / slidesPerView);
-//   const maxIndex = totalSlides - 1;
-
-//   const nextSlide = () => {
-//     setDirection(1);
-//     setCurrentIndex((prev) => (prev >= maxIndex ? 0 : prev + 1));
-//   };
-
-//   const prevSlide = () => {
-//     setDirection(-1);
-//     setCurrentIndex((prev) => (prev <= 0 ? maxIndex : prev - 1));
-//   };
-
-//   const goToSlide = (index: number) => {
-//     setDirection(index > currentIndex ? 1 : -1);
-//     setCurrentIndex(index);
-//   };
-
-//   // Auto-play
-//   useEffect(() => {
-//     if (!isAutoPlaying) return;
-    
-//     const interval = setInterval(() => {
-//       nextSlide();
-//     }, 4000);
-
-//     return () => clearInterval(interval);
-//   }, [currentIndex, isAutoPlaying, maxIndex]);
-
-//   // Touch handlers
-//   const handleTouchStart = (e: TouchEvent) => {
-//     touchStartX.current = e.touches[0].clientX;
-//   };
-
-//   const handleTouchMove = (e: TouchEvent) => {
-//     touchEndX.current = e.touches[0].clientX;
-//   };
-
-//   const handleTouchEnd = () => {
-//     const diff = touchStartX.current - touchEndX.current;
-//     const threshold = 50;
-
-//     if (Math.abs(diff) > threshold) {
-//       if (diff > 0) {
-//         nextSlide();
-//       } else {
-//         prevSlide();
-//       }
-//     }
-//   };
-
-//   // Get current visible slides
-//   const getVisibleSlides = () => {
-//     const start = currentIndex * slidesPerView;
-//     const end = start + slidesPerView;
-//     return causesData.slice(start, end);
-//   };
-
-//   // Animation variants with absolute positioning to prevent layout shift
-//   const slideVariants = {
-//     enter: (direction: number) => ({
-//       x: direction > 0 ? 300 : -300,
-//       opacity: 0,
-//       position: "absolute" as const,
-//       width: "100%",
-//     }),
-//     center: {
-//       x: 0,
-//       opacity: 1,
-//       position: "relative" as const,
-//       width: "100%",
-//     },
-//     exit: (direction: number) => ({
-//       x: direction > 0 ? -300 : 300,
-//       opacity: 0,
-//       position: "absolute" as const,
-//       width: "100%",
-//     }),
-//   };
-
-//   return (
-//     <section className="causes-section fix section-bg section-padding py-16! sm:py-20! lg:py-28! bg-slate-50! dark:bg-[#0f172a]! overflow-hidden">
-//       <div className="container mx-auto px-4! sm:px-6! lg:px-8! xl:max-w-7xl!">
-//         <div className="section-title text-center mb-12! md:mb-16!">
-//           <span className="sub-title color-2 wow fadeInUp inline-flex items-center gap-2 text-[#f86048]! font-semibold! uppercase! tracking-widest! text-sm! mb-4!">
-//             <i className="far fa-heart" />
-//             Help The People
-//           </span>
-//           <h2 className="text-3xl! sm:text-4xl! md:text-5xl! font-extrabold! text-slate-900! dark:text-white!">
-//             Our Key Initiatives
-//           </h2>
-//         </div>
-
-//         {/* Slider Container */}
-//         <div
-//           ref={sliderRef}
-//           className="relative"
-//           onTouchStart={handleTouchStart}
-//           onTouchMove={handleTouchMove}
-//           onTouchEnd={handleTouchEnd}
-//           onMouseEnter={() => setIsAutoPlaying(false)}
-//           onMouseLeave={() => setIsAutoPlaying(true)}
-//         >
-//           {/* Navigation Arrows */}
-//           <div className="flex justify-end gap-3 mb-6!">
-//             <button
-//               onClick={() => {
-//                 prevSlide();
-//                 setIsAutoPlaying(false);
-//               }}
-//               className="w-10! h-10! sm:w-12! sm:h-12! rounded-full border! border-slate-300! dark:border-slate-600! flex items-center justify-center hover:bg-[#f86048]! hover:border-[#f86048]! hover:text-white! transition-all group"
-//               aria-label="Previous slide"
-//             >
-//               <i className="far fa-arrow-left group-hover:text-white!"></i>
-//             </button>
-//             <button
-//               onClick={() => {
-//                 nextSlide();
-//                 setIsAutoPlaying(false);
-//               }}
-//               className="w-10! h-10! sm:w-12! sm:h-12! rounded-full border! border-slate-300! dark:border-slate-600! flex items-center justify-center hover:bg-[#f86048]! hover:border-[#f86048]! hover:text-white! transition-all group"
-//               aria-label="Next slide"
-//             >
-//               <i className="far fa-arrow-right group-hover:text-white!"></i>
-//             </button>
-//           </div>
-
-//           {/* Fixed height container to prevent layout shift */}
-//           <div className="overflow-hidden relative" style={{ minHeight: "400px" }}>
-//             <AnimatePresence initial={false} custom={direction} mode="popLayout">
-//               <motion.div
-//                 key={currentIndex}
-//                 custom={direction}
-//                 variants={slideVariants}
-//                 initial="enter"
-//                 animate="center"
-//                 exit="exit"
-//                 transition={{
-//                   x: { type: "spring", stiffness: 300, damping: 30 },
-//                   opacity: { duration: 0.3 },
-//                 }}
-//                 className={`grid gap-6! ${
-//                   slidesPerView === 1 
-//                     ? 'grid-cols-1' 
-//                     : 'grid-cols-1 xl:grid-cols-2'
-//                 }`}
-//                 style={{ width: "100%" }}
-//               >
-//                 {getVisibleSlides().map((item, i) => (
-//                   <motion.div
-//                     key={i}
-//                     initial={{ opacity: 0, y: 20 }}
-//                     animate={{ opacity: 1, y: 0 }}
-//                     transition={{ delay: i * 0.15 }}
-//                     className="popular-causes-card-items bg-white! dark:bg-slate-800! rounded-2xl! border! border-slate-100! dark:border-slate-700! p-4! sm:p-6! transition-all hover:shadow-xl! h-full!"
-//                   >
-//                     {/* Card inner layout */}
-//                     <div className="flex flex-col lg:flex-row items-center gap-4! sm:gap-6! h-full!">
-//                       {/* Image container */}
-//                       <div className="w-full lg:w-1/2 shrink-0">
-//                         <div className="relative aspect-[4/3] overflow-hidden rounded-xl!">
-//                           <Image
-//                             width={0}
-//                             height={0}
-//                             sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
-//                             className="w-full h-full object-cover transition-transform duration-700 hover:scale-110"
-//                             src={item.img}
-//                             alt="cause"
-//                           />
-//                         </div>
-//                       </div>
-
-//                       {/* Content */}
-//                       <div className="flex-1">
-//                         <h4 className="text-lg! sm:text-xl! font-semibold! mb-2! sm:mb-3! text-slate-900! dark:text-white!">
-//                           {item.title}
-//                         </h4>
-//                         <p className="text-sm! sm:text-base! text-gray-600! dark:text-slate-400! mb-4! sm:mb-6! line-clamp-3">
-//                           {item.description}
-//                         </p>
-
-//                         {/* Progress bar */}
-//                         <div className="mb-4!">
-//                           <div className="flex justify-between items-center mb-2!">
-//                             <span className="text-sm! font-medium! text-[#f86048]!">
-//                               {item.progress}%
-//                             </span>
-//                             <span className="text-xs! text-slate-500! dark:text-slate-400!">
-//                               Raised: <b className="dark:text-white!">{item.raised}</b>
-//                             </span>
-//                           </div>
-//                           <div className="w-full bg-gray-200! dark:bg-slate-700! rounded-full! h-2! overflow-hidden">
-//                             <motion.div
-//                               initial={{ width: 0 }}
-//                               whileInView={{ width: `${item.progress}%` }}
-//                               viewport={{ once: true }}
-//                               transition={{ duration: 1, delay: 0.5 }}
-//                               className="bg-[#f86048]! h-full! rounded-full!"
-//                             />
-//                           </div>
-//                           <div className="flex justify-between text-xs! mt-2! text-slate-600! dark:text-slate-400!">
-//                             <span>Goal: <b className="dark:text-white!">{item.goal}</b></span>
-//                           </div>
-//                         </div>
-
-//                         <Link
-//                           href="/donation-details"
-//                           className="inline-flex items-center gap-2! px-4! sm:px-6! py-2! sm:py-3! bg-[#f86048]! hover:bg-[#e04e3a]! text-white! rounded-full! transition-all! text-sm! font-semibold! hover:gap-3!"
-//                         >
-//                           <i className="far fa-heart" /> Donate Now
-//                         </Link>
-//                       </div>
-//                     </div>
-//                   </motion.div>
-//                 ))}
-//               </motion.div>
-//             </AnimatePresence>
-//           </div>
-
-//           {/* Progress Dots */}
-//           <div className="mt-8! sm:mt-10! flex items-center justify-center gap-2!">
-//             {Array.from({ length: totalSlides }).map((_, index: number) => (
-//               <button
-//                 key={index}
-//                 onClick={() => {
-//                   goToSlide(index);
-//                   setIsAutoPlaying(false);
-//                 }}
-//                 className="relative h-1.5! rounded-full! transition-all! duration-300! overflow-hidden"
-//                 style={{
-//                   width: index === currentIndex ? "40px" : "12px",
-//                   backgroundColor: index === currentIndex ? "#f86048" : "#cbd5e1",
-//                 }}
-//                 aria-label={`Go to slide ${index + 1}`}
-//               >
-//                 {index === currentIndex && isAutoPlaying && (
-//                   <motion.div
-//                     className="absolute inset-0 bg-white/30"
-//                     initial={{ width: "0%" }}
-//                     animate={{ width: "100%" }}
-//                     transition={{ duration: 4, ease: "linear" }}
-//                   />
-//                 )}
-//               </button>
-//             ))}
-//           </div>
-//         </div>
-//       </div>
-//     </section>
-//   );
-// };
-
+import { useKeyInitiatives } from "@/hooks/useKeyInitiatives";
+import { api } from "@/utility/api";
+import { useEffect } from "react";
 export const Causes1 = () => {
-  const causesData: {
-    img: string;
-    title: string;
-    description: string;
-    progress: number;
-    raised: string;
-    goal: string;
-    delay: string;
-  }[] = [
-    {
-      img: "/assets/img/microfinance/micro1.webp",
-      title: "Micro Finance Programme",
-      description:
-        "Providing microcredit and income generating opportunities to poor families for poverty reduction and women empowerment.",
-      progress: 85,
-      raised: "৳50,000,000",
-      goal: "৳60,000,000",
-      delay: ".3s",
-    },
-    {
-      img: "/assets/img/waterdistribution/1.webp",
-      title: "Rural WASH for Human Capital Development",
-      description:
-        "Increasing access to safe water, sanitary latrines, and hygiene practices to achieve SDG Goal 6 in rural communities.",
-      progress: 65,
-      raised: "৳12,000,000",
-      goal: "৳20,000,000",
-      delay: ".5s",
-    },
-    {
-      img: "/assets/img/factbg.webp",
-      title: "Disaster Management & Climate Adaptation",
-      description:
-        "Supporting disaster preparedness, climate resilience, and emergency response for vulnerable coastal communities.",
-      progress: 55,
-      raised: "৳8,500,000",
-      goal: "৳15,000,000",
-      delay: ".3s",
-    },
-    {
-      img: "/assets/img/scolarship/hh.jpg.jpg",
-      title: "Education Scholarship Program",
-      description:
-        "Providing scholarships to meritorious students from extremely poor families of microcredit beneficiaries.",
-      progress: 70,
-      raised: "৳6,000,000",
-      goal: "৳10,000,000",
-      delay: ".5s",
-    },
-    {
-      img: "/assets/img/factbg.webp",
-      title: "Adolescent Girl Empowerment Programme",
-      description:
-        "Building awareness and leadership among adolescent girls through training, clubs, and community engagement.",
-      progress: 60,
-      raised: "৳3,500,000",
-      goal: "৳7,000,000",
-      delay: ".3s",
-    },
-    {
-      img: "/assets/img/factbg.webp",
-      title: "Sustainable Microenterprise & Resilient Transformation (SMART)",
-      description:
-        "Supporting microenterprises in agribusiness, manufacturing, and services with climate-resilient technologies.",
-      progress: 40,
-      raised: "৳5,000,000",
-      goal: "৳12,000,000",
-      delay: ".5s",
-    },
-  ];
+  const { initiatives, loading, fetchInitiatives } = useKeyInitiatives();
+
+  useEffect(() => {
+    fetchInitiatives();
+  }, [fetchInitiatives]);
+
+  /**
+   * Safely strip HTML tags and decode HTML entities (&nbsp;, &amp;, etc.)
+   */
+  const cleanAndDecodeHtml = (htmlString: string) => {
+    if (!htmlString) return "";
+
+    if (typeof window !== "undefined") {
+      const doc = new DOMParser().parseFromString(htmlString, "text/html");
+      return doc.body.textContent || doc.body.innerText || "";
+    }
+
+    return htmlString
+      .replace(/<[^>]*>/g, "")
+      .replace(/&nbsp;/g, " ")
+      .replace(/&amp;/g, "&")
+      .trim();
+  };
 
   return (
     <section className="causes-section fix section-bg section-padding bg-slate-50 dark:bg-[#0f172a]!">
       <div className="container">
+        {/* Section Header */}
         <div className="section-title text-center">
           <span className="sub-title color-2 wow fadeInUp">
             <i className="far fa-heart" />
             Help The People
           </span>
-          <h2 className="mt-char-animation dark:text-white!">Our Key Initiatives</h2>
+          <h2 className="mt-char-animation dark:text-white!">
+            Our Key Initiatives
+          </h2>
         </div>
 
-        {/* Main grid: 2 cards per row on xl+, 1 on smaller */}
-        <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-          {causesData.map((item, i) => (
-            <div
-              key={i}
-              className="wow fadeInUp popular-causes-card-items bg-white dark:bg-slate-800! rounded-2xl border border-slate-100 dark:border-slate-700! p-4! transition-all hover:shadow-lg!"
-              data-wow-delay={item.delay}
-            >
-              {/* Card inner layout: stack on mobile, side‑by‑side on lg+ */}
-              <div className="flex flex-col lg:flex-row items-center gap-4">
-                {/* Image container */}
-                <div className="w-full lg:w-1/2 shrink-0">
-                  <Image
-                    width={0}
-                    height={0}
-                    sizes="100vw"
-                    className="w-full h-auto rounded-lg"
-                    src={item.img}
-                    alt="cause"
-                  />
-                </div>
-
-                {/* Content */}
-                <div className="flex-1">
-                  <h4 className="text-xl font-semibold mb-2! text-slate-900 dark:text-white!">
-                    {item.title}
-                  </h4>
-                  <p className="text-gray-600 dark:text-slate-400! mb-4!">
-                    {item.description}
-                  </p>
-
-                  {/* Progress and button (uncomment when needed) */}
-                  {/* 
-                  <div className="mb-4">
-                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300">
-                      {item.progress}%
-                    </span>
-                    <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mt-1">
-                      <div
-                        className="bg-blue-600 h-2 rounded-full"
-                        style={{ width: `${item.progress}%` }}
-                      />
-                    </div>
-                    <div className="flex justify-between text-xs mt-1 text-slate-600 dark:text-slate-400">
-                      <span>Raised <b className="dark:text-white">{item.raised}</b></span>
-                      <span>Goal <b className="dark:text-white">{item.goal}</b></span>
-                    </div>
+        {/* Loading Skeleton */}
+        {loading ? (
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {[1, 2, 3, 4].map((n) => (
+              <div
+                key={n}
+                className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 animate-pulse"
+              >
+                <div className="flex flex-col lg:flex-row items-center gap-4">
+                  <div className="w-full lg:w-1/2 h-44 bg-slate-200 dark:bg-slate-700 rounded-lg shrink-0" />
+                  <div className="flex-1 w-full space-y-3">
+                    <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full" />
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6" />
                   </div>
-                  <Link
-                    href="/donation-details"
-                    className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 text-white rounded-full transition"
-                  >
-                    <i className="far fa-heart" /> Donate Now
-                  </Link>
-                  */}
                 </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        ) : (
+          /* Main grid: 2 cards per row on xl+, 1 on smaller */
+          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+            {initiatives
+              ?.filter((item) => item.IsActive)
+              .map((item, i) => {
+                const imageSrc = item.Photo
+                  ? api.getFileUrl(item.Photo)
+                  : "/assets/img/factbg.webp";
+
+                const cleanDescription = cleanAndDecodeHtml(item.Details);
+
+                return (
+                  <div
+                    key={item.InitiativeID || i}
+                    className="wow fadeInUp popular-causes-card-items bg-white dark:bg-slate-800! rounded-2xl border border-slate-100 dark:border-slate-700! p-4! transition-all hover:shadow-lg!"
+                    data-wow-delay={`${0.3 + (i % 2) * 0.2}s`}
+                  >
+                    {/* Card inner layout: stack on mobile, side-by-side on lg+ */}
+                    <div className="flex flex-col lg:flex-row items-center gap-4">
+                      {/* Image container */}
+                      <div className="w-full lg:w-1/2 shrink-0 relative h-48 lg:h-44 overflow-hidden rounded-lg">
+                        <Image
+                          fill
+                          sizes="(max-width: 1024px) 100vw, 25vw"
+                          className="w-full h-full object-cover rounded-lg"
+                          src={imageSrc}
+                          alt={item.Title || "Key Initiative"}
+                          unoptimized
+                        />
+                      </div>
+
+                      {/* Content */}
+                      <div className="flex-1 w-full min-w-0">
+                        <h4 className="text-xl font-semibold mb-2! text-slate-900 dark:text-white! truncate">
+                          {item.Title}
+                        </h4>
+
+                        <p className="text-gray-600 dark:text-slate-400! mb-4! line-clamp-3 text-sm leading-relaxed break-words">
+                          {cleanDescription}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+          </div>
+        )}
       </div>
     </section>
   );

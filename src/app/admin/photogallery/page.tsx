@@ -1,96 +1,88 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Swal from "sweetalert2";
 import DataTable, { Column } from "@/components/Admin/DataTable";
 import { StatusCell, ImageCell } from "@/components/Admin/TableCells";
-
-interface Gallery {
-  id: string;
-  title: string;
-  cover: string | null;
-  totalImages: number;
-  status: "Active" | "Inactive";
-}
-
-const dummyGallery: Gallery[] = [
-  {
-    id: "1",
-    title: "Industrial Training",
-    cover: null,
-    totalImages: 5,
-    status: "Active",
-  },
-  {
-    id: "2",
-    title: "Robotics Workshop",
-    cover: null,
-    totalImages: 3,
-    status: "Inactive",
-  },
-];
+import { usePhotoGallery, ApiPhotoGallery } from "@/hooks/usePhotoGallery";
 
 export default function AllGallery() {
   const router = useRouter();
-  const [gallery, setGallery] = useState<Gallery[]>(dummyGallery);
+  const { galleries, fetchGalleries } = usePhotoGallery();
   const [statusFilter, setStatusFilter] = useState("All");
 
-  const filteredGallery = useMemo(
-    () =>
-      gallery.filter(
-        (g) => statusFilter === "All" || g.status === statusFilter,
-      ),
-    [gallery, statusFilter],
-  );
+  useEffect(() => {
+    fetchGalleries();
+  }, [fetchGalleries]);
 
-  const handleDelete = async (item: Gallery) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `Delete "${item.title}" gallery?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#e86958",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete!",
+  const filteredGallery = useMemo(() => {
+    return galleries.filter((g) => {
+      const statusText = g.Status ? "Active" : "Inactive";
+      return statusFilter === "All" || statusText === statusFilter;
     });
+  }, [galleries, statusFilter]);
 
-    if (result.isConfirmed) {
-      setGallery((prev) => prev.filter((g) => g.id !== item.id));
-      Swal.fire({
-        title: "Deleted!",
-        text: "Gallery removed.",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    }
-  };
-
-  const columns: Column<Gallery>[] = [
-    { key: "title", header: "Title", className: "font-medium text-black" },
+  const columns: Column<ApiPhotoGallery>[] = [
     {
-      key: "cover",
-      header: "Cover",
-      render: (g) =>
-        g.cover ? <ImageCell src={g.cover} alt={g.title} /> : null,
+      key: "GalleryTitle",
+      header: "Title",
+      className: "font-medium text-black",
+      render: (g) => (
+        <div className="flex flex-col">
+          <span className="font-bold text-slate-800">{g.GalleryTitle}</span>
+          {g.PublishedDate && (
+            <span className="text-[10px] text-slate-400">
+              Published: {g.PublishedDate}
+            </span>
+          )}
+        </div>
+      ),
     },
-    { key: "totalImages", header: "Images" },
     {
-      key: "status",
+      key: "Photos",
+      header: "Cover",
+      render: (g) => {
+        const coverUrl =
+          Array.isArray(g.Photos) && g.Photos.length > 0
+            ? g.Photos[0].PhotoUrl
+            : null;
+
+        return coverUrl ? (
+          <ImageCell src={coverUrl} alt={g.GalleryTitle || "Gallery Cover"} />
+        ) : (
+          <span className="text-slate-400 text-xs">No Cover</span>
+        );
+      },
+    },
+    {
+      key: "CategoryID",
+      header: "Total Images",
+      render: (g) => (
+        <span className="font-semibold text-slate-700">
+          {Array.isArray(g.Photos) ? g.Photos.length : 0}
+        </span>
+      ),
+    },
+    {
+      key: "Status",
       header: "Status",
-      render: (g) => <StatusCell status={g.status} showIcon={false} />,
+      render: (g) => (
+        <StatusCell
+          status={g.Status ? "Active" : "Inactive"}
+          showIcon={false}
+        />
+      ),
     },
   ];
 
   return (
-    <div className="">
-      <DataTable<Gallery>
+    <div>
+      <DataTable<ApiPhotoGallery>
         title="Photo Gallery"
         description="Manage gallery albums"
         data={filteredGallery}
         columns={columns}
-        searchKeys={["title"]}
+        searchKeys={["GalleryTitle"]}
         filters={[
           {
             key: "status",
@@ -108,10 +100,9 @@ export default function AllGallery() {
         onAdd={() => router.push("/admin/photogallery/add")}
         onEdit={(g) => {
           localStorage.setItem("tempGalleryData", JSON.stringify(g));
-          router.push(`/admin/photogallery/add?id=${g.id}`);
+          router.push(`/admin/photogallery/add?id=${g.PhotoGalleryID}`);
         }}
-        onDelete={handleDelete}
-        getRowId={(g) => g.id}
+        getRowId={(g) => g.PhotoGalleryID || String(Math.random())}
         showActions
       />
     </div>

@@ -61,8 +61,9 @@ export default function AddEditProgramPage() {
   const validate = () => {
     const newErrors: Partial<Record<keyof ProgramFormData, string>> = {};
 
-    if (!formData.title.trim()) newErrors.title = "Title is required";
-    if (!formData.category.trim()) newErrors.category = "Category is required";
+    if (!formData.title.trim()) newErrors.title = "Title is Required. ";
+    if (!formData.category.trim())
+      newErrors.category = "Category is Required. ";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -190,7 +191,6 @@ export default function AddEditProgramPage() {
         <div className="space-y-2">
           <StatusSelect
             label="Status"
-            required
             value={formData.status}
             onChange={(val) =>
               setFormData((prev) => ({ ...prev, status: val }))

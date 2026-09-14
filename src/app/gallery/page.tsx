@@ -1,24 +1,76 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import DanboxLayout from "@/layout/DanboxLayout";
 import PageBanner from "@/components/PageBanner";
 import { motion, AnimatePresence } from "framer-motion";
-import gallery from "@/app/data/gallery.json";
+import { usePhotoGallery } from "@/hooks/usePhotoGallery";
+import { api } from "@/utility/api";
 
 const ITEMS_PER_PAGE = 9;
 const PRIMARY = "#f86048";
 
+interface FlattenedGalleryItem {
+  id: string;
+  title: string;
+  category: string;
+  image: string;
+  caption?: string;
+  date?: string;
+}
+
 const GalleryPage = () => {
-  const categories = ["All", ...new Set(gallery.map((g) => g.category))];
+  const { galleries, loading, fetchGalleries } = usePhotoGallery();
   const [activeFilter, setActiveFilter] = useState("All");
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE);
-  const [selectedImage, setSelectedImage] = useState<any>(null);
+  const [selectedImage, setSelectedImage] = useState<FlattenedGalleryItem | null>(null);
 
-  const filteredItems =
-    activeFilter === "All"
-      ? gallery
-      : gallery.filter((item) => item.category === activeFilter);
+  useEffect(() => {
+    fetchGalleries();
+  }, [fetchGalleries]);
+
+  // Flatten nested gallery photos into individual items with dynamic caption support
+  const allPhotoItems = useMemo(() => {
+    const items: FlattenedGalleryItem[] = [];
+
+    galleries
+      ?.filter((g) => g.Status)
+      .forEach((gallery, gIdx) => {
+        const category = gallery.CategoryID || gallery.GalleryTitle || "General";
+
+        if (Array.isArray(gallery.Photos)) {
+          gallery.Photos.forEach((photo, pIdx) => {
+            if (photo.PhotoUrl) {
+              const photoCaption = photo.Caption?.trim();
+              const displayTitle = photoCaption || gallery.GalleryTitle;
+
+              items.push({
+                id: `${gallery.PhotoGalleryID || gIdx}-${pIdx}`,
+                title: displayTitle,
+                category: category,
+                image: api.getFileUrl(photo.PhotoUrl),
+                caption: photoCaption,
+                date: gallery.PublishedDate,
+              });
+            }
+          });
+        }
+      });
+
+    return items;
+  }, [galleries]);
+
+  // Dynamic Categories list from API data
+  const categories = useMemo(() => {
+    const cats = new Set(allPhotoItems.map((item) => item.category));
+    return ["All", ...Array.from(cats)];
+  }, [allPhotoItems]);
+
+  const filteredItems = useMemo(() => {
+    return activeFilter === "All"
+      ? allPhotoItems
+      : allPhotoItems.filter((item) => item.category === activeFilter);
+  }, [activeFilter, allPhotoItems]);
 
   useEffect(() => {
     setVisibleCount(ITEMS_PER_PAGE);
@@ -68,6 +120,7 @@ const GalleryPage = () => {
               </h2>
             </div>
 
+            {/* Dynamic Categories */}
             <div className="flex flex-wrap gap-3 justify-start md:justify-end w-full! md:w-auto!">
               {categories.map((cat) => (
                 <button
@@ -85,44 +138,61 @@ const GalleryPage = () => {
             </div>
           </div>
 
-          <motion.div
-            layout
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
-          >
-            <AnimatePresence mode="popLayout">
-              {filteredItems.slice(0, visibleCount).map((item, idx) => (
-                <motion.div
-                  key={item.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.5, delay: idx * 0.05 }}
-                  onClick={() => setSelectedImage(item)}
-                  className="group relative aspect-[4/5] overflow-hidden rounded-[2rem] sm:rounded-[2.5rem]! bg-slate-100! dark:bg-slate-800! shadow-2xl shadow-slate-200/50! dark:shadow-none! cursor-pointer"
-                >
-                  <img
-                    src={item.image}
-                    alt={item.title}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110!"
-                  />
-
-                  <div className="absolute inset-0 bg-gradient-to-t! from-slate-900! via-slate-900/20! to-transparent opacity-80 lg:opacity-0! lg:group-hover:opacity-95 transition-all duration-500">
-                    <div className="absolute inset-0 p-6! sm:p-8! lg:p-10! flex flex-col justify-end transform translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-500">
-                      <span className="text-[10px]! font-black! uppercase tracking-[0.3em]! mb-3! inline-block! px-3! py-1! bg-white/10! backdrop-blur-md! rounded-full w-fit! text-white!">
-                        {item.category}
-                      </span>
-                      <h4 className="text-2xl font-black! text-white! leading-tight! mb-6!">
-                        {item.title}
-                      </h4>
-                    </div>
-                  </div>
-                </motion.div>
+          {loading ? (
+            /* Skeleton Loading State */
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((n) => (
+                <div
+                  key={n}
+                  className="aspect-[4/5] rounded-[2rem] bg-slate-200 dark:bg-slate-800 animate-pulse"
+                />
               ))}
-            </AnimatePresence>
-          </motion.div>
+            </div>
+          ) : (
+            <motion.div
+              layout
+              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+            >
+              <AnimatePresence mode="popLayout">
+                {filteredItems.slice(0, visibleCount).map((item, idx) => (
+                  <motion.div
+                    key={item.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ duration: 0.5, delay: idx * 0.05 }}
+                    onClick={() => setSelectedImage(item)}
+                    className="group relative aspect-[4/5] overflow-hidden rounded-[2rem] sm:rounded-[2.5rem]! bg-slate-100! dark:bg-slate-800! shadow-2xl shadow-slate-200/50! dark:shadow-none! cursor-pointer"
+                  >
+                    <img
+                      src={item.image}
+                      alt={item.title}
+                      className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110!"
+                    />
 
-          {visibleCount < filteredItems.length && (
+                    <div className="absolute inset-0 bg-gradient-to-t! from-slate-900! via-slate-900/20! to-transparent opacity-80 lg:opacity-0! lg:group-hover:opacity-95 transition-all duration-500">
+                      <div className="absolute inset-0 p-6! sm:p-8! lg:p-10! flex flex-col justify-end transform translate-y-4 lg:group-hover:translate-y-0 transition-transform duration-500">
+                        <span className="text-[10px]! font-black! uppercase tracking-[0.3em]! mb-3! inline-block! px-3! py-1! bg-white/10! backdrop-blur-md! rounded-full w-fit! text-white!">
+                          {item.category}
+                        </span>
+                        <h4 className="text-2xl font-black! text-white! leading-tight! mb-2!">
+                          {item.title}
+                        </h4>
+                        {item.caption && item.caption !== item.title && (
+                          <p className="text-xs text-slate-300 line-clamp-2 font-light">
+                            {item.caption}
+                          </p>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            </motion.div>
+          )}
+
+          {!loading && visibleCount < filteredItems.length && (
             <div className="mt-24! text-center">
               <button
                 onClick={handleLoadMore}
@@ -137,6 +207,7 @@ const GalleryPage = () => {
           )}
         </div>
 
+        {/* Lightbox Modal */}
         <AnimatePresence>
           {selectedImage && (
             <motion.div
@@ -167,15 +238,14 @@ const GalleryPage = () => {
                   className="relative w-full max-w-7xl max-h-[90vh] flex flex-col lg:flex-row gap-6 lg:gap-8"
                 >
                   {/* Image Section */}
-                  <div className="flex-1 relative overflow-hidden bg-black/40! backdrop-blur-sm shadow-2xl">
+                  <div className="flex-1 relative overflow-hidden bg-black/40! backdrop-blur-sm shadow-2xl flex items-center justify-center">
                     <img
                       id="fullscreen-image"
                       src={selectedImage.image}
                       alt={selectedImage.title}
-                      className="w-full h-full object-contain max-h-[50vh] lg:max-h-[80vh] "
+                      className="w-full h-full object-contain max-h-[50vh] lg:max-h-[80vh]"
                     />
                     
-                    {/* Image Overlay Gradient */}
                     <div className="absolute inset-0 bg-gradient-to-t! from-black/50 via-transparent to-transparent lg:hidden"></div>
                   </div>
 
@@ -224,34 +294,28 @@ const GalleryPage = () => {
                       style={{ backgroundColor: PRIMARY }}
                     ></motion.div>
 
-                    {/* Description */}
+                    {/* Dynamic Caption / Description */}
                     <motion.p
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: 0.6 }}
                       className="text-slate-300 text-base lg:text-lg leading-relaxed! mb-8! font-light"
                     >
-                      {selectedImage.description || "Visual documentation of our ongoing efforts in coastal resilience and community empowerment. Each image tells a story of transformation, hope, and the unwavering spirit of the communities we serve."}
+                      {selectedImage.caption || "Visual documentation of our ongoing efforts in community development, resilience, and empowerment."}
                     </motion.p>
 
-                    {/* Stats/Info Grid */}
+                    {/* Published Date */}
                     {selectedImage.date && (
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.7 }}
-                        className="grid grid-cols-2 gap-4 mb-8"
+                        className="grid grid-cols-1 gap-4 mb-8"
                       >
                         <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                          <span className="text-xs text-slate-400 uppercase tracking-wider! block mb-1!">Date</span>
+                          <span className="text-xs text-slate-400 uppercase tracking-wider! block mb-1!">Published Date</span>
                           <span className="text-sm font-bold text-white">{selectedImage.date}</span>
                         </div>
-                        {selectedImage.location && (
-                          <div className="p-4 rounded-2xl bg-white/5 border border-white/5">
-                            <span className="text-xs text-slate-400 uppercase tracking-wider! block mb-1!">Location</span>
-                            <span className="text-sm font-bold text-white">{selectedImage.location}</span>
-                          </div>
-                        )}
                       </motion.div>
                     )}
 

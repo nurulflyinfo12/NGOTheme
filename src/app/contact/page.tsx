@@ -6,26 +6,26 @@ import { useState } from "react";
 
 const ContactPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();           
+    e.preventDefault();
     e.stopPropagation();
     console.log("Form submission prevented - No reload");
   };
 
   const fadeInUp = {
     hidden: { opacity: 0, y: 40 },
-    visible: { opacity: 1, y: 0 }
+    visible: { opacity: 1, y: 0 },
   };
-  
+
   return (
     <DanboxLayout header={1}>
       <PageBanner pageName="Contact" pageTitle="Get In Touch" />
-      
+
       {/* Contact Form Section */}
       <section className="contact-section-2 bg-white dark:bg-[#0f172a]! section-padding pt-5">
         <div className="container">
-          <motion.div 
+          <motion.div
             className="dark:bg-slate-800/70! p-3 md:p-8 lg:p-20!"
             initial="hidden"
             whileInView="visible"
@@ -34,13 +34,13 @@ const ContactPage = () => {
             variants={fadeInUp}
           >
             <div className="section-title text-center">
-              <motion.span 
+              <motion.span
                 className="sub-title color-2 inline-flex items-center gap-2 px-4 py-2 sm:px-6 sm:py-3 bg-blue-50! dark:bg-blue-950! rounded-full text-sm sm:text-base text-blue-600 dark:text-blue-400!"
                 variants={fadeInUp}
               >
                 <i className="fal fa-pen" /> Write Here
               </motion.span>
-              <motion.h2 
+              <motion.h2
                 className="mt-char-animation text-2xl sm:text-3xl lg:text-4xl font-bold mt-4 sm:mt-5 text-gray-900! dark:text-white!"
                 variants={fadeInUp}
               >
@@ -55,76 +55,56 @@ const ContactPage = () => {
               variants={fadeInUp}
             >
               <div className="row g-3 sm:g-4">
-                <motion.div 
-                  className="col-lg-6"
-                  variants={fadeInUp}
-                >
+                <motion.div className="col-lg-6" variants={fadeInUp}>
                   <div className="form-clt">
                     <input
                       type="text"
                       name="name"
                       placeholder="Your Name*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
                 </motion.div>
-                <motion.div 
-                  className="col-lg-6"
-                  variants={fadeInUp}
-                >
+                <motion.div className="col-lg-6" variants={fadeInUp}>
                   <div className="form-clt">
                     <input
                       type="email"
                       name="email"
                       placeholder="Your Email*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500! focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
                 </motion.div>
-                <motion.div 
-                  className="col-lg-6"
-                  variants={fadeInUp}
-                >
+                <motion.div className="col-lg-6" variants={fadeInUp}>
                   <div className="form-clt">
                     <input
                       type="tel"
                       name="phone"
                       placeholder="Phone*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white! dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
                 </motion.div>
-                <motion.div 
-                  className="col-lg-6"
-                  variants={fadeInUp}
-                >
+                <motion.div className="col-lg-6" variants={fadeInUp}>
                   <div className="form-clt">
                     <input
                       type="text"
                       name="subject"
                       placeholder="Subject*"
-                      required
                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
                     />
                   </div>
                 </motion.div>
-                <motion.div 
-                  className="col-lg-12"
-                  variants={fadeInUp}
-                >
+                <motion.div className="col-lg-12" variants={fadeInUp}>
                   <div className="form-clt">
                     <textarea
                       name="message"
                       placeholder="Write Message*"
-                      required
                       className="w-full px-4 py-4 sm:px-6 sm:py-5 lg:px-7 rounded-2xl sm:rounded-3xl border border-gray-200! dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900 dark:text-white! outline-none transition-all h-32 sm:h-36 lg:h-40 text-sm sm:text-base"
                     />
                   </div>
                 </motion.div>
-                <motion.div 
+                <motion.div
                   className="col-lg-12 text-center"
                   variants={fadeInUp}
                 >
@@ -142,7 +122,7 @@ const ContactPage = () => {
             </motion.form>
           </motion.div>
         </div>
-        <motion.div 
+        <motion.div
           className="office-google-map-wrapper mt-8 sm:mt-10 lg:mt-12"
           initial={{ opacity: 0, y: 40 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -164,9 +144,6 @@ const ContactPage = () => {
 
 export default ContactPage;
 
-
-
-
 // "use client";
 // import PageBanner from "@/components/PageBanner";
 // import DanboxLayout from "@/layout/DanboxLayout";
@@ -174,24 +151,24 @@ export default ContactPage;
 
 // const ContactPage = () => {
 //   const [isSubmitting, setIsSubmitting] = useState(false);
-  
+
 //     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-//       e.preventDefault();           
+//       e.preventDefault();
 //       e.stopPropagation();
-  
+
 //       console.log("Form submission prevented - No reload");
-      
+
 //     };
-  
+
 //   return (
 //     <DanboxLayout header={1}>
 //       <PageBanner pageName="Contact" pageTitle="Get In Touch" />
-      
+
 //       {/* Contact Info Section */}
 //       <section className="contact-page-wrap py-24! lg:py-32! bg-white dark:bg-[#0f172a]! section-padding">
 //         <div className="container">
 //           <div className="row g-3 sm:g-4">
-            
+
 //             {/* Email Card */}
 //             {/* <div className="col-xl-4 col-lg-6 col-md-6 col-12">
 //               <div className="single-contact-card card1 group bg-white/10 dark:bg-slate-800/70! backdrop-blur-2xl! border border-white/10! dark:border-slate-700! hover:border-blue-400 rounded-3xl p-5 sm:p-7 lg:p-10 h-full transition-all duration-500 hover:scale-105 ">
@@ -299,7 +276,7 @@ export default ContactPage;
 //                       type="text"
 //                       name="name"
 //                       placeholder="Your Name*"
-//                       required
+//
 //                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
 //                     />
 //                   </div>
@@ -310,7 +287,7 @@ export default ContactPage;
 //                       type="email"
 //                       name="email"
 //                       placeholder="Your Email*"
-//                       required
+//
 //                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500! focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
 //                     />
 //                   </div>
@@ -321,7 +298,7 @@ export default ContactPage;
 //                       type="tel"
 //                       name="phone"
 //                       placeholder="Phone*"
-//                       required
+//
 //                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white! dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
 //                     />
 //                   </div>
@@ -332,7 +309,7 @@ export default ContactPage;
 //                       type="text"
 //                       name="subject"
 //                       placeholder="Subject*"
-//                       required
+//
 //                       className="w-full px-4 py-3 sm:px-6 sm:py-4 lg:px-7 rounded-xl sm:rounded-2xl border border-gray-200 dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900! dark:text-white! outline-none transition-all text-sm sm:text-base"
 //                     />
 //                   </div>
@@ -342,7 +319,7 @@ export default ContactPage;
 //                     <textarea
 //                       name="message"
 //                       placeholder="Write Message*"
-//                       required
+//
 //                       className="w-full px-4 py-4 sm:px-6 sm:py-5 lg:px-7 rounded-2xl sm:rounded-3xl border border-gray-200! dark:border-slate-700! focus:border-blue-500 focus:ring-1 focus:ring-blue-200 dark:focus:ring-blue-800! bg-white dark:bg-slate-800! text-gray-900 dark:text-white! outline-none transition-all h-32 sm:h-36 lg:h-40 text-sm sm:text-base"
 //                     />
 //                   </div>

@@ -14,6 +14,7 @@ interface TeamMember {
 }
 
 interface CommitteeMember {
+  empId: number;
   image: string;
   name: string;
   designation: string;
@@ -44,26 +45,264 @@ const teamMembers: TeamMember[] = [
 
 const committeeMembers: CommitteeMember[] = [
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 1",
-    designation: "President",
+    "empId": 514,
+    "image": "/assets/img/directors/saifull.webp",
+    "name": "Mohammad Saiful Islam (Head Office)",
+    "designation": "Executive Director"
   },
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 2",
-    designation: "Vice President",
+    "empId": 503,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Shamsul Hoque (Head Office)",
+    "designation": "Deputy Director(Microfinance)"
   },
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 3",
-    designation: "General Secretary",
+    "empId": 980,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Hannan Molla (Head Office)",
+    "designation": "Coordinator(Admin)"
   },
   {
-    image: "/assets/img/logo/Sagorika.webp",
-    name: "Member Name 4",
-    designation: "General Secretary",
+    "empId": 1293,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Zulfiker Ali (Head Office)",
+    "designation": "Coordinator(Program)"
   },
-];
+  {
+    "empId": 1306,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Alauddin (Head Office)",
+    "designation": "Credit Coordinatio (Micro-Enterprise)"
+  },
+  {
+    "empId": 1440,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Abu Muhammad Hannan (Head Office)",
+    "designation": "Manager (Audit)"
+  },
+  {
+    "empId": 1010,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sultan Mahmud Rana (Head Office)",
+    "designation": "Manager (Micro-Enterprise)"
+  },
+  {
+    "empId": 589,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Rezaul Islam (Head Office)",
+    "designation": "Manager (Monitoring and Documentation)"
+  },
+  {
+    "empId": 673,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "MD Zahirul Islam (Head Office)",
+    "designation": "Manager (Micro-Enterprise)"
+  },
+  {
+    "empId": 1097,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Shahidul Alam (Head Office)",
+    "designation": "Fisheries officer"
+  },
+  {
+    "empId": 1098,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sibabrata Bhowmik (Head Office)",
+    "designation": "Agriculture officer"
+  },
+  {
+    "empId": 1259,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Anisur Rahman (Head Office)",
+    "designation": "Livestock officer"
+  },
+  {
+    "empId": 792,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Mazammal Hoque (Head Office)",
+    "designation": "Accounts Officer"
+  },
+  {
+    "empId": 833,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Jahedul Alam (Head Office)",
+    "designation": "IT Manager"
+  },
+  {
+    "empId": 508,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Raktima Chakraborty (Head Office)",
+    "designation": "Accountant"
+  },
+  {
+    "empId": 528,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "ABM Zakariya (Head Office)",
+    "designation": "Accountant"
+  },
+  {
+    "empId": 983,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Hari Kanta Das (Head Office)",
+    "designation": "Accounts Officer, RAISE"
+  },
+  {
+    "empId": 512,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Mosleh Uddin (Head Office)",
+    "designation": "Assistant Administative Officer"
+  },
+  {
+    "empId": 1294,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sunanda Bose (Head Office)",
+    "designation": "Assistant Manager HR"
+  },
+  {
+    "empId": 1755,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Ranjan Kumar Mahanta (Head Office)",
+    "designation": "Assistant Manager (Monitoring and Documentation)"
+  },
+  {
+    "empId": 1754,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Rajib Mahmud (Head Office)",
+    "designation": "Assistant Manager (Training & Social Activity)"
+  },
+  {
+    "empId": 953,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Nazrul Islam (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1254,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Muhammad Maksudur Rahman (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1263,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Fakhrul Islam (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1342,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Azharul Islam (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 662,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md.Kamal Uddin (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1490,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Safayet Hossain (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 1491,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Robiul Hossain (Head Office)",
+    "designation": "Audit Officer"
+  },
+  {
+    "empId": 739,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Rahamat Ullah (Head Office)",
+    "designation": "Accountant"
+  },
+  {
+    "empId": 639,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md Abu Bokkor Siddiq (Head Office)",
+    "designation": "Area Accountant"
+  },
+  {
+    "empId": 1069,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Joydeb Chandra Majumder (Head Office)",
+    "designation": "Accounts & Finance Officer, SMART"
+  },
+  {
+    "empId": 1295,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Kazi Mohammad Mosaref Hossain (Head Office)",
+    "designation": "Personal Secretary"
+  },
+  {
+    "empId": 1296,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Kanij Farhana Nipu (Head Office)",
+    "designation": "Documentation and Publication Officer"
+  },
+  {
+    "empId": 1093,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Abul Khayer (Head Office)",
+    "designation": "Logistic Officer"
+  },
+  {
+    "empId": 1432,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Nazmul Islam Mishu (Head Office)",
+    "designation": "Photographer"
+  },
+  {
+    "empId": 1441,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md. Nurul Karim Patwary (Head Office)",
+    "designation": "Assistant Accountant"
+  },
+  {
+    "empId": 1443,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Saidul Islam (Head Office)",
+    "designation": "Assistant Livestock Officer"
+  },
+  {
+    "empId": 1554,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Md Rashedul Islam (Head Office)",
+    "designation": "Assistant Fisheries Officer"
+  },
+  {
+    "empId": 1442,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Sree Sushanta Kumar Ray (Head Office)",
+    "designation": "Assistant Agriculture Officer"
+  },
+  {
+    "empId": 504,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Jamal Uddin (Head Office)",
+    "designation": "Admin Assistant"
+  },
+  {
+    "empId": 307,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "MD Kefayet Ullah (Head Office)",
+    "designation": "Case Management Officer"
+  },
+  {
+    "empId": 308,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Riyed Hossain (Head Office)",
+    "designation": "Officer(Life Skill and Enterprise Development)"
+  },
+  {
+    "empId": 309,
+    "image": "/assets/img/logo/Sagorika.webp",
+    "name": "Shamsunnahar (Head Office)",
+    "designation": "District Facilitator"
+  }
+]
 
 const PRIMARY = "#f86048";
 
@@ -82,14 +321,14 @@ export default function OurLeadershipPage() {
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.7, delay: 0.1, ease: [0.215, 0.61, 0.355, 1] }}
+                  transition={{ duration: 0.35, delay: 0.05, ease: [0.215, 0.61, 0.355, 1] }}
                   className="flex items-center gap-4 mb-4!"
                 >
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: "3rem" }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    transition={{ duration: 0.3, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                     className="h-[2px]"
                     style={{ backgroundColor: PRIMARY }}
                   ></motion.div>
@@ -97,7 +336,7 @@ export default function OurLeadershipPage() {
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    transition={{ duration: 0.25, delay: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
                     className="font-black uppercase tracking-[0.3em]! text-[10px]!"
                     style={{ color: PRIMARY }}
                   >
@@ -108,7 +347,7 @@ export default function OurLeadershipPage() {
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.8, delay: 0.3, ease: [0.215, 0.61, 0.355, 1] }}
+                  transition={{ duration: 0.4, delay: 0.15, ease: [0.215, 0.61, 0.355, 1] }}
                   className="text-5xl lg:text-7xl font-black text-slate-900 dark:text-white! leading-[1]! tracking-wide!"
                 >
                   General &{" "}
@@ -116,7 +355,7 @@ export default function OurLeadershipPage() {
                     initial={{ opacity: 0, x: -30, filter: "blur(4px)" }}
                     whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.7, delay: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    transition={{ duration: 0.35, delay: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
                     style={{ color: PRIMARY_COLOR }}
                     className="inline-block"
                   >
@@ -126,7 +365,7 @@ export default function OurLeadershipPage() {
                     initial={{ opacity: 0, scale: 0 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 1.1, type: "spring", stiffness: 150, damping: 10 }}
+                    transition={{ duration: 0.25, delay: 0.55, type: "spring", stiffness: 150, damping: 10 }}
                     style={{ color: PRIMARY }}
                   >
                     .
@@ -137,11 +376,11 @@ export default function OurLeadershipPage() {
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.7, delay: 0.5, ease: [0.215, 0.61, 0.355, 1] }}
+                transition={{ duration: 0.35, delay: 0.25, ease: [0.215, 0.61, 0.355, 1] }}
                 className="max-w-sm text-slate-500 dark:text-slate-400! text-sm! leading-relaxed! italic! border-l-2! pl-6!"
                 style={{ borderColor: PRIMARY }}
               >
-                SSUS has a 7 member executive body. It is very much strong and active. The Executive Body meets by monthly and discusses the organizational performance and gives the guideline for implementation of the various projects.
+                SSUS has a strong and active 7-member executive body that meets monthly to review organizational performance and guide project implementation.
               </motion.p>
             </div>
 
@@ -155,8 +394,8 @@ export default function OurLeadershipPage() {
                 visible: {
                   opacity: 1,
                   transition: {
-                    staggerChildren: 0.12,
-                    delayChildren: 0.4,
+                    staggerChildren: 0.06,
+                    delayChildren: 0.2,
                   },
                 },
               }}
@@ -166,24 +405,22 @@ export default function OurLeadershipPage() {
                 <motion.div
                   key={index}
                   variants={{
-                    hidden: {
-                      opacity: 0,
-                      y: 60,
-                      scale: 0.92,
-                    },
+                    hidden: { opacity: 0 },
                     visible: {
                       opacity: 1,
-                      y: 0,
-                      scale: 1,
+                      transition: {
+                        staggerChildren: 0.03,
+                        delayChildren: 0.05,
+                      },
                     },
                   }}
                   transition={{
-                    duration: 0.7,
+                    duration: 0.35,
                     ease: [0.215, 0.61, 0.355, 1],
                   }}
                   whileHover={{
                     y: -8,
-                    transition: { duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] },
+                    transition: { duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] },
                   }}
                   className="group relative bg-white dark:bg-slate-800! rounded-2xl sm:rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl border border-slate-100 dark:border-slate-700! transition-shadow duration-500"
                 >
@@ -191,7 +428,7 @@ export default function OurLeadershipPage() {
                   <div className="relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-700!">
                     <motion.div
                       whileHover={{ scale: 1.08 }}
-                      transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+                      transition={{ duration: 0.35, ease: [0.215, 0.61, 0.355, 1] }}
                       className="w-full h-full"
                     >
                       <Image
@@ -206,7 +443,7 @@ export default function OurLeadershipPage() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
                       className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent opacity-0 group-hover:opacity-100"
                     />
 
@@ -214,7 +451,7 @@ export default function OurLeadershipPage() {
                     <motion.div
                       initial={{ x: "-100%", opacity: 0 }}
                       whileHover={{ x: "200%", opacity: 0.15 }}
-                      transition={{ duration: 0.8, ease: "easeInOut" }}
+                      transition={{ duration: 0.4, ease: "easeInOut" }}
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent skew-x-12 pointer-events-none"
                     />
 
@@ -222,7 +459,7 @@ export default function OurLeadershipPage() {
                     <motion.div
                       initial={{ opacity: 0, y: 15 }}
                       whileHover={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.4, staggerChildren: 0.08, delayChildren: 0.1 }}
+                      transition={{ duration: 0.2, staggerChildren: 0.04, delayChildren: 0.05 }}
                       className="absolute bottom-4 left-0 right-0 flex justify-center gap-3 opacity-0 group-hover:opacity-100"
                     >
                       <motion.button
@@ -250,7 +487,11 @@ export default function OurLeadershipPage() {
                       initial={{ opacity: 0, y: 8 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: 0.6 + index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{
+                        duration: 0.2,
+                        delay: Math.min(0.15 + index * 0.02, 0.45), 
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                      }}
                       className="text-[10px] sm:text-xs font-semibold uppercase tracking-[1.5px]! sm:tracking-[2px]! mb-1 sm:mb-2!"
                       style={{ color: PRIMARY_COLOR }}
                     >
@@ -260,7 +501,11 @@ export default function OurLeadershipPage() {
                       initial={{ opacity: 0, y: 8 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.4, delay: 0.7 + index * 0.08, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{
+                        duration: 0.2,
+                        delay: Math.min(0.2 + index * 0.02, 0.5),
+                        ease: [0.25, 0.46, 0.45, 0.94],
+                      }}
                       className="text-sm sm:text-base md:text-lg font-bold text-slate-900 dark:text-white! leading-tight! group-hover:text-[#e86958]! transition-colors duration-300"
                     >
                       {member.name}
@@ -270,7 +515,7 @@ export default function OurLeadershipPage() {
                     <motion.div
                       initial={{ scaleX: 0 }}
                       whileHover={{ scaleX: 1 }}
-                      transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{ duration: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                       className="absolute bottom-2 left-1/2 -translate-x-1/2 w-12 h-0.5 bg-[#e86958] origin-center"
                     />
                   </div>
@@ -279,7 +524,7 @@ export default function OurLeadershipPage() {
                   <motion.div
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 1 }}
-                    transition={{ duration: 0.3 }}
+                    transition={{ duration: 0.15 }}
                     className="absolute inset-0 rounded-2xl sm:rounded-3xl ring-2 ring-[#e86958]/30 pointer-events-none opacity-0 group-hover:opacity-100"
                   />
                 </motion.div>
@@ -297,14 +542,14 @@ export default function OurLeadershipPage() {
                   initial={{ opacity: 0, x: -30 }}
                   whileInView={{ opacity: 1, x: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.7, delay: 0.1, ease: [0.215, 0.61, 0.355, 1] }}
+                  transition={{ duration: 0.35, delay: 0.05, ease: [0.215, 0.61, 0.355, 1] }}
                   className="flex items-center gap-4 mb-4!"
                 >
                   <motion.div
                     initial={{ width: 0 }}
                     whileInView={{ width: "3rem" }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    transition={{ duration: 0.3, delay: 0.15, ease: [0.25, 0.46, 0.45, 0.94] }}
                     className="h-[2px]"
                     style={{ backgroundColor: PRIMARY }}
                   ></motion.div>
@@ -312,7 +557,7 @@ export default function OurLeadershipPage() {
                     initial={{ opacity: 0, y: 10 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    transition={{ duration: 0.25, delay: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
                     className="font-black uppercase tracking-[0.3em]! text-[10px]!"
                     style={{ color: PRIMARY }}
                   >
@@ -323,7 +568,7 @@ export default function OurLeadershipPage() {
                   initial={{ opacity: 0, y: 40 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.8, delay: 0.2, ease: [0.215, 0.61, 0.355, 1] }}
+                  transition={{ duration: 0.4, delay: 0.1, ease: [0.215, 0.61, 0.355, 1] }}
                   className="text-5xl lg:text-7xl font-black text-slate-900 dark:text-white! leading-[1]! tracking-wide!"
                 >
                   The Visionaries Driving{" "}
@@ -331,7 +576,7 @@ export default function OurLeadershipPage() {
                     initial={{ opacity: 0, x: -30, filter: "blur(4px)" }}
                     whileInView={{ opacity: 1, x: 0, filter: "blur(0px)" }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.7, delay: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                    transition={{ duration: 0.35, delay: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
                     style={{ color: PRIMARY_COLOR }}
                     className="inline-block"
                   >
@@ -341,7 +586,7 @@ export default function OurLeadershipPage() {
                     initial={{ opacity: 0, scale: 0 }}
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 0.5, delay: 1, type: "spring", stiffness: 150, damping: 10 }}
+                    transition={{ duration: 0.25, delay: 0.5, type: "spring", stiffness: 150, damping: 10 }}
                     style={{ color: PRIMARY }}
                   >
                     .
@@ -352,7 +597,7 @@ export default function OurLeadershipPage() {
                 initial={{ opacity: 0, x: 40 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.7, delay: 0.5, ease: [0.215, 0.61, 0.355, 1] }}
+                transition={{ duration: 0.35, delay: 0.25, ease: [0.215, 0.61, 0.355, 1] }}
                 className="max-w-sm text-slate-500 dark:text-slate-400! text-sm! leading-relaxed! italic! border-l-2! pl-6!"
                 style={{ borderColor: PRIMARY }}
               >
@@ -370,8 +615,8 @@ export default function OurLeadershipPage() {
                 visible: {
                   opacity: 1,
                   transition: {
-                    staggerChildren: 0.2,
-                    delayChildren: 0.3,
+                    staggerChildren: 0.1,
+                    delayChildren: 0.15,
                   },
                 },
               }}
@@ -395,12 +640,12 @@ export default function OurLeadershipPage() {
                     },
                   }}
                   transition={{
-                    duration: 0.9,
+                    duration: 0.45,
                     ease: [0.215, 0.61, 0.355, 1],
                   }}
                   whileHover={{
                     y: -12,
-                    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+                    transition: { duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] },
                   }}
                   className="group relative bg-white dark:bg-slate-800! rounded-2xl sm:rounded-3xl overflow-hidden shadow-xl hover:shadow-2xl border border-slate-100 dark:border-slate-700! transition-shadow duration-500"
                 >
@@ -408,7 +653,7 @@ export default function OurLeadershipPage() {
                   <div className="relative aspect-[4/3] overflow-hidden">
                     <motion.div
                       whileHover={{ scale: 1.08 }}
-                      transition={{ duration: 0.8, ease: [0.215, 0.61, 0.355, 1] }}
+                      transition={{ duration: 0.4, ease: [0.215, 0.61, 0.355, 1] }}
                       className="w-full h-full"
                     >
                       <Image
@@ -423,7 +668,7 @@ export default function OurLeadershipPage() {
                     <motion.div
                       initial={{ opacity: 0 }}
                       whileHover={{ opacity: 1 }}
-                      transition={{ duration: 0.5 }}
+                      transition={{ duration: 0.25 }}
                       className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/35 to-transparent opacity-0 group-hover:opacity-100"
                     />
 
@@ -431,7 +676,7 @@ export default function OurLeadershipPage() {
                     <motion.div
                       initial={{ x: "-100%", opacity: 0 }}
                       whileHover={{ x: "200%", opacity: 0.2 }}
-                      transition={{ duration: 0.9, ease: "easeInOut" }}
+                      transition={{ duration: 0.45, ease: "easeInOut" }}
                       className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent skew-x-12 pointer-events-none"
                     />
 
@@ -441,8 +686,8 @@ export default function OurLeadershipPage() {
                       whileInView={{ opacity: 1, x: 0, rotate: 0 }}
                       viewport={{ once: true }}
                       transition={{
-                        duration: 0.5,
-                        delay: 1 + index * 0.2,
+                        duration: 0.25,
+                        delay: 0.5 + index * 0.1,
                         type: "spring",
                         stiffness: 200,
                         damping: 15,
@@ -466,7 +711,7 @@ export default function OurLeadershipPage() {
                       initial={{ width: 0, opacity: 0 }}
                       whileInView={{ width: "3rem", opacity: 1 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.6, delay: 0.9 + index * 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{ duration: 0.3, delay: 0.45 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
                       className="inline-block h-0.5 bg-gradient-to-r from-transparent via-[#e86958]! to-transparent mb-4 sm:mb-6"
                     />
 
@@ -474,7 +719,7 @@ export default function OurLeadershipPage() {
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: 0.7 + index * 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{ duration: 0.25, delay: 0.35 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
                       className="uppercase text-[10px] sm:text-xs font-semibold tracking-[2px] sm:tracking-[2.5px]! text-slate-500 dark:text-slate-400! mb-1! sm:mb-2!"
                     >
                       {member.role}
@@ -484,14 +729,14 @@ export default function OurLeadershipPage() {
                       initial={{ opacity: 0, y: 10 }}
                       whileInView={{ opacity: 1, y: 0 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.5, delay: 0.8 + index * 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{ duration: 0.25, delay: 0.4 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
                       className="text-lg sm:text-xl md:text-2xl font-semibold text-slate-900 dark:text-white! leading-tight! group-hover:text-[#e86958]! transition-colors duration-300 relative inline-block"
                     >
                       {member.name}
                       <motion.span
                         initial={{ scaleX: 0 }}
                         whileHover={{ scaleX: 1 }}
-                        transition={{ duration: 0.35, ease: [0.25, 0.46, 0.45, 0.94] }}
+                        transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
                         className="absolute bottom-0 left-0 w-full h-0.5 bg-[#e86958] origin-left"
                       />
                     </motion.h3>
@@ -501,7 +746,7 @@ export default function OurLeadershipPage() {
                       initial={{ scaleX: 0, opacity: 0 }}
                       whileInView={{ scaleX: 1, opacity: 1 }}
                       viewport={{ once: true }}
-                      transition={{ duration: 0.7, delay: 1.2 + index * 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                      transition={{ duration: 0.35, delay: 0.6 + index * 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
                       className="mt-6 sm:mt-8 h-px w-full bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700! to-transparent"
                       style={{ transformOrigin: "center" }}
                     />
@@ -511,7 +756,7 @@ export default function OurLeadershipPage() {
                   <motion.div
                     initial={{ opacity: 0 }}
                     whileHover={{ opacity: 1 }}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.2 }}
                     className="absolute inset-0 rounded-2xl sm:rounded-3xl ring-2 ring-[#e86958]/25 pointer-events-none opacity-0 group-hover:opacity-100"
                   />
                 </motion.div>

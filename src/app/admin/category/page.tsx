@@ -1,102 +1,65 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import Swal from "sweetalert2";
 
 import DataTable, { Column } from "@/components/Admin/DataTable";
 import { StatusCell } from "@/components/Admin/TableCells";
-
-interface Category {
-  id: string;
-  name: string;
-  description: string;
-  status: "Active" | "Inactive";
-}
-
-const dummyCategories: Category[] = [
-  {
-    id: "1",
-    name: "Technology",
-    description: "Tech related content",
-    status: "Active",
-  },
-  {
-    id: "2",
-    name: "Health",
-    description: "Health & wellness topics",
-    status: "Active",
-  },
-  {
-    id: "3",
-    name: "Lifestyle",
-    description: "Daily life tips",
-    status: "Inactive",
-  },
-];
+import { useCategories, ApiCategory } from "@/hooks/useCategories";
 
 export default function AllCategories() {
   const router = useRouter();
-  const [categories, setCategories] = useState<Category[]>(dummyCategories);
+  const { categories, loading, fetchCategories, deleteCategory } = useCategories();
   const [statusFilter, setStatusFilter] = useState("All");
+
+  useEffect(() => {
+    fetchCategories();
+  }, [fetchCategories]);
 
   const filteredCategories = useMemo(
     () =>
-      categories.filter(
-        (cat) => statusFilter === "All" || cat.status === statusFilter,
-      ),
-    [categories, statusFilter],
+      categories.filter((cat) => {
+        if (statusFilter === "All") return true;
+        const status = cat.IsActive ? "Active" : "Inactive";
+        return status === statusFilter;
+      }),
+    [categories, statusFilter]
   );
 
-  const handleDelete = async (category: Category) => {
-    const result = await Swal.fire({
-      title: "Are you sure?",
-      text: `Delete "${category.name}"?`,
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#e86958",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
-    });
-
-    if (result.isConfirmed) {
-      setCategories((prev) => prev.filter((c) => c.id !== category.id));
-
-      Swal.fire({
-        title: "Deleted!",
-        text: "Category removed.",
-        icon: "success",
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    }
-  };
-
-  const columns: Column<Category>[] = [
+  const columns: Column<ApiCategory>[] = [
     {
-      key: "name",
+      key: "CategoryName",
       header: "Category Name",
       className: "font-medium text-black",
     },
-    { key: "description", header: "Description" },
     {
-      key: "status",
+      key: "Description",
+      header: "Description",
+      render: (c) => c.Description || "-",
+    },
+    {
+      key: "IsActive",
       header: "Status",
-      render: (c) => <StatusCell status={c.status} showIcon={false} />,
+      render: (c) => (
+        <StatusCell
+          status={c.IsActive ? "Active" : "Inactive"}
+          showIcon={false}
+        />
+      ),
     },
   ];
 
   return (
     <div>
-      <DataTable<Category>
+      <DataTable<ApiCategory>
         title="Categories"
         description="Manage content categories"
         data={filteredCategories}
         columns={columns}
-        searchKeys={["name", "description"]}
+        searchKeys={["CategoryName", "Description"]}
         filters={[
           {
-            key: "status",
+            key: "IsActive",
             label: "Status",
             options: [
               { value: "All", label: "All Status" },
@@ -111,10 +74,10 @@ export default function AllCategories() {
         onAdd={() => router.push("/admin/category/add")}
         onEdit={(cat) => {
           localStorage.setItem("tempCategoryData", JSON.stringify(cat));
-          router.push(`/admin/category/add?id=${cat.id}`);
+          router.push(`/admin/category/add?id=${cat.CategoryID}`);
         }}
-        onDelete={handleDelete}
-        getRowId={(c) => c.id}
+        onDelete={deleteCategory}
+        getRowId={(c) => c.CategoryID || c.CategoryName}
         showActions
       />
     </div>

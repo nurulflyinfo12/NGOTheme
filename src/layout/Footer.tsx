@@ -351,7 +351,7 @@ const Footer = () => {
               >
                 Developed By:{" "}
                 <Link
-                  href="#"
+                  href="https://flyinfosoftbd.com/"
                   className="text-white hover:text-[#f86048] transition-colors duration-300 font-medium"
                 >
                   Flyinfosoft Technologies Limited
