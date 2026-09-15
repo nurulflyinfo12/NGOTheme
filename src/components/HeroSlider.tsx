@@ -3,32 +3,9 @@
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
-import { useHeroSection, ApiHeroSection } from "@/hooks/useHeroSection";
-import { api } from "@/utility/api";
+import { useHeroSection, parseSingleImageUrl } from "@/hooks/useHeroSection";
 
 const PRIMARY = "#f86048";
-
-const parseImageUrls = (imageUrls?: any[]): string[] => {
-  if (!imageUrls || imageUrls.length === 0) return [];
-
-  const rawString = Array.isArray(imageUrls)
-    ? imageUrls.join(",")
-    : String(imageUrls);
-
-  const urlRegex = /(https?:\/\/[^\s"',\]]+|\/[^\s"',\]]+)/g;
-  const matches = rawString.match(urlRegex) || [];
-
-  const cleaned = matches.map((url) =>
-    url.replace(/[\\\]"' border]+$/g, "").replace(/\\/g, "")
-  );
-
-  const uniqueUrls = Array.from(new Set(cleaned));
-
-  return uniqueUrls.map((url) => {
-    if (url.startsWith("http")) return url;
-    return api.getFileUrl(url);
-  });
-};
 
 export const HeroSlider1 = () => {
   const { heroSections, loading, fetchHeroSections } = useHeroSection();
@@ -38,6 +15,7 @@ export const HeroSlider1 = () => {
     fetchHeroSections();
   }, [fetchHeroSections]);
 
+  // Maps each HeroSection item to EXACTLY ONE slide with 1 image
   const slides = useMemo(() => {
     if (heroSections.length === 0) {
       return [
@@ -50,31 +28,12 @@ export const HeroSlider1 = () => {
       ];
     }
 
-    const compiledSlides: {
-      img: string;
-      mission: string;
-      h1: string;
-      details?: string;
-    }[] = [];
-
-    heroSections.forEach((hero) => {
-      const extractedImages = parseImageUrls(hero.ImageUrls);
-      const bgImages =
-        extractedImages.length > 0
-          ? extractedImages
-          : ["/assets/img/hero/hero-1.webp"];
-
-      bgImages.forEach((imgUrl) => {
-        compiledSlides.push({
-          img: imgUrl,
-          mission: hero.Quote || "Strategic Initiatives",
-          h1: hero.HeroTitle,
-          details: hero.HeroDetails,
-        });
-      });
-    });
-
-    return compiledSlides;
+    return heroSections.map((hero) => ({
+      img: parseSingleImageUrl(hero.ImageUrls),
+      mission: hero.Quote || "Strategic Initiatives",
+      h1: hero.HeroTitle,
+      details: hero.HeroDetails || "",
+    }));
   }, [heroSections]);
 
   useEffect(() => {
@@ -91,13 +50,7 @@ export const HeroSlider1 = () => {
   };
 
   return (
-    <section
-      className="
-        relative w-full overflow-hidden bg-white dark:bg-[#0f172a]!
-        h-[100svh] min-h-[500px] max-h-[900px]
-        sm:h-[95vh] sm:min-h-[580px]
-      "
-    >
+    <section className="relative w-full overflow-hidden bg-white dark:bg-[#0f172a] h-[100svh] min-h-[500px] max-h-[900px] sm:h-[95vh] sm:min-h-[580px]">
       {/* Background Image Slides */}
       {slides.map((slide, i) => (
         <div
@@ -148,36 +101,24 @@ export const HeroSlider1 = () => {
                       </motion.div>
                     )}
 
-                    {/* Main Title — FLUID CLAMP TYPOGRAPHY */}
+                    {/* Main Title */}
                     <motion.h1
                       initial={{ opacity: 0, y: 30 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.8, delay: 0.2 }}
-                      className="
-                        whitespace-pre-line font-black text-white
-                        leading-[1.1] tracking-tight
-                        break-words
-                        text-[clamp(1.5rem,5vw+1rem,4.5rem)]
-                      "
+                      className="whitespace-pre-line font-black text-white leading-[1.1] tracking-tight break-words text-[clamp(1.5rem,5vw+1rem,4.5rem)]"
                     >
                       {slide.h1}
                       <span style={{ color: PRIMARY }}>.</span>
                     </motion.h1>
 
-                    {/* Hero Description Details */}
+                    {/* Hero Details */}
                     {slide.details && (
                       <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.8, delay: 0.4 }}
-                        className="
-                          mt-4 sm:mt-6
-                          max-w-2xl
-                          text-slate-300
-                          leading-relaxed
-                          line-clamp-3
-                          text-[clamp(0.875rem,1.5vw+0.5rem,1.125rem)]
-                        "
+                        className="mt-4 sm:mt-6 max-w-2xl text-slate-300 leading-relaxed line-clamp-3 text-[clamp(0.875rem,1.5vw+0.5rem,1.125rem)]"
                       >
                         {slide.details}
                       </motion.p>
@@ -191,7 +132,7 @@ export const HeroSlider1 = () => {
       </div>
 
       {/* Bottom Gradient Fade */}
-      <div className="absolute bottom-0 left-0 z-20 h-24 sm:h-32 w-full bg-gradient-to-t from-white dark:from-[#0f172a]! to-transparent pointer-events-none" />
+      <div className="absolute bottom-0 left-0 z-20 h-24 sm:h-32 w-full bg-gradient-to-t from-white dark:from-[#0f172a] to-transparent pointer-events-none" />
 
       {/* Slider Navigation Dots */}
       {slides.length > 1 && (

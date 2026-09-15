@@ -14,7 +14,7 @@ interface CoreProgramsProps {
   categorySlug?: string;
 }
 
-const CorePrograms = ({ categorySlug = "check" }: CoreProgramsProps) => {
+const CorePrograms = ({ categorySlug = "core-programs" }: CoreProgramsProps) => {
   const {
     projects,
     loading,

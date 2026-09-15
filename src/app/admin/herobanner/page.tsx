@@ -7,7 +7,7 @@ import { ImageCell } from "@/components/Admin/TableCells";
 import {
   useHeroSection,
   ApiHeroSection,
-  parseImageUrls,
+  parseSingleImageUrl,
 } from "@/hooks/useHeroSection";
 
 export default function AllHeroBanners() {
@@ -42,16 +42,14 @@ export default function AllHeroBanners() {
     },
     {
       key: "ImageUrls",
-      header: "Images",
+      header: "Image",
       render: (b) => {
-        const images = parseImageUrls(b.ImageUrls);
-        if (images.length === 0) return <span className="text-gray-400">No Images</span>;
+        const imageUrl = parseSingleImageUrl(b.ImageUrls);
+        if (!imageUrl) return <span className="text-gray-400">No Image</span>;
 
         return (
-          <div className="flex items-center gap-2 flex-wrap max-w-xs">
-            {images.map((imgUrl, idx) => (
-              <ImageCell key={idx} src={imgUrl} alt={`${b.HeroTitle} ${idx + 1}`} />
-            ))}
+          <div className="flex items-center gap-2">
+            <ImageCell src={imageUrl} alt={b.HeroTitle || "Banner Image"} />
           </div>
         );
       },

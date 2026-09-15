@@ -16,7 +16,7 @@ import { TextField } from "@/components/Admin/TextField";
 import {
   useHeroSection,
   ApiHeroSection,
-  parseImageUrls,
+  parseSingleImageUrl,
 } from "@/hooks/useHeroSection";
 
 export interface HeroBannerFormData {
@@ -24,7 +24,7 @@ export interface HeroBannerFormData {
   heroTitle: string;
   heroDetails: string;
   quote: string;
-  imageUrls: string[];
+  imageUrl: string;
 }
 
 export default function AddEditHeroBannerPage() {
@@ -39,7 +39,7 @@ export default function AddEditHeroBannerPage() {
     heroTitle: "",
     heroDetails: "",
     quote: "",
-    imageUrls: [],
+    imageUrl: "",
   });
 
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -54,15 +54,15 @@ export default function AddEditHeroBannerPage() {
       if (rawData) {
         try {
           const banner = JSON.parse(rawData);
-          // Parse complex nested JSON string array into clean array of URLs
-          const cleanImages = parseImageUrls(banner.ImageUrls);
+          // Parse single image URL string
+          const cleanImage = parseSingleImageUrl(banner.ImageUrls);
 
           setFormData({
             heroSectionId: banner.HeroSectionID || bannerId || undefined,
             heroTitle: banner.HeroTitle || "",
             heroDetails: banner.HeroDetails || "",
             quote: banner.Quote || "",
-            imageUrls: cleanImages,
+            imageUrl: cleanImage,
           });
         } catch (err) {
           console.error("Error parsing hero banner data:", err);
@@ -80,8 +80,8 @@ export default function AddEditHeroBannerPage() {
   const validate = () => {
     const newErrors: Partial<Record<keyof HeroBannerFormData, string>> = {};
     if (!formData.heroTitle.trim()) newErrors.heroTitle = "Title is Required.";
-    if (formData.imageUrls.length === 0 || !formData.imageUrls[0]) {
-      newErrors.imageUrls = "At least one banner image is Required.";
+    if (!formData.imageUrl.trim()) {
+      newErrors.imageUrl = "Banner image is Required.";
     }
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -104,7 +104,7 @@ export default function AddEditHeroBannerPage() {
       HeroDetails: formData.heroDetails,
       Quote: formData.quote,
       SetDate: new Date().toISOString(),
-      ImageUrls: formData.imageUrls,
+      ImageUrls: [formData.imageUrl],
     };
 
     const success = await saveOrUpdateHeroSection(payload);
@@ -121,7 +121,7 @@ export default function AddEditHeroBannerPage() {
       heroTitle: "",
       heroDetails: "",
       quote: "",
-      imageUrls: [],
+      imageUrl: "",
     });
     setErrors({});
   };
@@ -192,32 +192,31 @@ export default function AddEditHeroBannerPage() {
           </div>
         </div>
 
-        {/* Multi-Image Upload */}
+        {/* Single Image Upload */}
         <div className="space-y-1.5 sm:col-span-2">
           <label className="text-xs font-bold text-slate-700 tracking-wide uppercase px-1">
-            Banner Images <span className="text-red-500">*</span>
+            Banner Image <span className="text-red-500">*</span>
           </label>
 
           {isDataLoaded && (
             <ImageUpload
-              key={formData.imageUrls.join(",")} // Forces full component re-mount once initial images load
-              label="Drag & Drop Banner Images (Multiple Allowed)"
+              key={formData.imageUrl} // Re-renders if initial image updates
+              label="Drag & Drop Single Banner Image"
               allowedTypes="image"
-              allowMultiple={true}
+              allowMultiple={false}
               showCaption={false}
-              initialImages={formData.imageUrls.map((img) => ({ image: img }))}
+              initialImages={
+                formData.imageUrl ? [{ image: formData.imageUrl }] : []
+              }
               onImagesChange={(files) =>
-                handleChange(
-                  "imageUrls",
-                  files.map((f) => f.image).filter(Boolean)
-                )
+                handleChange("imageUrl", files[0]?.image || "")
               }
             />
           )}
 
-          {errors.imageUrls && (
+          {errors.imageUrl && (
             <p className="text-xs text-red-600 flex items-center gap-1 ml-1 mt-1">
-              <AlertCircle size={12} /> {errors.imageUrls}
+              <AlertCircle size={12} /> {errors.imageUrl}
             </p>
           )}
         </div>

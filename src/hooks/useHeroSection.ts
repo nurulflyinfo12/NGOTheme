@@ -10,52 +10,32 @@ export interface ApiHeroSection {
   HeroDetails?: string;
   Quote?: string;
   SetDate?: string;
-  ImageUrls: string[];
+  ImageUrls: string[] | string;
 }
+// Utility: Parses API payload and extracts ONLY the first valid image URL
+export const parseSingleImageUrl = (imageUrls?: any): string => {
+  if (!imageUrls) return "/assets/img/hero/hero-1.webp";
 
-// Utility: Recursively unpacks multi-layer JSON strings and array structures
-export const parseImageUrls = (imageUrls?: any): string[] => {
-  if (!imageUrls) return [];
-  const parsedUrls: string[] = [];
+  const rawString = Array.isArray(imageUrls)
+    ? imageUrls.join(",")
+    : String(imageUrls);
 
-  const extractString = (val: any) => {
-    if (val === null || val === undefined) return;
+  // Match absolute URLs or root file paths
+  const urlRegex = /(https?:\/\/[^\s"',\]]+|\/[^\s"',\]]+)/g;
+  const matches = rawString.match(urlRegex);
 
-    if (Array.isArray(val)) {
-      val.forEach(extractString);
-      return;
-    }
+  // Safely extract first match
+  const firstMatch = matches?.[0];
 
-    if (typeof val === "string") {
-      const trimmed = val.trim();
-      // Check if stringified JSON array or string
-      if (
-        (trimmed.startsWith("[") && trimmed.endsWith("]")) ||
-        (trimmed.startsWith('"') && trimmed.endsWith('"'))
-      ) {
-        try {
-          const parsed = JSON.parse(trimmed);
-          extractString(parsed);
-          return;
-        } catch {
-          // If JSON parse fails, process as raw string below
-        }
-      }
+  if (!firstMatch) return "/assets/img/hero/hero-1.webp";
 
-      // Clean up escaped backslashes and surrounding double quotes
-      const cleanUrl = trimmed.replace(/^["']|["']$/g, "").replace(/\\/g, "");
-      if (cleanUrl.startsWith("http") || cleanUrl.startsWith("/")) {
-        parsedUrls.push(cleanUrl);
-      }
-    }
-  };
+  // Take only the first matched URL and strip escaping artifacts
+  const cleanUrl = firstMatch
+    .replace(/[\\\]"' border]+$/g, "")
+    .replace(/\\/g, "");
 
-  extractString(imageUrls);
-
-  return parsedUrls.map((url) => {
-    if (url.startsWith("http")) return url;
-    return api.getFileUrl(url);
-  });
+  if (cleanUrl.startsWith("http")) return cleanUrl;
+  return api.getFileUrl(cleanUrl);
 };
 
 export function useHeroSection() {
@@ -64,13 +44,13 @@ export function useHeroSection() {
   const [submitting, setSubmitting] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
-  // 1. Fetch Hero Section: GET /api/Public/GetHeroSection
+  // 1. Fetch Hero Section
   const fetchHeroSections = useCallback(async () => {
     setLoading(true);
     setError("");
     try {
       const data = await api.get<ApiHeroSection[] | ApiHeroSection>(
-        "/Public/GetHeroSection"
+        "/Public/GetHeroSection",
       );
       const list = Array.isArray(data) ? data : data ? [data] : [];
       setHeroSections(list);
@@ -84,7 +64,7 @@ export function useHeroSection() {
     }
   }, []);
 
-  // 2. Save or Update Hero Section: POST /api/HeroSectionSetup/CreateUpdateHeroSection
+  // 2. Save or Update Hero Section
   const saveOrUpdateHeroSection = async (payload: ApiHeroSection) => {
     setSubmitting(true);
     setError("");
@@ -94,7 +74,7 @@ export function useHeroSection() {
         {
           ...payload,
           SetDate: payload.SetDate || new Date().toISOString(),
-        }
+        },
       );
 
       if (
@@ -165,9 +145,9 @@ export function useHeroSection() {
       try {
         await api.post(
           `/HeroSectionSetup/DeleteHeroSection?heroSectionId=${encodeURIComponent(
-            bannerId
+            bannerId,
           )}`,
-          {}
+          {},
         );
         Swal.fire({
           title: "Deleted!",
