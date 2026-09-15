@@ -14,7 +14,7 @@ interface AllProjectsProps {
   categorySlug?: string;
 }
 
-const AllProjects = ({ categorySlug = "check" }: AllProjectsProps) => {
+const AllProjects = ({ categorySlug = "projects" }: AllProjectsProps) => {
   const { projects, loading, fetchProjectsByCategorySlug, fetchProjects } = useProjects();
 
   useEffect(() => {

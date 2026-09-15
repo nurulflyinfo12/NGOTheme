@@ -13,7 +13,7 @@ interface Service1Props {
   categorySlug?: string;
 }
 
-export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
+export const Service1 = ({ categorySlug = "projects" }: Service1Props) => {
   const { projects, loading, fetchProjectsByCategorySlug } = useProjects();
 
   const [currentIndex, setCurrentIndex] = useState<number>(0);
@@ -39,13 +39,20 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
   }, [projects]);
 
   // Map API data to component layout requirements
-  const serviceData = projects.map((item) => ({
-    id: item.ProjectID,
-    img: api.getFileUrl(item.Photo),
-    title: item.Title || "Untitled Project",
-    description: item.Subtitle || item.Details?.replace(/<[^>]*>?/gm, "") || "",
-    tag: item.SubcategoryName || item.CategoryName || "Core Initiative",
-  }));
+  const serviceData = projects.map((item) => {
+    const imgUrl = api.getFileUrl(item.Photo);
+    // Debug log — remove once images work
+    console.log("Project Photo:", item.Photo, "→ Resolved URL:", imgUrl);
+
+    return {
+      id: item.ProjectID,
+      img: imgUrl,
+      title: item.Title || "Untitled Project",
+      description:
+        item.Subtitle || item.Details?.replace(/<[^>]*>?/gm, "") || "",
+      tag: item.SubcategoryName || item.CategoryName || "Core Initiative",
+    };
+  });
 
   // Intersection Observer for section reveal
   useEffect(() => {
@@ -59,7 +66,7 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
       {
         threshold: 0.1,
         rootMargin: "0px 0px -50px 0px",
-      }
+      },
     );
 
     if (sectionRef.current) {
@@ -76,7 +83,9 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
   // Detect screen size using media query
   useEffect(() => {
     const mobileQuery = window.matchMedia("(max-width: 767px)");
-    const tabletQuery = window.matchMedia("(min-width: 768px) and (max-width: 1279px)");
+    const tabletQuery = window.matchMedia(
+      "(min-width: 768px) and (max-width: 1279px)",
+    );
     const desktopQuery = window.matchMedia("(min-width: 1280px)");
 
     const updateSlidesPerView = () => {
@@ -102,7 +111,10 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
     };
   }, []);
 
-  const totalSlides = Math.max(1, Math.ceil(serviceData.length / slidesPerView));
+  const totalSlides = Math.max(
+    1,
+    Math.ceil(serviceData.length / slidesPerView),
+  );
   const maxIndex = totalSlides - 1;
 
   const nextSlide = () => {
@@ -131,7 +143,13 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [currentIndex, isAutoPlaying, maxIndex, serviceData.length, slidesPerView]);
+  }, [
+    currentIndex,
+    isAutoPlaying,
+    maxIndex,
+    serviceData.length,
+    slidesPerView,
+  ]);
 
   // Touch handlers
   const handleTouchStart = (e: TouchEvent) => {
@@ -163,6 +181,14 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
     return serviceData.slice(start, end);
   };
 
+  // Helper: decide if image should bypass Next.js optimizer
+  const shouldUnoptimize = (src: string) =>
+    !src ||
+    src.includes("localhost") ||
+    src.startsWith("http://") ||
+    src.startsWith("blob:") ||
+    src.startsWith("data:");
+
   // Animation variants
   const slideVariants = {
     enter: (direction: number) => ({
@@ -187,8 +213,8 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
 
   const cardHoverVariants = {
     rest: { scale: 1, y: 0 },
-    hover: { 
-      scale: 1.02, 
+    hover: {
+      scale: 1.02,
       y: -8,
     },
   };
@@ -205,7 +231,11 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
             <motion.div
               initial={{ opacity: 0, x: -30 }}
               animate={isVisible ? { opacity: 1, x: 0 } : {}}
-              transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.6,
+                delay: 0.1,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="flex items-center gap-3 sm:gap-4! mb-3! sm:mb-4!"
             >
               <motion.div
@@ -228,14 +258,23 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
               animate={isVisible ? { opacity: 1, y: 0 } : {}}
-              transition={{ duration: 0.7, delay: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              transition={{
+                duration: 0.7,
+                delay: 0.3,
+                ease: [0.25, 0.46, 0.45, 0.94],
+              }}
               className="text-xl sm:text-2xl md:text-3xl lg:text-5xl xl:text-6xl font-black text-slate-900 dark:text-white! leading-tight! tracking-tighter!"
             >
               Strategic Solutions for Community Growth
               <motion.span
                 initial={{ opacity: 0, scale: 0 }}
                 animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-                transition={{ duration: 0.4, delay: 0.8, type: "spring", stiffness: 200 }}
+                transition={{
+                  duration: 0.4,
+                  delay: 0.8,
+                  type: "spring",
+                  stiffness: 200,
+                }}
                 style={{ color: PRIMARY }}
               >
                 .
@@ -246,7 +285,11 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
           <motion.div
             initial={{ opacity: 0, x: 30 }}
             animate={isVisible ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.5, ease: [0.25, 0.46, 0.45, 0.94] }}
+            transition={{
+              duration: 0.6,
+              delay: 0.5,
+              ease: [0.25, 0.46, 0.45, 0.94],
+            }}
             className="flex items-center justify-between sm:justify-end gap-4 sm:gap-6 w-full sm:w-auto"
           >
             <Link
@@ -269,7 +312,11 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
         <motion.div
           initial={{ opacity: 0, y: 40 }}
           animate={isVisible ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, delay: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
+          transition={{
+            duration: 0.8,
+            delay: 0.6,
+            ease: [0.25, 0.46, 0.45, 0.94],
+          }}
           ref={sliderRef}
           className="relative"
           onTouchStart={handleTouchStart}
@@ -295,7 +342,11 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
           ) : (
             /* Fixed height container */
             <div className="overflow-hidden relative min-h-[440px] sm:min-h-[460px]">
-              <AnimatePresence initial={false} custom={direction} mode="popLayout">
+              <AnimatePresence
+                initial={false}
+                custom={direction}
+                mode="popLayout"
+              >
                 <motion.div
                   key={currentIndex}
                   custom={direction}
@@ -307,12 +358,13 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                     x: { type: "spring", stiffness: 300, damping: 30 },
                     opacity: { duration: 0.2 },
                   }}
-                  className={`grid gap-5 lg:gap-6 ${slidesPerView === 1
-                    ? "grid-cols-1"
-                    : slidesPerView === 2
-                      ? "grid-cols-1 md:grid-cols-2"
-                      : "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
-                    }`}
+                  className={`grid gap-5 lg:gap-6 ${
+                    slidesPerView === 1
+                      ? "grid-cols-1"
+                      : slidesPerView === 2
+                        ? "grid-cols-1 md:grid-cols-2"
+                        : "grid-cols-1 md:grid-cols-2 xl:grid-cols-3"
+                  }`}
                 >
                   {getVisibleSlides().map((item, i) => (
                     <motion.div
@@ -320,9 +372,9 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                       variants={cardHoverVariants}
                       initial="rest"
                       whileHover="hover"
-                      transition={{ 
-                        duration: 0.4, 
-                        ease: [0.25, 0.46, 0.45, 0.94] 
+                      transition={{
+                        duration: 0.4,
+                        ease: [0.25, 0.46, 0.45, 0.94],
                       }}
                       className="group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-slate-200/80 dark:border-slate-800! shadow-md hover:shadow-2xl transition-all duration-500 bg-slate-900"
                     >
@@ -330,26 +382,46 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                       <div className="relative h-[420px] sm:h-[450px] w-full overflow-hidden">
                         <motion.div
                           whileHover={{ scale: 1.1 }}
-                          transition={{ duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] }}
+                          transition={{
+                            duration: 0.7,
+                            ease: [0.25, 0.46, 0.45, 0.94],
+                          }}
                           className="absolute inset-0"
                         >
-                          <Image
-                            fill
-                            src={item.img}
-                            alt={item.title}
-                            className="object-cover"
-                            sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
-                          />
+                          {item.img ? (
+                            <Image
+                              fill
+                              src={item.img}
+                              alt={item.title}
+                              className="object-cover"
+                              sizes="(max-width: 767px) 100vw, (max-width: 1279px) 50vw, 33vw"
+                              unoptimized={shouldUnoptimize(item.img)}
+                              onError={(e) => {
+                                console.error(
+                                  "Image failed to load:",
+                                  item.img,
+                                  e,
+                                );
+                              }}
+                            />
+                          ) : (
+                            <div className="w-full h-full bg-slate-700 flex items-center justify-center text-slate-400 text-sm">
+                              No image
+                            </div>
+                          )}
                         </motion.div>
 
-                        {/* Enhanced Gradient Overlay for Instant Legibility */}
+                        {/* Enhanced Gradient Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/50 to-transparent opacity-80 group-hover:opacity-95 transition-opacity duration-500 z-10" />
 
-                        {/* Top Badge & Number Header */}
+                        {/* Top Badge */}
                         <motion.div
                           initial={{ opacity: 0, y: -10 }}
                           animate={{ opacity: 1, y: 0 }}
-                          transition={{ duration: 0.4, delay: 0.2 + i * 0.1 }}
+                          transition={{
+                            duration: 0.4,
+                            delay: 0.2 + i * 0.1,
+                          }}
                           className="absolute top-4 left-4 right-4 flex items-center justify-between z-20"
                         >
                           <motion.span
@@ -360,16 +432,21 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                           </motion.span>
                         </motion.div>
 
-                        {/* Card Bottom Content Zone */}
+                        {/* Card Bottom Content */}
                         <div className="absolute inset-x-0 bottom-0 p-5 sm:p-6 z-20 flex flex-col justify-end">
-                          {/* Title */}
                           <motion.h3
                             initial={{ opacity: 0, y: 10 }}
                             animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.4, delay: 0.3 + i * 0.1 }}
+                            transition={{
+                              duration: 0.4,
+                              delay: 0.3 + i * 0.1,
+                            }}
                             className="text-lg sm:text-xl font-bold text-white leading-snug! mb-1! group-hover:text-[#f86048]! transition-colors duration-300"
                           >
-                            <Link href={`/project/${item.id}`} className="line-clamp-2 text-white hover:text-[#f86048]">
+                            <Link
+                              href={`/project/${item.id}`}
+                              className="line-clamp-2 text-white hover:text-[#f86048]"
+                            >
                               {item.title}
                             </Link>
                           </motion.h3>
@@ -378,7 +455,10 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                           <motion.div
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
-                            transition={{ duration: 0.4, delay: 0.4 + i * 0.1 }}
+                            transition={{
+                              duration: 0.4,
+                              delay: 0.4 + i * 0.1,
+                            }}
                             className="grid grid-rows-[0fr] group-hover:grid-rows-[1fr] transition-all duration-500 ease-in-out opacity-0 group-hover:opacity-100!"
                           >
                             <div className="overflow-hidden">
@@ -396,7 +476,11 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                                   Explore Details
                                   <motion.i
                                     animate={{ x: [0, 5, 0] }}
-                                    transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                                    transition={{
+                                      duration: 1.5,
+                                      repeat: Infinity,
+                                      ease: "easeInOut",
+                                    }}
                                     className="far fa-arrow-right text-xs"
                                   />
                                 </Link>
@@ -410,7 +494,7 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                 </motion.div>
               </AnimatePresence>
 
-              {/* Navigation Arrows - Only show if total slides > 1 */}
+              {/* Navigation Arrows */}
               {totalSlides > 1 && (
                 <>
                   <motion.button
@@ -443,7 +527,7 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
             </div>
           )}
 
-          {/* Progress Dots - Only show if total slides > 1 */}
+          {/* Progress Dots */}
           {!loading && totalSlides > 1 && (
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -463,7 +547,8 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
                   className="relative h-1.5 rounded-full transition-all duration-300 overflow-hidden"
                   style={{
                     width: index === currentIndex ? "32px" : "10px",
-                    backgroundColor: index === currentIndex ? PRIMARY : "#cbd5e1",
+                    backgroundColor:
+                      index === currentIndex ? PRIMARY : "#cbd5e1",
                   }}
                   aria-label={`Go to slide ${index + 1}`}
                 >
@@ -486,7 +571,11 @@ export const Service1 = ({ categorySlug = "check" }: Service1Props) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.8 }}
         animate={isVisible ? { opacity: 1, scale: 1 } : {}}
-        transition={{ duration: 1, delay: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+        transition={{
+          duration: 1,
+          delay: 0.8,
+          ease: [0.25, 0.46, 0.45, 0.94],
+        }}
         className="hidden lg:block absolute bottom-0 right-5 lg:right-10 select-none pointer-events-none opacity-[0.03]! dark:opacity-[0.05]!"
       >
         <h1 className="text-[12rem] lg:text-[15rem] xl:text-[18rem] font-black leading-none uppercase tracking-tighter!">

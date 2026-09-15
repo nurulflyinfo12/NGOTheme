@@ -1,19 +1,20 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  reactStrictMode: false, // Turn off strict mode
+  reactStrictMode: false,
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
         hostname: "localhost",
         port: "44302",
-        pathname: "/api/FileServer/**",
+        pathname: "/**",
       },
       {
         protocol: "http",
         hostname: "localhost",
         port: "44302",
-        pathname: "/api/FileServer/**",
+        pathname: "/**",
       },
     ],
   },
