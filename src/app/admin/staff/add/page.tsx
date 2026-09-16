@@ -17,6 +17,7 @@ export interface StaffFormData {
   position: string;
   email: string;
   isLead: boolean;
+  isExecutive: boolean;
   isActive: boolean;
 }
 
@@ -35,6 +36,7 @@ export default function AddEditStaffPage() {
     position: "",
     email: "",
     isLead: false,
+    isExecutive: false,
     isActive: true,
   });
 
@@ -56,6 +58,7 @@ export default function AddEditStaffPage() {
             email: item.Email || "",
             photo: item.Photo || "",
             isLead: Boolean(item.IsLead ?? false),
+            isExecutive: Boolean(item.IsExecutive ?? false),
             isActive: item.IsActive ?? true,
           });
         } catch (e) {
@@ -72,6 +75,7 @@ export default function AddEditStaffPage() {
               email: item.Email || "",
               photo: item.Photo || "",
               isLead: Boolean(item.IsLead ?? false),
+              isExecutive: Boolean(item.IsExecutive ?? false),
               isActive: item.IsActive ?? true,
             });
           }
@@ -90,6 +94,7 @@ export default function AddEditStaffPage() {
       position: "",
       email: "",
       isLead: false,
+      isExecutive: false,
       isActive: true,
     });
     setErrors({});
@@ -123,6 +128,7 @@ export default function AddEditStaffPage() {
       Position: formData.position,
       Email: formData.email,
       IsLead: Boolean(formData.isLead),
+      IsExecutive: Boolean(formData.isExecutive),
       IsActive: formData.isActive,
       SetDate: new Date().toISOString(),
     };
@@ -195,21 +201,39 @@ export default function AddEditStaffPage() {
         error={errors.email}
       />
 
-      {/* Simple Is Lead Checkbox */}
-      <div className="flex items-center gap-2 pt-2 sm:col-span-2">
-        <input
-          type="checkbox"
-          id="isLead"
-          checked={formData.isLead}
-          onChange={(e) => handleChange("isLead", e.target.checked)}
-          className="h-4 w-4 rounded border-gray-300 text-[#f86048] focus:ring-[#f86048] cursor-pointer"
-        />
-        <label
-          htmlFor="isLead"
-          className="text-sm font-semibold text-slate-700 cursor-pointer select-none"
-        >
-         Designate as Team/Project Lead
-        </label>
+      {/* Checkboxes */}
+      <div className="flex flex-wrap items-center gap-6 pt-2 sm:col-span-2">
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="isLead"
+            checked={formData.isLead}
+            onChange={(e) => handleChange("isLead", e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-[#f86048] focus:ring-[#f86048] cursor-pointer"
+          />
+          <label
+            htmlFor="isLead"
+            className="text-sm font-semibold text-slate-700 cursor-pointer select-none"
+          >
+            Designate as Team Lead
+          </label>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <input
+            type="checkbox"
+            id="isExecutive"
+            checked={formData.isExecutive}
+            onChange={(e) => handleChange("isExecutive", e.target.checked)}
+            className="h-4 w-4 rounded border-gray-300 text-[#f86048] focus:ring-[#f86048] cursor-pointer"
+          />
+          <label
+            htmlFor="isExecutive"
+            className="text-sm font-semibold text-slate-700 cursor-pointer select-none"
+          >
+            Designate as Executive Member
+          </label>
+        </div>
       </div>
 
       <div className="space-y-1.5 sm:col-span-2">

@@ -9,6 +9,9 @@ import Link from "next/link";
 import { useKeyInitiatives } from "@/hooks/useKeyInitiatives";
 import { api } from "@/utility/api";
 import { useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+const PRIMARY = "#f86048";
+
 export const Causes1 = () => {
   const { initiatives, loading, fetchInitiatives } = useKeyInitiatives();
 
@@ -16,9 +19,7 @@ export const Causes1 = () => {
     fetchInitiatives();
   }, [fetchInitiatives]);
 
-  /**
-   * Safely strip HTML tags and decode HTML entities (&nbsp;, &amp;, etc.)
-   */
+  /* ---------------- Helpers ---------------- */
   const cleanAndDecodeHtml = (htmlString: string) => {
     if (!htmlString) return "";
 
@@ -34,86 +35,189 @@ export const Causes1 = () => {
       .trim();
   };
 
-  return (
-    <section className="causes-section fix section-bg section-padding bg-slate-50 dark:bg-[#0f172a]!">
-      <div className="container">
-        {/* Section Header */}
-        <div className="section-title text-center">
-          <span className="sub-title color-2 wow fadeInUp">
-            <i className="far fa-heart" />
-            Help The People
-          </span>
-          <h2 className="mt-char-animation dark:text-white!">
-            Our Key Initiatives
-          </h2>
-        </div>
+  /* ---------------- Animation Variants ---------------- */
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.1, delayChildren: 0.15 },
+    },
+  };
 
-        {/* Loading Skeleton */}
+  const cardVariants = {
+    hidden: { opacity: 0, y: 30, scale: 0.96 },
+    visible: { opacity: 1, y: 0, scale: 1 },
+  };
+
+  return (
+    <section className="relative py-16! sm:py-20! lg:py-24! bg-slate-50 dark:bg-[#0f172a]! overflow-hidden">
+      {/* Decorative blobs */}
+      <div className="absolute top-0 right-0 w-[320px]! sm:w-[420px]! md:w-[520px]! h-[320px]! sm:h-[420px]! md:h-[520px]! bg-[#f86048]/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3 pointer-events-none" />
+      <div className="absolute bottom-0 left-0 w-[280px]! sm:w-[360px]! h-[280px]! sm:h-[360px]! bg-slate-200/40 dark:bg-slate-800/30! rounded-full blur-3xl translate-y-1/3 -translate-x-1/4 pointer-events-none" />
+
+      <div className="container relative mx-auto px-4! sm:px-6! lg:max-w-7xl">
+        {/* ---------------- Section Header ---------------- */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.7, ease: [0.215, 0.61, 0.355, 1] }}
+          className="text-center max-w-2xl mx-auto mb-12! sm:mb-16! lg:mb-20!"
+        >
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="flex items-center justify-center gap-3 mb-4"
+          >
+            <span
+              className="h-[2px] w-8! sm:w-10! rounded-full"
+              style={{ backgroundColor: PRIMARY }}
+            />
+            <span
+              className="text-[10px]! sm:text-[11px]! font-black! uppercase! tracking-[0.28em]!"
+              style={{ color: PRIMARY }}
+            >
+              Help The People
+            </span>
+            <span
+              className="h-[2px] w-8! sm:w-10! rounded-full"
+              style={{ backgroundColor: PRIMARY }}
+            />
+          </motion.div>
+
+          <h2 className="text-3xl! sm:text-4xl! md:text-5xl! lg:text-6xl! font-black! text-slate-900! dark:text-white! leading-[0.95]! tracking-tight!">
+            Our Key Initiatives
+            <span style={{ color: PRIMARY }}>.</span>
+          </h2>
+
+          <p className="mt-4! sm:mt-5! text-sm! sm:text-base! text-slate-500! dark:text-slate-400! leading-relaxed max-w-xl mx-auto">
+            Strategic programs designed to create lasting change across coastal
+            communities.
+          </p>
+        </motion.div>
         {loading ? (
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6! sm:gap-8!">
             {[1, 2, 3, 4].map((n) => (
               <div
                 key={n}
-                className="bg-white dark:bg-slate-800 rounded-2xl p-4 border border-slate-100 dark:border-slate-700 animate-pulse"
+                className="bg-white dark:bg-slate-800/60! rounded-3xl! p-5! sm:p-6! border border-slate-200/80 dark:border-slate-800! animate-pulse"
               >
-                <div className="flex flex-col lg:flex-row items-center gap-4">
-                  <div className="w-full lg:w-1/2 h-44 bg-slate-200 dark:bg-slate-700 rounded-lg shrink-0" />
+                <div className="flex flex-col sm:flex-row items-center gap-4! sm:gap-6!">
+                  <div className="w-full sm:w-2/5 h-44! sm:h-40! bg-slate-200 dark:bg-slate-700! rounded-2xl! shrink-0" />
                   <div className="flex-1 w-full space-y-3">
-                    <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-3/4" />
-                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-full" />
-                    <div className="h-4 bg-slate-200 dark:bg-slate-700 rounded w-5/6" />
+                    <div className="h-6 bg-slate-200 dark:bg-slate-700! rounded-lg w-3/4" />
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700! rounded w-full" />
+                    <div className="h-4 bg-slate-200 dark:bg-slate-700! rounded w-5/6" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : (
-          /* Main grid: 2 cards per row on xl+, 1 on smaller */
-          <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-            {initiatives
-              ?.filter((item) => item.IsActive)
-              .map((item, i) => {
-                const imageSrc = item.Photo
-                  ? api.getFileUrl(item.Photo)
-                  : "/assets/img/factbg.webp";
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-40px" }}
+            className="grid grid-cols-1 lg:grid-cols-2 gap-6! sm:gap-7! lg:gap-8!"
+          >
+            <AnimatePresence mode="popLayout">
+              {initiatives
+                ?.filter((item) => item.IsActive)
+                .map((item, i) => {
+                  const imageSrc = item.Photo
+                    ? api.getFileUrl(item.Photo)
+                    : "/assets/img/factbg.webp";
 
-                const cleanDescription = cleanAndDecodeHtml(item.Details);
+                  const cleanDescription = cleanAndDecodeHtml(item.Details);
 
-                return (
-                  <div
-                    key={item.InitiativeID || i}
-                    className="wow fadeInUp popular-causes-card-items bg-white dark:bg-slate-800! rounded-2xl border border-slate-100 dark:border-slate-700! p-4! transition-all hover:shadow-lg!"
-                    data-wow-delay={`${0.3 + (i % 2) * 0.2}s`}
-                  >
-                    {/* Card inner layout: stack on mobile, side-by-side on lg+ */}
-                    <div className="flex flex-col lg:flex-row items-center gap-4">
-                      {/* Image container */}
-                      <div className="w-full lg:w-1/2 shrink-0 relative h-48 lg:h-44 overflow-hidden rounded-lg">
-                        <Image
-                          fill
-                          sizes="(max-width: 1024px) 100vw, 25vw"
-                          className="w-full h-full object-cover rounded-lg"
-                          src={imageSrc}
-                          alt={item.Title || "Key Initiative"}
-                          unoptimized
-                        />
+                  return (
+                    <motion.article
+                      key={item.InitiativeID || i}
+                      variants={cardVariants}
+                      layout
+                      whileHover={{
+                        y: -6,
+                        transition: {
+                          duration: 0.4,
+                          ease: [0.25, 0.46, 0.45, 0.94],
+                        },
+                      }}
+                      className="
+                        group relative
+                        bg-white dark:bg-slate-900/80!
+                        rounded-3xl!
+                        border border-slate-200/80 dark:border-slate-800!
+                        hover:border-[#f86048]/40!
+                        overflow-hidden
+                        transition-all duration-500
+                        hover:shadow-2xl hover:shadow-[#f86048]/10
+                        dark:hover:shadow-none!
+                        flex flex-col
+                      "
+                    >
+                      <div
+                        className="absolute top-0 left-0 right-0 h-1 opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10"
+                        style={{
+                          background: `linear-gradient(90deg, ${PRIMARY}, #ff9a80, ${PRIMARY})`,
+                        }}
+                      />
+
+                      <div className="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/5 to-transparent pointer-events-none z-10" />
+
+                      <div className="flex flex-col sm:flex-row items-stretch gap-0 sm:gap-0 flex-1">
+                        <div className="relative w-full sm:w-2/5 shrink-0 overflow-hidden bg-slate-900 dark:bg-slate-950!">
+                          <div className="relative w-full aspect-video sm:aspect-auto sm:h-full sm:min-h-[220px]">
+                            <Image
+                              fill
+                              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 40vw, 30vw"
+                              className="object-cover transition-transform duration-700 group-hover:scale-105"
+                              src={imageSrc}
+                              alt={item.Title || "Key Initiative"}
+                              unoptimized
+                            />
+
+                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-slate-950/20 to-transparent sm:bg-gradient-to-r sm:from-transparent sm:via-slate-950/0 sm:to-slate-950/40" />
+
+                            <div className="absolute top-4! left-4! z-10">
+                              <span
+                                className="
+                                  inline-flex items-center justify-center
+                                  w-9! h-9! sm:w-10! sm:h-10!
+                                  rounded-xl!
+                                  text-sm! sm:text-base!
+                                  font-black!
+                                  text-white!
+                                  shadow-lg
+                                  backdrop-blur-md
+                                  border border-white/20!
+                                "
+                                style={{ backgroundColor: PRIMARY }}
+                              >
+                                {String(i + 1).padStart(2, "0")}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="flex-1 min-w-0 flex flex-col justify-between p-5! sm:p-6! lg:p-7!">
+                          <div>
+                            <h3 className="text-lg! sm:text-xl! lg:text-2xl! font-black! text-slate-900! dark:text-white! leading-snug! mb-3! group-hover:text-[#f86048] transition-colors duration-300 line-clamp-2 break-words">
+                              {item.Title}
+                            </h3>
+                            <p className="text-sm! sm:text-[15px]! text-slate-600! dark:text-slate-400! leading-relaxed! line-clamp-3 break-words">
+                              {cleanDescription}
+                            </p>
+                          </div>
+                        </div>
                       </div>
-
-                      {/* Content */}
-                      <div className="flex-1 w-full min-w-0">
-                        <h4 className="text-xl font-semibold mb-2! text-slate-900 dark:text-white! truncate">
-                          {item.Title}
-                        </h4>
-
-                        <p className="text-gray-600 dark:text-slate-400! mb-4! line-clamp-3 text-sm leading-relaxed break-words">
-                          {cleanDescription}
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-          </div>
+                    </motion.article>
+                  );
+                })}
+            </AnimatePresence>
+          </motion.div>
         )}
       </div>
     </section>

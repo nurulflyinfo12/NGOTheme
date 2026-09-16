@@ -14,6 +14,7 @@ export interface ApiStaff {
   Position: string;
   Email?: string;
   IsLead?: boolean;
+  IsExecutive?: boolean;
   IsActive?: boolean;
   SetDate?: string;
 }
@@ -35,6 +36,24 @@ export function useStaff() {
       return list;
     } catch (err: any) {
       const msg = err.message || "Failed to load leadership team.";
+      setError(msg);
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  // 1b. Get Executive Team: GET /api/Public/GetExecutiveTeam
+  const fetchExecutiveTeam = useCallback(async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await api.get<ApiStaff[]>("/Public/GetExecutiveTeam");
+      const list = Array.isArray(data) ? data : [];
+      setStaffList(list);
+      return list;
+    } catch (err: any) {
+      const msg = err.message || "Failed to load executive team.";
       setError(msg);
       return [];
     } finally {
@@ -87,6 +106,7 @@ export function useStaff() {
       const res: any = await api.post("/Staff/SaveUpdateStaff", {
         ...payload,
         IsLead: payload.IsLead ?? false,
+        IsExecutive: payload.IsExecutive ?? false,
         SetDate: payload.SetDate || new Date().toISOString(),
       });
 
@@ -167,6 +187,7 @@ export function useStaff() {
     submitting,
     error,
     fetchLeadershipTeam,
+    fetchExecutiveTeam,
     fetchStaff,
     fetchStaffById,
     saveOrUpdateStaff,
