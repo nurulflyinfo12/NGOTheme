@@ -3,6 +3,8 @@
 import { ArrowLeft, X } from "lucide-react";
 import { ReactNode } from "react";
 
+const PRIMARY = "#f86048";
+
 interface FormCardProps {
   title: string;
   description?: string;
@@ -29,40 +31,75 @@ export default function FormCard({
   onSubmit,
 }: FormCardProps) {
   return (
-    <div className="space-y-6 font-sans">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between px-1">
-        <div className="space-y-0.5">
-          <h1 className="text-2xl! font-medium tracking-tight text-gray-900 dark:text-white sm:text-2xl">
+    <div className="space-y-6! font-sans">
+      {/* ---------------- Header ---------------- */}
+      <div className="flex flex-col gap-4! md:flex-row md:items-center md:justify-between px-1!">
+        <div className="space-y-0.5!">
+          <h1 className="text-2xl! sm:text-3xl! font-black! tracking-tight! text-gray-900! dark:text-white!">
             {title}
           </h1>
           {description && (
-            <p className="text-sm text-gray-500 dark:text-gray-400 font-normal">
+            <p className="text-sm! text-gray-500! dark:text-gray-400! font-normal!">
               {description}
             </p>
           )}
         </div>
+
         {onBack && (
           <button
+            type="button"
             onClick={onBack}
-            className="inline-flex items-center justify-center gap-2 rounded-full! border border-gray-200 bg-[#e86958]! px-6 py-2.5 text-sm font-semibold text-white shadow-sm shadow-gray-200/20 transition-all"
+            className="
+              inline-flex items-center justify-center gap-2
+              rounded-full! px-6! py-2.5!
+              text-sm! font-semibold! text-white!
+              shadow-md shadow-[#f86048]/20!
+              transition-all
+              hover:opacity-90! hover:shadow-lg
+              active:scale-95
+            "
+            style={{ backgroundColor: PRIMARY }}
           >
-            <ArrowLeft className="h-4 w-4 stroke-[3px]" /> {backButtonLabel}
+            <ArrowLeft className="h-4 w-4 stroke-[3px]" />
+            {backButtonLabel}
           </button>
         )}
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm dark:border-gray-800 dark:bg-gray-900">
-        <form onSubmit={onSubmit} className="p-6 sm:p-10 space-y-6">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-6">
+      {/* ---------------- Card ---------------- */}
+      <div className="
+        overflow-hidden rounded-2xl!
+        border border-gray-200 dark:border-gray-800!
+        bg-white dark:bg-gray-900!
+        shadow-sm
+      ">
+        <form onSubmit={onSubmit} className="p-6! sm:p-10! space-y-6!">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6! gap-y-6!">
             {children}
           </div>
 
-          <div className="mt-6 flex items-center justify-end gap-3 border-t border-gray-100 pt-6 dark:border-gray-800">
+          {/* ---------------- Actions ---------------- */}
+          <div className="
+            mt-6! flex items-center justify-end gap-3!
+            border-t border-gray-100 dark:border-gray-800!
+            pt-6!
+          ">
             {onClear && (
               <button
                 type="button"
                 onClick={onClear}
-                className="inline-flex items-center justify-center gap-2 rounded-full! border border-gray-200 bg-white px-6 py-2.5 text-sm font-semibold text-gray-700 shadow-sm shadow-gray-200/20 transition-all hover:bg-gray-50! hover:text-gray-900 dark:border-gray-800 dark:bg-gray-900 dark:text-gray-300 dark:hover:bg-gray-800"
+                className="
+                  inline-flex items-center justify-center gap-2
+                  rounded-full! px-6! py-2.5!
+                  text-sm! font-semibold!
+                  border border-gray-200 dark:border-gray-700!
+                  bg-white dark:bg-gray-900!
+                  text-gray-700! dark:text-gray-300!
+                  shadow-sm
+                  transition-all
+                  hover:bg-gray-50! dark:hover:bg-gray-800!
+                  hover:text-gray-900! dark:hover:text-white!
+                "
               >
                 <X className="h-4 w-4 stroke-[3px]" />
                 {clearButtonLabel}
@@ -71,7 +108,16 @@ export default function FormCard({
 
             <button
               type="submit"
-              className="inline-flex items-center justify-center gap-2 rounded-full! bg-[#e86958]! px-6 py-2.5 text-sm font-semibold text-white shadow-md shadow-primary/20 transition-all hover:bg-primary/90! hover:translate-y-[-1px] active:translate-y-[0px]"
+              className="
+                inline-flex items-center justify-center gap-2
+                rounded-full! px-6! py-2.5!
+                text-sm! font-semibold! text-white!
+                shadow-md shadow-[#f86048]/20!
+                transition-all
+                hover:opacity-90! hover:-translate-y-px!
+                active:translate-y-0!
+              "
+              style={{ backgroundColor: PRIMARY }}
             >
               {submitIcon} {submitLabel}
             </button>

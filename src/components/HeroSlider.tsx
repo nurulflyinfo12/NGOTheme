@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useMemo } from "react";
 import { useHeroSection, parseSingleImageUrl } from "@/hooks/useHeroSection";
@@ -15,18 +14,9 @@ export const HeroSlider1 = () => {
     fetchHeroSections();
   }, [fetchHeroSections]);
 
-  // Maps each HeroSection item to EXACTLY ONE slide with 1 image
+  // Maps API response dynamically to slides array (No static fallbacks)
   const slides = useMemo(() => {
-    if (heroSections.length === 0) {
-      return [
-        {
-          img: "/assets/img/hero/hero-1.webp",
-          mission: "Women Empowerment • Economic Growth",
-          h1: "Empowering Coastal \n Communities Since 1985",
-          details: "",
-        },
-      ];
-    }
+    if (!heroSections || heroSections.length === 0) return [];
 
     return heroSections.map((hero) => ({
       img: parseSingleImageUrl(hero.ImageUrls),
@@ -36,6 +26,7 @@ export const HeroSlider1 = () => {
     }));
   }, [heroSections]);
 
+  // Auto-advance slides only when valid API slides are present
   useEffect(() => {
     if (slides.length <= 1) return;
     const interval = setInterval(() => {
@@ -49,9 +40,24 @@ export const HeroSlider1 = () => {
     setActiveIndex(index);
   };
 
+  // Loading skeleton state while fetching API response
+  if (loading || slides.length === 0) {
+    return (
+      <section className="relative w-full overflow-hidden bg-slate-900 h-[100svh] min-h-[500px] max-h-[900px] sm:h-[95vh] sm:min-h-[580px] flex items-center">
+        <div className="container relative z-10 mx-auto px-4 xs:px-5 sm:px-6 lg:px-8 lg:max-w-7xl animate-pulse">
+          <div className="max-w-4xl space-y-4">
+            <div className="h-4 bg-slate-700 rounded w-1/4" />
+            <div className="h-12 sm:h-16 bg-slate-700 rounded w-3/4" />
+            <div className="h-6 bg-slate-700 rounded w-1/2" />
+          </div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section className="relative w-full overflow-hidden bg-white dark:bg-[#0f172a] h-[100svh] min-h-[500px] max-h-[900px] sm:h-[95vh] sm:min-h-[580px]">
-      {/* Background Image Slides */}
+      {/* Background Image Slides (Purely API Powered) */}
       {slides.map((slide, i) => (
         <div
           key={i}
@@ -64,7 +70,7 @@ export const HeroSlider1 = () => {
             transition={{ duration: 7, ease: "easeOut" }}
             className="h-full w-full"
             style={{
-              backgroundImage: `url(${slide.img})`,
+              backgroundImage: slide.img ? `url(${slide.img})` : "none",
               backgroundSize: "cover",
               backgroundPosition: "center",
             }}

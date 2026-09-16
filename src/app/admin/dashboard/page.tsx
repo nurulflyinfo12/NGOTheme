@@ -1,14 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Bar, Line } from "react-chartjs-2";
+import { useEffect, useMemo, useState } from "react";
+import { Line } from "react-chartjs-2";
 import { motion } from "framer-motion";
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
-  BarElement,
   LineElement,
   PointElement,
   Title,
@@ -24,206 +22,444 @@ import {
   ArrowUpRight,
   TrendingUp,
   Activity,
+  Layers,
+  BookOpen,
+  Briefcase,
+  Video,
+  Building2,
+  Loader2,
 } from "lucide-react";
+
+import { useProjects } from "@/hooks/useProjects";
+import { useCategories } from "@/hooks/useCategories";
+import { useBranch } from "@/hooks/useBranch";
+import { useStaff } from "@/hooks/useStaff";
+import { usePublication } from "@/hooks/usePublication";
+import { useCareer } from "@/hooks/useCareer";
+import { useVideoGallery } from "@/hooks/useVideoGallery";
+import { useKeyInitiatives } from "@/hooks/useKeyInitiatives";
 import { StatusCell } from "@/components/Admin/TableCells";
 
 ChartJS.register(
   CategoryScale,
   LinearScale,
-  BarElement,
   LineElement,
   PointElement,
   Title,
   Tooltip,
   Legend,
-  Filler,
+  Filler
 );
 
-// --- Modern Dummy Data ---
-const stats = [
-  {
-    label: "Active Programs",
-    value: "24",
-    icon: Globe,
-    trend: "+12%",
-    color: "text-emerald-600",
-    bg: "bg-emerald-50",
-  },
-  {
-    label: "Total Blogs",
-    value: "142",
-    icon: FileText,
-    trend: "+5%",
-    color: "text-blue-600",
-    bg: "bg-blue-50",
-  },
-  {
-    label: "Live Banners",
-    value: "08",
-    icon: ImageIcon,
-    trend: "Stable",
-    color: "text-[#e86958]",
-    bg: "bg-[#e86958]/10",
-  },
-  {
-    label: "System Users",
-    value: "1,240",
-    icon: Users,
-    trend: "+18%",
-    color: "text-purple-600",
-    bg: "bg-purple-50",
-  },
-];
+const PRIMARY = "#f86048";
 
-const recentPrograms = [
-  {
-    id: "1",
-    title: "Industrial Robotics Mastery",
-    Category: "Automation",
-    status: "Active",
-    date: "Mar 28, 2026",
-  },
-  {
-    id: "2",
-    title: "Advanced PLC Programming",
-    Category: "Engineering",
-    status: "Inactive",
-    date: "Mar 25, 2026",
-  },
-  {
-    id: "3",
-    title: "IoT Solutions for SME",
-    Category: "Technology",
-    status: "Active",
-    date: "Mar 20, 2026",
-  },
-];
+/* ---------------- Helpers ---------------- */
+const formatDate = (dateStr?: string) => {
+  if (!dateStr) return "—";
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return "—";
+  return d.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+};
 
+/* ---------------- Dashboard ---------------- */
 export default function Dashboard() {
-  const router = useRouter();
   const [mounted, setMounted] = useState(false);
+
+  /* ---------- Hooks ---------- */
+  const { projects, loading: projectsLoading, fetchProjects } = useProjects();
+  const { categories, fetchCategories } = useCategories();
+  const { branches, fetchBranches } = useBranch();
+  const { staffList, fetchStaff } = useStaff();
+  const { publications, fetchPublications } = usePublication();
+  const { careers, fetchCareers } = useCareer();
+  const { videos, fetchVideos } = useVideoGallery();
+  const { initiatives, fetchInitiatives } = useKeyInitiatives();
 
   useEffect(() => {
     setMounted(true);
   }, []);
 
+  /* ---------- Initial data load ---------- */
+  useEffect(() => {
+    if (!mounted) return;
+    fetchProjects();
+    fetchCategories();
+    fetchBranches();
+    fetchStaff();
+    fetchPublications();
+    fetchCareers();
+    fetchVideos();
+    fetchInitiatives();
+  }, [
+    mounted,
+    fetchProjects,
+    fetchCategories,
+    fetchBranches,
+    fetchStaff,
+    fetchPublications,
+    fetchCareers,
+    fetchVideos,
+    fetchInitiatives,
+  ]);
+
+  /* ---------- Derived stats ---------- */
+  const stats = useMemo(() => {
+    const activeProjects = projects.filter((p) => p.IsActive).length;
+    const activeBranches = branches.length;
+    const activeStaff = staffList.filter((s) => s.IsActive !== false).length;
+
+    return [
+      {
+        label: "Active Projects",
+        value: String(activeProjects),
+        icon: Globe,
+        color: "text-emerald-600 dark:text-emerald-400",
+        bg: "bg-emerald-50 dark:bg-emerald-500/10",
+      },
+      {
+        label: "Categories",
+        value: String(categories.length),
+        icon: Layers,
+        color: "text-blue-600 dark:text-blue-400",
+        bg: "bg-blue-50 dark:bg-blue-500/10",
+      },
+      {
+        label: "Branches",
+        value: String(activeBranches),
+        icon: Building2,
+        color: "text-amber-600 dark:text-amber-400",
+        bg: "bg-amber-50 dark:bg-amber-500/10",
+      },
+      {
+        label: "Team Members",
+        value: String(activeStaff),
+        icon: Users,
+        color: "text-purple-600 dark:text-purple-400",
+        bg: "bg-purple-50 dark:bg-purple-500/10",
+      },
+    ];
+  }, [projects, categories, branches, staffList]);
+
+  const secondaryStats = useMemo(() => {
+    return [
+      {
+        label: "Key Initiatives",
+        value: initiatives.filter((i) => i.IsActive).length,
+        icon: Activity,
+      },
+      {
+        label: "Publications",
+        value: publications.filter((p) => p.IsActive).length,
+        icon: BookOpen,
+      },
+      {
+        label: "Job Circulars",
+        value: careers.filter((c) => c.IsActive).length,
+        icon: Briefcase,
+      },
+      {
+        label: "Videos",
+        value: videos.length,
+        icon: Video,
+      },
+    ];
+  }, [initiatives, publications, careers, videos]);
+
+  /* ---------- Recent programs ---------- */
+  const recentPrograms = useMemo(() => {
+    return [...projects]
+      .sort((a, b) => {
+        const aTime = a.SetDate ? new Date(a.SetDate).getTime() : 0;
+        const bTime = b.SetDate ? new Date(b.SetDate).getTime() : 0;
+        return bTime - aTime;
+      })
+      .slice(0, 5);
+  }, [projects]);
+
+  /* ---------- Monthly engagement chart ---------- */
+  const activityData = useMemo(() => {
+    const months = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
+    const now = new Date();
+    const buckets: number[] = new Array(12).fill(0);
+
+    projects.forEach((p) => {
+      const src = p.SetDate || p.Date;
+      if (!src) return;
+      const d = new Date(src);
+      if (isNaN(d.getTime())) return;
+      buckets[d.getMonth()] += 1;
+    });
+
+    const startMonth = Math.max(0, now.getMonth() - 5);
+    const labels = months.slice(startMonth, now.getMonth() + 1);
+    const data = buckets.slice(startMonth, now.getMonth() + 1);
+
+    return {
+      labels,
+      datasets: [
+        {
+          fill: true,
+          label: "Projects Added",
+          data,
+          borderColor: PRIMARY,
+          backgroundColor: `${PRIMARY}15`,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: PRIMARY,
+          pointBorderColor: "#ffffff",
+          pointBorderWidth: 2,
+          pointHoverRadius: 6,
+        },
+      ],
+    };
+  }, [projects]);
+
+  const totalProjects = projects.length;
+  const totalActive = projects.filter((p) => p.IsActive).length;
+
+  const isLoading =
+    projectsLoading ||
+    !mounted ||
+    (projects.length === 0 &&
+      branches.length === 0 &&
+      staffList.length === 0 &&
+      publications.length === 0);
+
   if (!mounted) return null;
 
-  // Modern Chart Configuration
+  /* ---------------- Chart Options (dark-aware) ---------------- */
+  const isDark =
+    typeof document !== "undefined" &&
+    document.documentElement.classList.contains("dark");
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
       legend: { display: false },
       tooltip: {
-        backgroundColor: "#1e293b",
+        backgroundColor: isDark ? "#0f172a" : "#1e293b",
         padding: 12,
         titleFont: { size: 14, weight: "bold" as const },
         cornerRadius: 8,
       },
     },
     scales: {
-      y: { grid: { display: false }, ticks: { color: "#94a3b8" } },
-      x: { grid: { display: false }, ticks: { color: "#94a3b8" } },
+      y: {
+        grid: { display: false },
+        ticks: {
+          color: isDark ? "#64748b" : "#94a3b8",
+          stepSize: 1,
+          precision: 0,
+        },
+      },
+      x: {
+        grid: { display: false },
+        ticks: { color: isDark ? "#64748b" : "#94a3b8" },
+      },
     },
   };
 
-  const activityData = {
-    labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-    datasets: [
-      {
-        fill: true,
-        label: "Platform Engagement",
-        data: [40, 65, 52, 88, 70, 95],
-        borderColor: "#e86958",
-        backgroundColor: "rgba(232, 105, 88, 0.05)",
-        tension: 0.4,
-        pointRadius: 4,
-      },
-    ],
-  };
-
   return (
-    <div className=" space-y-10 pb-10 animate-in fade-in duration-700">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="space-y-8! sm:space-y-10! pb-10! animate-in fade-in duration-700">
+      {/* ---------------- Primary Stats ---------------- */}
+      <div className="grid grid-cols-2! lg:grid-cols-4! gap-4! sm:gap-6!">
         {stats.map((s, idx) => (
           <motion.div
+            key={s.label}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.1 }}
-            key={s.label}
-            className="group bg-white p-6 rounded-2xl border border-slate-100 shadow-sm hover:shadow-xl hover:shadow-slate-200/50 transition-all duration-300"
+            transition={{ delay: idx * 0.08 }}
+            className="bg-white dark:bg-slate-900/80! p-4! sm:p-6! rounded-2xl! border border-slate-100 dark:border-slate-800! shadow-sm"
           >
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-3! sm:mb-4!">
               <div
-                className={`${s.bg} ${s.color} p-3 rounded-xl transition-colors`}
+                className={`${s.bg} ${s.color} p-2.5! sm:p-3! rounded-xl!`}
               >
-                <s.icon size={20} />
+                <s.icon size={18} className="sm:hidden!" />
+                <s.icon size={20} className="hidden! sm:block!" />
               </div>
-              <span className="flex items-center gap-1 text-[10px] font-black text-emerald-600 bg-emerald-50 px-2 py-1 rounded-lg">
-                <ArrowUpRight size={12} /> {s.trend}
+              <span className="flex items-center gap-1 text-[10px]! font-black! text-emerald-600! dark:text-emerald-400! bg-emerald-50 dark:bg-emerald-500/10! px-2! py-1! rounded-lg!">
+                <ArrowUpRight size={11} />
+                Live
               </span>
             </div>
             <div>
-              <p className="text-[11px] font-black text-slate-400 uppercase tracking-wider">
+              <p className="text-[10px]! sm:text-[11px]! font-black! text-slate-400! dark:text-slate-500! uppercase! tracking-wider!">
                 {s.label}
               </p>
-              <h3 className="text-2xl font-black text-slate-900 mt-1">
-                {s.value}
+              <h3 className="text-xl! sm:text-2xl! font-black! text-slate-900! dark:text-white! mt-1!">
+                {isLoading ? (
+                  <span className="inline-block h-6! w-12! bg-slate-100 dark:bg-slate-800! rounded animate-pulse" />
+                ) : (
+                  s.value
+                )}
               </h3>
             </div>
           </motion.div>
         ))}
       </div>
 
-      {/* Main Content: Charts & Table */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Engagement Chart */}
-        <div className="lg:col-span-2 bg-white p-8 rounded-2xl border border-slate-100 shadow-sm">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h2 className="text-lg font-black text-slate-900 uppercase tracking-tight">
-                Platform Engagement
-              </h2>
-              <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                Monthly user interactions
+      {/* ---------------- Secondary Stats Row ---------------- */}
+      <div className="grid grid-cols-2! lg:grid-cols-4! gap-4! sm:gap-6!">
+        {secondaryStats.map((s, idx) => (
+          <motion.div
+            key={s.label}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 + idx * 0.06 }}
+            className="flex items-center gap-3! bg-white dark:bg-slate-900/80! px-4! sm:px-5! py-3.5! sm:py-4! rounded-2xl! border border-slate-100 dark:border-slate-800! shadow-sm"
+          >
+            <div className="w-9! h-9! sm:w-10! sm:h-10! rounded-xl! flex items-center justify-center bg-[#f86048]/10! shrink-0">
+              <s.icon size={16} className="text-[#f86048]!" />
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px]! font-black! text-slate-400! dark:text-slate-500! uppercase! tracking-wider! truncate">
+                {s.label}
+              </p>
+              <p className="text-base! sm:text-lg! font-black! text-slate-900! dark:text-white! leading-tight!">
+                {isLoading ? (
+                  <span className="inline-block h-5! w-8! bg-slate-100 dark:bg-slate-800! rounded animate-pulse" />
+                ) : (
+                  s.value
+                )}
               </p>
             </div>
-            <TrendingUp className="text-[#e86958]" size={20} />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* ---------------- Main Grid: Chart + Recent ---------- */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6! sm:gap-8!">
+        {/* ---------- Engagement Chart ---------- */}
+        <div className="lg:col-span-2 bg-white dark:bg-slate-900/80! p-5! sm:p-8! rounded-2xl! border border-slate-100 dark:border-slate-800! shadow-sm">
+          <div className="flex items-center justify-between mb-6! sm:mb-8!">
+            <div>
+              <h2 className="text-base! sm:text-lg! font-black! text-slate-900! dark:text-white! uppercase! tracking-tight!">
+                Project Activity
+              </h2>
+              <p className="text-[10px]! sm:text-xs! font-bold! text-slate-400! dark:text-slate-500! uppercase! tracking-widest! mt-0.5!">
+                Programs added over the last 6 months
+              </p>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="hidden sm:inline-flex items-center gap-1 text-[10px]! font-black! text-emerald-600! dark:text-emerald-400! bg-emerald-50 dark:bg-emerald-500/10! px-2.5! py-1! rounded-lg!">
+                <Activity size={12} />
+                {totalActive} active
+              </span>
+              <TrendingUp className="text-[#f86048]!" size={20} />
+            </div>
           </div>
-          <div className="h-[300px]">
-            <Line data={activityData} options={chartOptions} />
+
+          <div className="h-[240px]! sm:h-[280px]! lg:h-[300px]!">
+            {isLoading ? (
+              <div className="w-full h-full flex items-center justify-center">
+                <Loader2
+                  className="animate-spin text-slate-300 dark:text-slate-600!"
+                  size={28}
+                />
+              </div>
+            ) : (
+              <Line data={activityData} options={chartOptions} />
+            )}
+          </div>
+
+          {/* Mini totals footer */}
+          <div className="grid grid-cols-3 gap-3! mt-6! pt-5! border-t border-slate-100 dark:border-slate-800!">
+            <div>
+              <p className="text-[10px]! font-black! text-slate-400! dark:text-slate-500! uppercase! tracking-widest!">
+                Total
+              </p>
+              <p className="text-base! sm:text-lg! font-black! text-slate-900! dark:text-white! mt-0.5!">
+                {totalProjects}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px]! font-black! text-slate-400! dark:text-slate-500! uppercase! tracking-widest!">
+                Active
+              </p>
+              <p className="text-base! sm:text-lg! font-black! text-emerald-600! dark:text-emerald-400! mt-0.5!">
+                {totalActive}
+              </p>
+            </div>
+            <div>
+              <p className="text-[10px]! font-black! text-slate-400! dark:text-slate-500! uppercase! tracking-widest!">
+                Inactive
+              </p>
+              <p className="text-base! sm:text-lg! font-black! text-slate-400! dark:text-slate-500! mt-0.5!">
+                {totalProjects - totalActive}
+              </p>
+            </div>
           </div>
         </div>
 
-        {/* Quick List / Programs */}
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-slate-50 bg-slate-50/30">
-            <h2 className="text-sm font-black text-slate-900 uppercase tracking-widest">
-              Recent Programs
+        {/* ---------- Recent Programs ---------- */}
+        <div className="bg-white dark:bg-slate-900/80! rounded-2xl! border border-slate-100 dark:border-slate-800! shadow-sm overflow-hidden flex flex-col">
+          <div className="p-4! sm:p-6! border-b border-slate-50 dark:border-slate-800! bg-slate-50/30 dark:bg-slate-800/30! flex items-center justify-between">
+            <h2 className="text-xs! sm:text-sm! font-black! text-slate-900! dark:text-white! uppercase! tracking-widest!">
+              Recent Projects
             </h2>
+            <span className="text-[10px]! font-black! text-slate-400! dark:text-slate-500! bg-slate-100 dark:bg-slate-800! px-2! py-0.5! rounded-md!">
+              {recentPrograms.length}
+            </span>
           </div>
-          <div className="flex-1 divide-y divide-slate-50">
-            {recentPrograms.map((p) => (
-              <div
-                key={p.id}
-                className="p-4 hover:bg-slate-50 transition-colors flex items-center justify-between"
-              >
-                <div>
-                  <h4 className="text-sm font-bold text-slate-800">
-                    {p.title}
-                  </h4>
-                  <p className="text-[10px] font-bold text-slate-400 uppercase">
-                    {p.Category} • {p.date}
-                  </p>
+
+          <div className="flex-1 divide-y divide-slate-50 dark:divide-slate-800!">
+            {isLoading ? (
+              [1, 2, 3, 4].map((n) => (
+                <div key={n} className="p-4! animate-pulse">
+                  <div className="h-4! w-3/4! bg-slate-100 dark:bg-slate-800! rounded mb-2!" />
+                  <div className="h-3! w-1/2! bg-slate-100 dark:bg-slate-800! rounded" />
                 </div>
-                <StatusCell status={p.status as "Active" | "Inactive"} />
+              ))
+            ) : recentPrograms.length === 0 ? (
+              <div className="p-6! text-center">
+                <FileText
+                  className="mx-auto text-slate-300! dark:text-slate-600! mb-3!"
+                  size={28}
+                />
+                <p className="text-xs! font-bold! text-slate-400! dark:text-slate-500!">
+                  No projects yet
+                </p>
               </div>
-            ))}
+            ) : (
+              recentPrograms.map((p) => (
+                <div
+                  key={p.ProjectID}
+                  className="p-4! flex items-center justify-between gap-3!"
+                >
+                  <div className="min-w-0 flex-1">
+                    <h4 className="text-sm! font-bold! text-slate-800! dark:text-white! truncate">
+                      {p.Title}
+                    </h4>
+                    <p className="text-[10px]! font-bold! text-slate-400! dark:text-slate-500! uppercase! truncate! mt-0.5!">
+                      {p.CategoryName || p.Category || "Uncategorized"} •{" "}
+                      {formatDate(p.SetDate || p.Date)}
+                    </p>
+                  </div>
+                  <StatusCell status={p.IsActive ? "Active" : "Inactive"} />
+                </div>
+              ))
+            )}
           </div>
-          <button className="w-full py-4 text-[10px] font-black text-[#e86958] uppercase tracking-widest hover:bg-[#e86958]/5 transition-colors">
-            View All Programs
-          </button>
+
         </div>
       </div>
     </div>

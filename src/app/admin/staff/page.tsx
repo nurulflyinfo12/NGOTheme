@@ -29,6 +29,11 @@ export default function StaffList() {
     { key: "Name", header: "Name", className: "font-medium text-black" },
     { key: "Position", header: "Position" },
     { key: "Type", header: "Type" },
+    {
+      key: "IsExecutive",
+      header: "Executive",
+      render: (s) => (s.IsExecutive ? "Yes" : "No"),
+    },
     { key: "Email", header: "Email", render: (s) => s.Email || "-" },
   ];
 
@@ -49,7 +54,6 @@ export default function StaffList() {
       onDelete={deleteStaff}
       getRowId={(s) => String(s.StaffID || s.ID || s.Name)}
       showActions
-   
     />
   );
 }

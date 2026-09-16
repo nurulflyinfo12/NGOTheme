@@ -16,6 +16,18 @@ const nextConfig = {
         port: "44302",
         pathname: "/**",
       },
+      {
+        protocol: "http",
+        hostname: "api.sagarika.org.bd",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "api.sagarika.org.bd",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
 };
